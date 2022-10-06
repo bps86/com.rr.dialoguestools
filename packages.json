@@ -7,5 +7,9 @@
     "dependencies": {
         "com.unity.textmeshpro":"3.0.6",
         "com.esotericsoftware.spine.spine-unity":"3.8.0"
-    }
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/bps86/com.rr.dialoguestools.git"
+      }
 }
