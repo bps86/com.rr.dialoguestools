@@ -7,7 +7,7 @@ using UnityEditor.UI;
 using RR.Narration;
 using RR.Narration.Editor;
 using Spine.Collections;
-// using UnityEditor.Localization;
+using UnityEditor.Localization;
 
 public class RR_Narration_MainEditor : EditorWindow
 {
@@ -41,6 +41,7 @@ public class RR_Narration_MainEditor : EditorWindow
     void OnEnable()
     {
         RR_Narration_EditorTools.locales = GetLocales(new string[] { });
+        RR_Narration_EditorTools.currentLocaleIndex = RR_Narration_EditorTools.locales.Length-1;
         currentScrollViewWidth = this.position.width / 2;
         cursorChangeRect = new Rect(currentScrollViewWidth, 0, 2f, this.position.height);
     }
@@ -120,10 +121,10 @@ public class RR_Narration_MainEditor : EditorWindow
     string[] GetLocales(string[] localesArray)
     {
         List<string> names = new List<string>();
-        // for (int i = 0; i < LocalizationEditorSettings.GetLocales().Count; i++)
-        // {
-        //     names.Add(LocalizationEditorSettings.GetLocales()[i].Identifier.Code);
-        // }
+        for (int i = 0; i < LocalizationEditorSettings.GetLocales().Count; i++)
+        {
+            names.Add(LocalizationEditorSettings.GetLocales()[i].Identifier.Code);
+        }
         names.Add("<None>");
         return names.ToArray();
     }

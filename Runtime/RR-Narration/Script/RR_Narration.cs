@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
-// using UnityEngine.Localization;
+using UnityEngine.Localization;
 using Spine.Unity;
 
 namespace RR.Narration
@@ -119,7 +119,7 @@ namespace RR.Narration
         public static Dictionary<string, Sprite> dictActorSprite = new Dictionary<string, Sprite>();
         public static Dictionary<string, ActorSpine> dictActorSpine = new Dictionary<string, ActorSpine>();
         public static Dictionary<string, AudioClip> dictActorBeep = new Dictionary<string, AudioClip>();
-        // public static LocalizedStringTable localizedDialogueTable = new LocalizedStringTable(tableReference: "RR-Dialogue");
+        public static LocalizedStringTable localizedDialogueTable = new LocalizedStringTable(tableReference: "RR-Dialogue");
         public static bool isLoaded = false;
         public static IEnumerator LoadActorData()
         {
@@ -155,7 +155,7 @@ namespace RR.Narration
 
         public static void LoadDialogueTable(string tableKey)
         {
-            // LoadDialogueFile(Loaders.localizedDialogueTable.GetTable()[tableKey].LocalizedValue);
+            LoadDialogueFile(Loaders.localizedDialogueTable.GetTable()[tableKey].LocalizedValue);
         }
         public static void LoadDialogueFile(string _dialoguedata)
         {
