@@ -1,5 +1,5 @@
 {
-  "name": "RR-DialogueTools",
+  "name": "com.rr.dialoguetools",
   "version": "1.0.0",
   "description": "RedRain Dialogue Tools is a Dialogue Tools based on Sprite And Spine, currently on development.",
   "main": "index.js",
