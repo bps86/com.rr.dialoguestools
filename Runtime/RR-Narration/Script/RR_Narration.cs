@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Localization;
 using Spine.Unity;
 
@@ -48,7 +47,6 @@ namespace RR.Narration
         public ActorSpine(string _name, string path)
         {
             this.name = _name;
-            // Debug.Log(path);
             this.skeletonDataAsset = Resources.Load<SkeletonDataAsset>(path);
         }
     }
@@ -58,7 +56,7 @@ namespace RR.Narration
         public static void NewFile(string fileName)
         {
             string newFile = null;
-            using StreamWriter writer = new StreamWriter(Application.dataPath + Path.AltDirectorySeparatorChar + fileName + ".txt");
+            using StreamWriter writer = new StreamWriter(Application.dataPath + Path.AltDirectorySeparatorChar + fileName);
             writer.Write(newFile);
             writer.Close();
         }
@@ -100,15 +98,6 @@ namespace RR.Narration
             }
             return tmpDialogues;
         }
-
-        // static void GetSprite(string[] paths)
-        // {
-
-        // }
-        // static void GetSpine(string[] paths)
-        // {
-
-        // }
     }
     public static class Loaders
     {
@@ -156,6 +145,7 @@ namespace RR.Narration
         public static void LoadDialogueTable(string tableKey)
         {
             LoadDialogueFile(Loaders.localizedDialogueTable.GetTable()[tableKey].LocalizedValue);
+            
         }
         public static void LoadDialogueFile(string _dialoguedata)
         {

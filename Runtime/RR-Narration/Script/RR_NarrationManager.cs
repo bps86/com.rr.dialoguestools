@@ -1,20 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
-// using UnityEngine.Localization;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using RR.Narration;
 using RR.Narration.Audio;
-using RR;
 using TMPro;
 using Spine.Unity;
 
 [RequireComponent(typeof(AudioSource))]
 public class RR_NarrationManager : MonoBehaviour
 {
-    // string path => $"{Application.dataPath + Path.AltDirectorySeparatorChar}" + "newDialogue.txt";
     public string tags;
     public int index, beepPerSeconds;
     public TMP_Text _name, _dialogue;
@@ -48,7 +43,8 @@ public class RR_NarrationManager : MonoBehaviour
         Debug.Log(Loaders.isLoaded);
         StartCoroutine(Loaders.LoadActorData());
         yield return new WaitUntil(() => Loaders.isLoaded);
-        Loaders.LoadDialogueFile(Loaders.dialoguesData["Dialogue1"].text);
+        // Loaders.LoadDialogueFile(Loaders.dialoguesData["Dialogue1"].text);
+        Loaders.LoadDialogueTable("newdialogue");
         _name.text = "failed loading statics";
         Refresh(useBeep);
     }
@@ -59,10 +55,17 @@ public class RR_NarrationManager : MonoBehaviour
         {
             NextDialogue();
         }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            Loaders.LoadDialogueTable("newdialogue");
+            stop = true;
+            Loaders.LoadDialogueData(tags, index);
+            stop = false;
+            Refresh(useBeep);
+        }
     }
     public void NextDialogue()
     {
-
         if (index < Loaders.dialogues.Count - 1) index += 1;
         if (index >= Loaders.dialogues.Count - 1) return;
         stop = true;
@@ -90,8 +93,8 @@ public class RR_NarrationManager : MonoBehaviour
         {
             image.sprite = Loaders.dictActorSprite[Loaders.dialogue.name + ";;" + Loaders.dialogue.expression];
             color.a = 255;
-            image.transform.position = spriteV3 + new Vector3((float)Loaders.dialogue.charPos*Range, 1, 1);
-            image.gameObject.transform.localScale = Vector3.Scale(spriteV3scale,new Vector3((float)isInverted,1,1));
+            image.transform.position = spriteV3 + new Vector3((float)Loaders.dialogue.charPos * Range, 1, 1);
+            image.gameObject.transform.localScale = Vector3.Scale(spriteV3scale, new Vector3((float)isInverted, 1, 1));
         }
         else
         {
@@ -109,8 +112,8 @@ public class RR_NarrationManager : MonoBehaviour
         skeletonAnimation.skeletonDataAsset = Loaders.dialogue.skeletonDataAsset;
         skeletonAnimation.Initialize(true);
         skeletonAnimation.AnimationName = Loaders.dialogue.expression;
-        skeletonAnimation.gameObject.transform.position = spineV3 + new Vector3((float)Loaders.dialogue.charPos*Range, 1, 1);
-        skeletonAnimation.transform.localScale = Vector3.Scale(spineV3scale,new Vector3((float)isInverted,1,1));
+        skeletonAnimation.gameObject.transform.position = spineV3 + new Vector3((float)Loaders.dialogue.charPos * Range, 1, 1);
+        skeletonAnimation.transform.localScale = Vector3.Scale(spineV3scale, new Vector3((float)isInverted, 1, 1));
     }
     void Beep()
     {
