@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "com.unity.localization": "1.3.2",
-    "com.unity.textmeshpro": "3.0.6"
+    "com.unity.textmeshpro": "3.0.6",
+    "com.esotericsoftware.spine.spine-unity": "https://esotericsoftware.com/files/runtimes/unity/spine-unity-3.8-2021-11-10.unitypackage"
   },
   "repository": {
     "type": "git",
