@@ -127,10 +127,13 @@ public class RR_Narration_MainEditor : EditorWindow
                     Loaders.dialogues[i].dialogue = GUILayout.TextArea(Loaders.dialogues[i].dialogue, GUILayout.Width(300), GUILayout.Height(117));
                     GUILayout.BeginVertical(GUILayout.Width(60));
                     Loaders.dialogues[i].tags = GUILayout.TextField(Loaders.dialogues[i].tags, GUILayout.Width(60));
-                    Loaders.dialogues[i].nameMode = (Dialogue.NameMode)EditorGUILayout.Popup((int)Loaders.dialogues[i].nameMode, new string[] { "Normal", "Hidden", "None" }, GUILayout.Width(60));
+                    Loaders.dialogues[i].nameMode = (Dialogue.NameMode)EditorGUILayout.EnumPopup(Loaders.dialogues[i].nameMode);
                     GUILayout.EndVertical();
+                    GUILayout.BeginVertical();
                     Loaders.dialogues[i].index = EditorGUILayout.IntField(Loaders.dialogues[i].index, GUILayout.Width(60));
+                    Loaders.dialogues[i].charPos = (Dialogue.CharPos)EditorGUILayout.EnumPopup(Loaders.dialogues[i].charPos, GUILayout.Width(60));                    
                     if (GUILayout.Button("Remove", GUILayout.Width(60))) Loaders.dialogues.RemoveAt(i);
+                    GUILayout.EndVertical();
                     GUILayout.EndHorizontal();
                 }
         GUILayout.EndScrollView();
