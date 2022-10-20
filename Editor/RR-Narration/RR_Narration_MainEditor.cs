@@ -406,7 +406,6 @@ namespace RR.Narration.Editor
                         missingLocale.Add(LocalizationEditorSettings.GetLocales()[i]);
                 for (int i = 0; i < missingLocale.Count; i++)
                     rrDialoguesTable.AddNewTable(missingLocale[i].Identifier);
-                // rrDialoguesTable.AddNewTable()
             }
             RR_Narration_EditorTools.Refresh_RR_Narration();
         }
