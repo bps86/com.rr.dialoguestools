@@ -6,6 +6,7 @@ using UnityEditor;
 using RR.Narration;
 using RR.Narration.Editor;
 using UnityEditor.Localization;
+using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
 using UnityEngine.Localization.Tables;
 
@@ -17,35 +18,12 @@ public class RR_Narration_MainEditor : EditorWindow
     private Vector2 scrollPos = Vector2.zero, scrollPos2 = Vector2.zero;
     Rect cursorChangeRect;
     public static EditorWindow getWindow, thisWindow;
-    public static StringTableCollection rrDialoguesTable;
+    
 
     [MenuItem("Window/RR/Narration")]
     static void init()
     {
-        LocalizationSettings localizationSettings = null;
-        if (!Directory.Exists("Assets/RR-Narration")) Directory.CreateDirectory("Assets/RR-Narration");
-        if (!Directory.Exists("Assets/RR-Narration/Resources")) Directory.CreateDirectory("Assets/RR-Narration/Resources");
-        if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Dialogues")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Dialogues");
-        if (!Directory.Exists("Assets/RR-Narration/Resources/RR-DialoguesTable")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-DialoguesTable");
-        if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Actors")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Actors");
-        if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Actors-Spine")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Actors-Spine");
-        if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Sound")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Sound");
-        if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Sound/Beep")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Sound/Beep");
-        if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Sound/Voice-Act")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Sound/Voice-Act");
-        if (!Directory.Exists("Assets/Editor")) Directory.CreateDirectory("Assets/Editor");
-        if (!Directory.Exists("Assets/Editor/RR-Thumbnail")) Directory.CreateDirectory("Assets/Editor/RR-Thumbnail");
-        if (LocalizationEditorSettings.ActiveLocalizationSettings != null)
-        {
-            localizationSettings = LocalizationEditorSettings.ActiveLocalizationSettings;
-            if (LocalizationEditorSettings.GetLocales().Count > 0)
-                if (!File.Exists("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue.asset") || !File.Exists("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue Shared Data.asset"))
-                {
-                    LocalizationEditorSettings.CreateStringTableCollection("RR-Dialogue", "Assets/RR-Narration/Resources/RR-DialoguesTable", LocalizationEditorSettings.GetLocales());
-                }
-        }
-        if (File.Exists("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue.asset"))
-            rrDialoguesTable = AssetDatabase.LoadAssetAtPath<StringTableCollection>("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue.asset");
-        RR_Narration_EditorTools.Refresh_RR_Narration();
+        RR_Narration_EditorTools.Initialize_RR_Dir();
         thisWindow = (RR_Narration_MainEditor)EditorWindow.GetWindow(typeof(RR_Narration_MainEditor));
         thisWindow.position = new Rect(Screen.width / 2, Screen.height / 2, 1000, 600);
         thisWindow.Show();
@@ -131,7 +109,7 @@ public class RR_Narration_MainEditor : EditorWindow
                     GUILayout.EndVertical();
                     GUILayout.BeginVertical();
                     Loaders.dialogues[i].index = EditorGUILayout.IntField(Loaders.dialogues[i].index, GUILayout.Width(60));
-                    Loaders.dialogues[i].charPos = (Dialogue.CharPos)EditorGUILayout.EnumPopup(Loaders.dialogues[i].charPos, GUILayout.Width(60));                    
+                    Loaders.dialogues[i].charPos = (Dialogue.CharPos)EditorGUILayout.EnumPopup(Loaders.dialogues[i].charPos, GUILayout.Width(60));
                     if (GUILayout.Button("Remove", GUILayout.Width(60))) Loaders.dialogues.RemoveAt(i);
                     GUILayout.EndVertical();
                     GUILayout.EndHorizontal();
@@ -193,7 +171,7 @@ public class RR_Narration_NewFileWindow : EditorWindow
         //     Manager.NewFile("RR-Narration/Resources/RR-Dialogues/" + RR_Narration_EditorTools.currentLocale + "/" + RR_Narration_EditorTools.fileName + ".txt");
         if (RR_Narration_EditorTools.currentLocaleIndex == RR_Narration_EditorTools.locales.Length - 1)
             Manager.NewFile("RR-Narration/Resources/RR-Dialogues/" + RR_Narration_EditorTools.fileName + ".txt");
-        RR_Narration_EditorTools.ToStringTable(RR_Narration_EditorTools.fileName, "", RR_Narration_MainEditor.rrDialoguesTable);
+        RR_Narration_EditorTools.ToStringTable(RR_Narration_EditorTools.fileName, "", RR_Narration_EditorTools.rrDialoguesTable);
         RR_Narration_OpenFileWindow.OpenFile();
         Close();
     }
@@ -226,8 +204,8 @@ public class RR_Narration_OpenFileWindow : EditorWindow
     {
         if (RR_Narration_EditorTools.currentLocaleIndex < RR_Narration_EditorTools.locales.Length - 1)
         {
-            StringTable stringTable = AssetDatabase.LoadAssetAtPath<StringTable>("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue_"+RR_Narration_EditorTools.currentLocale+".asset");
-            StringTableEntry stringTableEntry = RR_Narration_EditorTools.GetStringTableEntry(stringTable,RR_Narration_EditorTools.fileName);
+            StringTable stringTable = AssetDatabase.LoadAssetAtPath<StringTable>("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue_" + RR_Narration_EditorTools.currentLocale + ".asset");
+            StringTableEntry stringTableEntry = RR_Narration_EditorTools.GetStringTableEntry(stringTable, RR_Narration_EditorTools.fileName);
             string[] dialogueList = stringTableEntry.Value.Split(';');
             Loaders.dialogues = Manager.GetDialogues(dialogueList);
         }
@@ -267,7 +245,7 @@ public class RR_Narration_SaveFileWindow : EditorWindow
         // if (RR_Narration_EditorTools.currentLocaleIndex < RR_Narration_EditorTools.locales.Length - 1)
         //     Manager.SaveFile("Assets/RR-Narration/Resources/RR-Dialogues/" + RR_Narration_EditorTools.currentLocale + "/" + RR_Narration_EditorTools.fileName + ".txt", RR_Narration_EditorTools.fileData);
         // Debug.Log("Checked Save on Locale");
-        RR_Narration_EditorTools.ToStringTable(RR_Narration_EditorTools.fileName, RR_Narration_EditorTools.fileData, RR_Narration_MainEditor.rrDialoguesTable);
+        RR_Narration_EditorTools.ToStringTable(RR_Narration_EditorTools.fileName, RR_Narration_EditorTools.fileData, RR_Narration_EditorTools.rrDialoguesTable);
         if (RR_Narration_EditorTools.currentLocaleIndex == RR_Narration_EditorTools.locales.Length - 1)
             Manager.SaveFile("Assets/RR-Narration/Resources/RR-Dialogues/" + RR_Narration_EditorTools.fileName + ".txt", RR_Narration_EditorTools.fileData);
         Debug.Log("Checked Save on Non Locale");
@@ -375,9 +353,9 @@ namespace RR.Narration.Editor
     public static class RR_Narration_EditorTools
     {
         public static string fileName, fileData;
-        static string[] spritePath = new string[]{};
-        static string[] spinePath = new string[]{};
-        static string[] beepPath = new string[]{};
+        static string[] spritePath = new string[] { };
+        static string[] spinePath = new string[] { };
+        static string[] beepPath = new string[] { };
         public static string[] names = new string[] { }, locales = new string[] { };
         public static Dictionary<string, int> actorDataIndex = new Dictionary<string, int>();
         public static Dictionary<string, string[]> expression = new Dictionary<string, string[]>();
@@ -385,6 +363,7 @@ namespace RR.Narration.Editor
         public static string currentLocale;
         public static int currentLocaleIndex;
         public static string getFileName;
+        public static StringTableCollection rrDialoguesTable;
         public static void GetDialogueIndex()
         {
             for (int i = 0; i < Loaders.dialogues.Count; i++)
@@ -392,6 +371,44 @@ namespace RR.Narration.Editor
                 RR_Narration_EditorTools.actorDataIndex["Actor" + i] = 0;
                 RR_Narration_EditorTools.actorDataIndex["Expression" + i] = 0;
             }
+        }
+        [MenuItem("Tools/RR/Initialize RR Dir")]
+        public static void Initialize_RR_Dir()
+        {
+            LocalizationSettings localizationSettings = null;
+            if (!Directory.Exists("Assets/RR-Narration")) Directory.CreateDirectory("Assets/RR-Narration");
+            if (!Directory.Exists("Assets/RR-Narration/Resources")) Directory.CreateDirectory("Assets/RR-Narration/Resources");
+            if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Dialogues")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Dialogues");
+            if (!Directory.Exists("Assets/RR-Narration/Resources/RR-DialoguesTable")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-DialoguesTable");
+            if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Actors")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Actors");
+            if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Actors-Spine")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Actors-Spine");
+            if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Sound")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Sound");
+            if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Sound/Beep")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Sound/Beep");
+            if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Sound/Voice-Act")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Sound/Voice-Act");
+            if (!Directory.Exists("Assets/Editor")) Directory.CreateDirectory("Assets/Editor");
+            if (!Directory.Exists("Assets/Editor/RR-Thumbnail")) Directory.CreateDirectory("Assets/Editor/RR-Thumbnail");
+            if (LocalizationEditorSettings.ActiveLocalizationSettings != null)
+            {
+                localizationSettings = LocalizationEditorSettings.ActiveLocalizationSettings;
+                if (LocalizationEditorSettings.GetLocales().Count > 0)
+                    if (!File.Exists("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue.asset") || !File.Exists("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue Shared Data.asset"))
+                    {
+                        LocalizationEditorSettings.CreateStringTableCollection("RR-Dialogue", "Assets/RR-Narration/Resources/RR-DialoguesTable", LocalizationEditorSettings.GetLocales());
+                    }
+            }
+            if (File.Exists("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue.asset"))
+            {
+                rrDialoguesTable = AssetDatabase.LoadAssetAtPath<StringTableCollection>("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue.asset");
+                List<Locale> missingLocale = new List<Locale>();
+                Debug.Log("missing locale initialized");
+                for (int i = 0; i < LocalizationEditorSettings.GetLocales().Count; i++)
+                    if (!rrDialoguesTable.ContainsTable(LocalizationEditorSettings.GetLocales()[i].Identifier))
+                        missingLocale.Add(LocalizationEditorSettings.GetLocales()[i]);
+                for (int i = 0; i < missingLocale.Count; i++)
+                    rrDialoguesTable.AddNewTable(missingLocale[i].Identifier);
+                // rrDialoguesTable.AddNewTable()
+            }
+            RR_Narration_EditorTools.Refresh_RR_Narration();
         }
         [MenuItem("Tools/RR/Refresh RR AssetPaths")]
         public static void Refresh_RR_Narration()
