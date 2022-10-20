@@ -375,9 +375,9 @@ namespace RR.Narration.Editor
     public static class RR_Narration_EditorTools
     {
         public static string fileName, fileData;
-        static string[] spritePath = Directory.GetFiles("Assets/RR-Narration/Resources/RR-Actors/");
-        static string[] spinePath = Directory.GetDirectories("Assets/RR-Narration/Resources/RR-Actors-Spine/");
-        static string[] beepPath = Directory.GetFiles("Assets/RR-Narration/Resources/RR-Sound/Beep/");
+        static string[] spritePath = new string[]{};
+        static string[] spinePath = new string[]{};
+        static string[] beepPath = new string[]{};
         public static string[] names = new string[] { }, locales = new string[] { };
         public static Dictionary<string, int> actorDataIndex = new Dictionary<string, int>();
         public static Dictionary<string, string[]> expression = new Dictionary<string, string[]>();
@@ -396,6 +396,9 @@ namespace RR.Narration.Editor
         [MenuItem("Tools/RR/Refresh RR AssetPaths")]
         public static void Refresh_RR_Narration()
         {
+            spritePath = Directory.GetFiles("Assets/RR-Narration/Resources/RR-Actors/");
+            spinePath = Directory.GetDirectories("Assets/RR-Narration/Resources/RR-Actors-Spine/");
+            beepPath = Directory.GetFiles("Assets/RR-Narration/Resources/RR-Sound/Beep/");
             int index = 0;
             int nameIndex = 0;
             int beepIndex = 0;
