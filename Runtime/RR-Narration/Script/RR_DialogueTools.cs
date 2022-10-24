@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Localization;
 using Spine.Unity;
 
-namespace RR.Narration
+namespace RR.DialogueTools.Engine
 {
     public class Dialogue
     {
@@ -176,11 +176,10 @@ namespace RR.Narration
     }
 }
 
-namespace RR.Narration.Audio
+namespace RR.DialogueTools.Audio
 {
     public static class Player
     {
-
         public static void PlayBeep(AudioSource audioSource, float minPitch = -0.2f, float maxPitch = 0.2f)
         {
             audioSource.pitch = Random.Range(minPitch, maxPitch);

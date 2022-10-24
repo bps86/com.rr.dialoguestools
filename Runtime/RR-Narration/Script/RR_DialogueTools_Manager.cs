@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using RR.Narration;
-using RR.Narration.Audio;
+using RR.DialogueTools.Engine;
+using RR.DialogueTools.Audio;
 using TMPro;
 using Spine.Unity;
 
 [RequireComponent(typeof(AudioSource))]
-public class RR_NarrationManager : MonoBehaviour
+public class RR_DialogueTools_Manager : MonoBehaviour
 {
     public string tags;
     public int index, beepPerSeconds;
