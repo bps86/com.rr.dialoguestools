@@ -23,7 +23,7 @@ public class RR_DialogueTools_MainEditor : EditorWindow
     [MenuItem("Window/RR/Narration")]
     static void init()
     {
-        RR_DialogueTools_EditorTools.Initialize_RR_Dir();
+        EditorTools.Initialize_RR_Dir();
         thisWindow = (RR_DialogueTools_MainEditor)EditorWindow.GetWindow(typeof(RR_DialogueTools_MainEditor));
         thisWindow.position = new Rect(Screen.width / 2, Screen.height / 2, 1000, 600);
         thisWindow.Show();
@@ -31,15 +31,15 @@ public class RR_DialogueTools_MainEditor : EditorWindow
 
     void OnEnable()
     {
-        RR_DialogueTools_EditorTools.locales = RR_DialogueTools_EditorTools.GetLocales(new string[] { });
-        if (Loaders.dialogues == null) RR_DialogueTools_EditorTools.currentLocaleIndex = RR_DialogueTools_EditorTools.locales.Length - 1;
+        EditorTools.locales = EditorTools.GetLocales(new string[] { });
+        if (Loaders.dialogues == null) EditorTools.currentLocaleIndex = EditorTools.locales.Length - 1;
         currentScrollViewWidth = this.position.width / 2;
         cursorChangeRect = new Rect(currentScrollViewWidth, 0, 2f, this.position.height);
     }
 
     void OnGUI()
     {
-        if (Loaders.dialogues != null) RR_DialogueTools_EditorTools.fileData = DialoguesToString();
+        if (Loaders.dialogues != null) EditorTools.fileData = DialoguesToString();
         GUILayout.BeginHorizontal();
         DrawOptions();
         EditorDrawTools.ResizeScrollView(ref cursorChangeRect, this.position, ref resize, ref currentScrollViewWidth);
@@ -66,7 +66,7 @@ public class RR_DialogueTools_MainEditor : EditorWindow
         }
         if (GUILayout.Button("Refresh"))
         {
-            RR_DialogueTools_EditorTools.Refresh_RR_DialogueTools();
+            EditorTools.Refresh_RR_DialogueTools();
         }
         if (Loaders.dialogues != null)
         {
@@ -139,7 +139,7 @@ public class RR_DialogueTools_MainEditor : EditorWindow
     }
     void OnDestroy()
     {
-        RR_DialogueTools_EditorTools.Refresh_RR_DialogueTools();
+        EditorTools.Refresh_RR_DialogueTools();
     }
 }
 
@@ -156,9 +156,9 @@ public class RR_DialogueTools_NewFileWindow : EditorWindow
     {
         GUILayout.BeginVertical();
         GUILayout.Label("File Name");
-        RR_DialogueTools_EditorTools.fileName = EditorGUILayout.TextField(RR_DialogueTools_EditorTools.fileName);
-        RR_DialogueTools_EditorTools.currentLocaleIndex = EditorGUILayout.Popup(RR_DialogueTools_EditorTools.currentLocaleIndex, RR_DialogueTools_EditorTools.locales);
-        RR_DialogueTools_EditorTools.currentLocale = RR_DialogueTools_EditorTools.locales[RR_DialogueTools_EditorTools.currentLocaleIndex];
+        EditorTools.fileName = EditorGUILayout.TextField(EditorTools.fileName);
+        EditorTools.currentLocaleIndex = EditorGUILayout.Popup(EditorTools.currentLocaleIndex, EditorTools.locales);
+        EditorTools.currentLocale = EditorTools.locales[EditorTools.currentLocaleIndex];
         if (GUILayout.Button("OK"))
             NewFile();
         GUILayout.EndVertical();
@@ -169,9 +169,9 @@ public class RR_DialogueTools_NewFileWindow : EditorWindow
         // if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Dialogues/" + RR_DialogueTools_EditorTools.currentLocale) && RR_DialogueTools_EditorTools.currentLocale != "<None>") Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Dialogues/" + RR_DialogueTools_EditorTools.currentLocale);
         // if (RR_DialogueTools_EditorTools.currentLocaleIndex < RR_DialogueTools_EditorTools.locales.Length - 1)
         //     Manager.NewFile("RR-Narration/Resources/RR-Dialogues/" + RR_DialogueTools_EditorTools.currentLocale + "/" + RR_DialogueTools_EditorTools.fileName + ".txt");
-        if (RR_DialogueTools_EditorTools.currentLocaleIndex == RR_DialogueTools_EditorTools.locales.Length - 1)
-            Manager.NewFile("RR-Narration/Resources/RR-Dialogues/" + RR_DialogueTools_EditorTools.fileName + ".txt");
-        RR_DialogueTools_EditorTools.ToStringTable(RR_DialogueTools_EditorTools.fileName, "", RR_DialogueTools_EditorTools.rrDialoguesTable);
+        if (EditorTools.currentLocaleIndex == EditorTools.locales.Length - 1)
+            Manager.NewFile("RR-Narration/Resources/RR-Dialogues/" + EditorTools.fileName + ".txt");
+        EditorTools.ToStringTable(EditorTools.fileName, "", EditorTools.rrDialoguesTable);
         RR_DialogueTools_OpenFileWindow.OpenFile();
         Close();
     }
@@ -190,9 +190,9 @@ public class RR_DialogueTools_OpenFileWindow : EditorWindow
     {
         GUILayout.BeginVertical();
         GUILayout.Label("File Name");
-        RR_DialogueTools_EditorTools.fileName = EditorGUILayout.TextField(RR_DialogueTools_EditorTools.fileName);
-        RR_DialogueTools_EditorTools.currentLocaleIndex = EditorGUILayout.Popup(RR_DialogueTools_EditorTools.currentLocaleIndex, RR_DialogueTools_EditorTools.locales);
-        RR_DialogueTools_EditorTools.currentLocale = RR_DialogueTools_EditorTools.locales[RR_DialogueTools_EditorTools.currentLocaleIndex];
+        EditorTools.fileName = EditorGUILayout.TextField(EditorTools.fileName);
+        EditorTools.currentLocaleIndex = EditorGUILayout.Popup(EditorTools.currentLocaleIndex, EditorTools.locales);
+        EditorTools.currentLocale = EditorTools.locales[EditorTools.currentLocaleIndex];
         if (GUILayout.Button("OK"))
         {
             OpenFile();
@@ -202,17 +202,17 @@ public class RR_DialogueTools_OpenFileWindow : EditorWindow
     }
     public static void OpenFile()
     {
-        if (RR_DialogueTools_EditorTools.currentLocaleIndex < RR_DialogueTools_EditorTools.locales.Length - 1)
+        if (EditorTools.currentLocaleIndex < EditorTools.locales.Length - 1)
         {
-            StringTable stringTable = AssetDatabase.LoadAssetAtPath<StringTable>("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue_" + RR_DialogueTools_EditorTools.currentLocale + ".asset");
-            StringTableEntry stringTableEntry = RR_DialogueTools_EditorTools.GetStringTableEntry(stringTable, RR_DialogueTools_EditorTools.fileName);
+            StringTable stringTable = AssetDatabase.LoadAssetAtPath<StringTable>("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue_" + EditorTools.currentLocale + ".asset");
+            StringTableEntry stringTableEntry = EditorTools.GetStringTableEntry(stringTable, EditorTools.fileName);
             string[] dialogueList = stringTableEntry.Value.Split(';');
             Loaders.dialogues = Manager.GetDialogues(dialogueList);
         }
-        if (RR_DialogueTools_EditorTools.currentLocaleIndex == RR_DialogueTools_EditorTools.locales.Length - 1)
-            Loaders.dialogues = Manager.OpenFile("Assets/RR-Narration/Resources/RR-Dialogues/" + RR_DialogueTools_EditorTools.fileName + ".txt");
-        RR_DialogueTools_EditorTools.GetDialogueIndex();
-        RR_DialogueTools_EditorTools.Refresh_RR_DialogueTools();
+        if (EditorTools.currentLocaleIndex == EditorTools.locales.Length - 1)
+            Loaders.dialogues = Manager.OpenFile("Assets/RR-Narration/Resources/RR-Dialogues/" + EditorTools.fileName + ".txt");
+        EditorTools.GetDialogueIndex();
+        EditorTools.Refresh_RR_DialogueTools();
         RR_DialogueTools_MainEditor.ready = true;
 
     }
@@ -231,9 +231,9 @@ public class RR_DialogueTools_SaveFileWindow : EditorWindow
     {
         GUILayout.BeginVertical();
         GUILayout.Label("File Name");
-        RR_DialogueTools_EditorTools.fileName = EditorGUILayout.TextField(RR_DialogueTools_EditorTools.fileName);
-        RR_DialogueTools_EditorTools.currentLocaleIndex = EditorGUILayout.Popup(RR_DialogueTools_EditorTools.currentLocaleIndex, RR_DialogueTools_EditorTools.locales);
-        RR_DialogueTools_EditorTools.currentLocale = RR_DialogueTools_EditorTools.locales[RR_DialogueTools_EditorTools.currentLocaleIndex];
+        EditorTools.fileName = EditorGUILayout.TextField(EditorTools.fileName);
+        EditorTools.currentLocaleIndex = EditorGUILayout.Popup(EditorTools.currentLocaleIndex, EditorTools.locales);
+        EditorTools.currentLocale = EditorTools.locales[EditorTools.currentLocaleIndex];
         if (GUILayout.Button("OK"))
             SaveFile();
         GUILayout.EndVertical();
@@ -245,9 +245,9 @@ public class RR_DialogueTools_SaveFileWindow : EditorWindow
         // if (RR_DialogueTools_EditorTools.currentLocaleIndex < RR_DialogueTools_EditorTools.locales.Length - 1)
         //     Manager.SaveFile("Assets/RR-Narration/Resources/RR-Dialogues/" + RR_DialogueTools_EditorTools.currentLocale + "/" + RR_DialogueTools_EditorTools.fileName + ".txt", RR_DialogueTools_EditorTools.fileData);
         // Debug.Log("Checked Save on Locale");
-        RR_DialogueTools_EditorTools.ToStringTable(RR_DialogueTools_EditorTools.fileName, RR_DialogueTools_EditorTools.fileData, RR_DialogueTools_EditorTools.rrDialoguesTable);
-        if (RR_DialogueTools_EditorTools.currentLocaleIndex == RR_DialogueTools_EditorTools.locales.Length - 1)
-            Manager.SaveFile("Assets/RR-Narration/Resources/RR-Dialogues/" + RR_DialogueTools_EditorTools.fileName + ".txt", RR_DialogueTools_EditorTools.fileData);
+        EditorTools.ToStringTable(EditorTools.fileName, EditorTools.fileData, EditorTools.rrDialoguesTable);
+        if (EditorTools.currentLocaleIndex == EditorTools.locales.Length - 1)
+            Manager.SaveFile("Assets/RR-Narration/Resources/RR-Dialogues/" + EditorTools.fileName + ".txt", EditorTools.fileData);
         Debug.Log("Checked Save on Non Locale");
         RR_DialogueTools_OpenFileWindow.OpenFile();
         Debug.Log("FileRefreshed");
@@ -270,9 +270,9 @@ public class RR_DialogueTools_ActorManager : EditorWindow
     public static void init(int indexD)
     {
         indexDialogue = indexD;
-        RR_DialogueTools_EditorTools.Refresh_RR_DialogueTools();
-        tempName = RR_DialogueTools_EditorTools.names[index];
-        tempExpression = GetExpression(RR_DialogueTools_EditorTools.expression[RR_DialogueTools_EditorTools.names[index]], new List<string>());
+        EditorTools.Refresh_RR_DialogueTools();
+        tempName = EditorTools.names[index];
+        tempExpression = GetExpression(EditorTools.expression[EditorTools.names[index]], new List<string>());
         RR_DialogueTools_ActorManager window = (RR_DialogueTools_ActorManager)EditorWindow.GetWindow(typeof(RR_DialogueTools_ActorManager));
         window.position = new Rect(Screen.width / 2, Screen.height / 2, 400, 300);
         window.Show();
@@ -295,13 +295,13 @@ public class RR_DialogueTools_ActorManager : EditorWindow
     {
         GUILayout.BeginScrollView(scrollPos, GUILayout.Width(currentScrollViewWidth));
         GUILayout.Label("Actors");
-        for (int i = 0; i < RR_DialogueTools_EditorTools.names.Length; i++)
+        for (int i = 0; i < EditorTools.names.Length; i++)
         {
-            if (GUILayout.Button(RR_DialogueTools_EditorTools.names[i]))
+            if (GUILayout.Button(EditorTools.names[i]))
             {
                 index = i;
-                tempName = RR_DialogueTools_EditorTools.names[i];
-                tempExpression = GetExpression(RR_DialogueTools_EditorTools.expression[RR_DialogueTools_EditorTools.names[i]], new List<string>());
+                tempName = EditorTools.names[i];
+                tempExpression = GetExpression(EditorTools.expression[EditorTools.names[i]], new List<string>());
             }
         }
         GUILayout.EndScrollView();
@@ -350,7 +350,7 @@ namespace RR.DialogueTools.Editor
         }
     }
 
-    public static class RR_DialogueTools_EditorTools
+    public static class EditorTools
     {
         public static string fileName, fileData;
         static string[] spritePath = new string[] { };
@@ -368,8 +368,8 @@ namespace RR.DialogueTools.Editor
         {
             for (int i = 0; i < Loaders.dialogues.Count; i++)
             {
-                RR_DialogueTools_EditorTools.actorDataIndex["Actor" + i] = 0;
-                RR_DialogueTools_EditorTools.actorDataIndex["Expression" + i] = 0;
+                EditorTools.actorDataIndex["Actor" + i] = 0;
+                EditorTools.actorDataIndex["Expression" + i] = 0;
             }
         }
         [MenuItem("Tools/RR/Initialize RR Dir")]
@@ -407,7 +407,7 @@ namespace RR.DialogueTools.Editor
                 for (int i = 0; i < missingLocale.Count; i++)
                     rrDialoguesTable.AddNewTable(missingLocale[i].Identifier);
             }
-            RR_DialogueTools_EditorTools.Refresh_RR_DialogueTools();
+            EditorTools.Refresh_RR_DialogueTools();
         }
         [MenuItem("Tools/RR/Refresh RR AssetPaths")]
         public static void Refresh_RR_DialogueTools()
@@ -511,12 +511,12 @@ namespace RR.DialogueTools.Editor
 
         public static void ToStringTable(string _filename, string _fileData, StringTableCollection stringTableCollection)
         {
-            if (RR_DialogueTools_EditorTools.currentLocaleIndex == RR_DialogueTools_EditorTools.locales.Length - 1) return;
+            if (EditorTools.currentLocaleIndex == EditorTools.locales.Length - 1) return;
             for (int i = 0; i < stringTableCollection.StringTables.Count; i++)
             {
-                if (stringTableCollection.StringTables[i].name == "RR-Dialogue_" + RR_DialogueTools_EditorTools.currentLocale)
+                if (stringTableCollection.StringTables[i].name == "RR-Dialogue_" + EditorTools.currentLocale)
                 {
-                    SetStringTable(_filename, _fileData, AssetDatabase.LoadAssetAtPath<StringTable>("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue_" + RR_DialogueTools_EditorTools.currentLocale + ".asset"));
+                    SetStringTable(_filename, _fileData, AssetDatabase.LoadAssetAtPath<StringTable>("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue_" + EditorTools.currentLocale + ".asset"));
                 }
             }
         }
