@@ -18,7 +18,7 @@ public class RR_DialogueTools_MainEditor : EditorWindow
     private Vector2 scrollPos = Vector2.zero, scrollPos2 = Vector2.zero;
     Rect cursorChangeRect;
     public static EditorWindow getWindow, thisWindow;
-    
+
 
     [MenuItem("Window/RR/Narration")]
     static void init()
@@ -87,33 +87,33 @@ public class RR_DialogueTools_MainEditor : EditorWindow
         if (!ready) return;
         scrollPos2 = GUILayout.BeginScrollView(scrollPos2, GUILayout.Width(this.position.width - currentScrollViewWidth));
         if (Loaders.dialogues != null)
-            if (!System.String.IsNullOrEmpty(Loaders.dialogues[0].dialogue))
-                for (int i = 0; i < Loaders.dialogues.Count; i++)
+            // if (!System.String.IsNullOrEmpty(Loaders.dialogues[0].dialogue))
+            for (int i = 0; i < Loaders.dialogues.Count; i++)
+            {
+                string nameThumb = Loaders.dialogues[i].name;
+                string expressionThumb = Loaders.dialogues[i].expression;
+                GUILayout.BeginHorizontal();
+                GUILayout.BeginVertical(GUILayout.Width(100));
+                GUILayout.Label(nameThumb);
+                if (GUILayout.Button(AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/RR-Thumbnail/Thumbnail-" + nameThumb + "," + expressionThumb + ".png"), GUILayout.Width(100), GUILayout.Height(100)))
                 {
-                    string nameThumb = Loaders.dialogues[i].name;
-                    string expressionThumb = Loaders.dialogues[i].expression;
-                    GUILayout.BeginHorizontal();
-                    GUILayout.BeginVertical(GUILayout.Width(100));
-                    GUILayout.Label(nameThumb);
-                    if (GUILayout.Button(AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/RR-Thumbnail/Thumbnail-" + nameThumb + "," + expressionThumb + ".png"), GUILayout.Width(100), GUILayout.Height(100)))
-                    {
-                        int index = i;
-                        RR_DialogueTools_ActorManager.init(index);
-                        GUIUtility.ExitGUI();
-                    }
-                    GUILayout.EndVertical();
-                    Loaders.dialogues[i].dialogue = GUILayout.TextArea(Loaders.dialogues[i].dialogue, GUILayout.Width(300), GUILayout.Height(117));
-                    GUILayout.BeginVertical(GUILayout.Width(60));
-                    Loaders.dialogues[i].tags = GUILayout.TextField(Loaders.dialogues[i].tags, GUILayout.Width(60));
-                    Loaders.dialogues[i].nameMode = (Dialogue.NameMode)EditorGUILayout.EnumPopup(Loaders.dialogues[i].nameMode);
-                    GUILayout.EndVertical();
-                    GUILayout.BeginVertical();
-                    Loaders.dialogues[i].index = EditorGUILayout.IntField(Loaders.dialogues[i].index, GUILayout.Width(60));
-                    Loaders.dialogues[i].charPos = (Dialogue.CharPos)EditorGUILayout.EnumPopup(Loaders.dialogues[i].charPos, GUILayout.Width(60));
-                    if (GUILayout.Button("Remove", GUILayout.Width(60))) Loaders.dialogues.RemoveAt(i);
-                    GUILayout.EndVertical();
-                    GUILayout.EndHorizontal();
+                    int index = i;
+                    RR_DialogueTools_ActorManager.init(index);
+                    GUIUtility.ExitGUI();
                 }
+                GUILayout.EndVertical();
+                Loaders.dialogues[i].dialogue = GUILayout.TextArea(Loaders.dialogues[i].dialogue, GUILayout.Width(300), GUILayout.Height(117));
+                GUILayout.BeginVertical(GUILayout.Width(60));
+                Loaders.dialogues[i].tags = GUILayout.TextField(Loaders.dialogues[i].tags, GUILayout.Width(60));
+                Loaders.dialogues[i].nameMode = (Dialogue.NameMode)EditorGUILayout.EnumPopup(Loaders.dialogues[i].nameMode);
+                GUILayout.EndVertical();
+                GUILayout.BeginVertical();
+                Loaders.dialogues[i].index = EditorGUILayout.IntField(Loaders.dialogues[i].index, GUILayout.Width(60));
+                Loaders.dialogues[i].charPos = (Dialogue.CharPos)EditorGUILayout.EnumPopup(Loaders.dialogues[i].charPos, GUILayout.Width(60));
+                if (GUILayout.Button("Remove", GUILayout.Width(60))) Loaders.dialogues.RemoveAt(i);
+                GUILayout.EndVertical();
+                GUILayout.EndHorizontal();
+            }
         GUILayout.EndScrollView();
     }
 
@@ -207,7 +207,8 @@ public class RR_DialogueTools_OpenFileWindow : EditorWindow
             StringTable stringTable = AssetDatabase.LoadAssetAtPath<StringTable>("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue_" + EditorTools.currentLocale + ".asset");
             StringTableEntry stringTableEntry = EditorTools.GetStringTableEntry(stringTable, EditorTools.fileName);
             string[] dialogueList = stringTableEntry.Value.Split(';');
-            Loaders.dialogues = Manager.GetDialogues(dialogueList);
+            if (dialogueList.Length == 1 && System.String.IsNullOrEmpty(dialogueList[0])) Loaders.dialogues = null;
+            else Loaders.dialogues = Manager.GetDialogues(dialogueList);
         }
         if (EditorTools.currentLocaleIndex == EditorTools.locales.Length - 1)
             Loaders.dialogues = Manager.OpenFile("Assets/RR-Narration/Resources/RR-Dialogues/" + EditorTools.fileName + ".txt");
