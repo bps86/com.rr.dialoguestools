@@ -70,7 +70,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     public void NextDialogue()
     {
         if (index < Loaders.dialogues.Count - 1) index += 1;
-        if (index >= Loaders.dialogues.Count - 1) return;
+        if (index >= Loaders.dialogues.Count) return;
         stop = true;
         Loaders.LoadDialogueData(tags, index);
         stop = false;
