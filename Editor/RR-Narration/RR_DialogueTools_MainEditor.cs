@@ -87,7 +87,6 @@ public class RR_DialogueTools_MainEditor : EditorWindow
         if (!ready) return;
         scrollPos2 = GUILayout.BeginScrollView(scrollPos2, GUILayout.Width(this.position.width - currentScrollViewWidth));
         if (Loaders.dialogues != null)
-            // if (!System.String.IsNullOrEmpty(Loaders.dialogues[0].dialogue))
             for (int i = 0; i < Loaders.dialogues.Count; i++)
             {
                 string nameThumb = Loaders.dialogues[i].name;
@@ -207,8 +206,7 @@ public class RR_DialogueTools_OpenFileWindow : EditorWindow
             StringTable stringTable = AssetDatabase.LoadAssetAtPath<StringTable>("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue_" + EditorTools.currentLocale + ".asset");
             StringTableEntry stringTableEntry = EditorTools.GetStringTableEntry(stringTable, EditorTools.fileName);
             string[] dialogueList = stringTableEntry.Value.Split(';');
-            if (dialogueList.Length == 1 && System.String.IsNullOrEmpty(dialogueList[0])) Loaders.dialogues = null;
-            else Loaders.dialogues = Manager.GetDialogues(dialogueList);
+            Loaders.dialogues = Manager.GetDialogues(dialogueList);
         }
         if (EditorTools.currentLocaleIndex == EditorTools.locales.Length - 1)
             Loaders.dialogues = Manager.OpenFile("Assets/RR-Narration/Resources/RR-Dialogues/" + EditorTools.fileName + ".txt");

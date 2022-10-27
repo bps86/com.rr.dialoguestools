@@ -66,8 +66,6 @@ namespace RR.DialogueTools.Engine
             string json = reader.ReadToEnd();
             reader.Close();
             string[] dialoguesList = json.Split(';');
-            if (dialoguesList.Length == 1 && System.String.IsNullOrEmpty(dialoguesList[0]))
-            return null;
             return GetDialogues(dialoguesList);
         }
         public static void SaveFile(string path, string fileData)
