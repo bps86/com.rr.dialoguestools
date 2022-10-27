@@ -121,6 +121,7 @@ namespace RR.DialogueTools.Engine
             string[] beepPath = beepDataPath.text.Split(';');
             for (int i = 0; i < spritePath.Length; i++)
             {
+                if(System.String.IsNullOrEmpty(spritePath[i])) continue;
                 string name = spritePath[i].Substring(spritePath[i].LastIndexOf('/') + 1, spritePath[i].LastIndexOf(',') - spritePath[i].LastIndexOf('/') - 1);
                 string expression = spritePath[i].Substring(spritePath[i].LastIndexOf(',') + 1, spritePath[i].Length - spritePath[i].LastIndexOf(',') - 1);
                 dictActorSprite.Add(name + ";;" + expression, Resources.Load<Sprite>(spritePath[i]));
@@ -128,12 +129,14 @@ namespace RR.DialogueTools.Engine
             }
             for (int i = 0; i < spinePath.Length; i++)
             {
+                if(System.String.IsNullOrEmpty(spinePath[i])) continue;
                 string name = spinePath[i].Substring(spinePath[i].LastIndexOf('/') + 1);
                 dictActorSpine.Add(name, new ActorSpine(name, "RR-Actors-Spine/" + name + "/skeleton_SkeletonData"));
                 yield return new WaitForFixedUpdate();
             }
             for (int i = 0; i < beepPath.Length; i++)
             {
+                if(System.String.IsNullOrEmpty(beepPath[i])) continue;
                 string name = beepPath[i].Substring(beepPath[i].LastIndexOf('/') + 1);
                 dictActorBeep.Add(name, Resources.Load<AudioClip>(beepPath[i]));
                 yield return new WaitForFixedUpdate();
