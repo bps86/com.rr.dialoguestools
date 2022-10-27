@@ -22,6 +22,8 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     bool stop = false;
     public enum IsInverted { True = -1, False = 1 }
     public IsInverted isInverted = IsInverted.False;
+    public List<string> Dialogues = new List<string>();
+    public string currentDialogue;
     Color color = new Color(255, 255, 255, 0);
     AudioSource audioSource;
     Vector3 spriteV3, spineV3, spriteV3scale, spineV3scale;
@@ -33,7 +35,8 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         spineV3 = skeletonAnimation.gameObject.transform.position;
         spriteV3scale = image.gameObject.transform.localScale;
         spineV3scale = skeletonAnimation.gameObject.transform.localScale;
-        Loaders.dialoguesData.Add("Dialogue1", Resources.Load<TextAsset>("RR-Dialogues/newdialogue"));
+        for ( int i = 0; i < Dialogues.Count;i++)
+        Loaders.dialoguesData.Add(Dialogues[i], Resources.Load<TextAsset>("RR-Dialogues/"+Dialogues[i]));
         StartCoroutine(Load());
         button.onClick.AddListener(delegate { NextDialogue(); });
     }
@@ -44,7 +47,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         StartCoroutine(Loaders.LoadActorData());
         yield return new WaitUntil(() => Loaders.isLoaded);
         // Loaders.LoadDialogueFile(Loaders.dialoguesData["Dialogue1"].text);
-        Loaders.LoadDialogueTable("newdialogue");
+        Loaders.LoadDialogueTable(currentDialogue);
         _name.text = "failed loading statics";
         Refresh(useBeep);
     }
@@ -57,7 +60,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.R))
         {
-            Loaders.LoadDialogueTable("newdialogue");
+            Loaders.LoadDialogueTable(currentDialogue);
             stop = true;
             Loaders.LoadDialogueData(tags, index);
             stop = false;
