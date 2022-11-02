@@ -16,7 +16,7 @@ namespace RR.DialogueTools.Engine
         public string dialogue;
         public string tags;
         public int index;
-        public enum NameMode { Normal = 0, Hidden = 1, None = 2}
+        public enum NameMode { Normal = 0, Hidden = 1, None = 2 }
         public NameMode nameMode;
         public enum CharPos { Left = -1, Center = 0, Right = 1 }
         public CharPos charPos;
@@ -60,12 +60,19 @@ namespace RR.DialogueTools.Engine
             writer.Write(newFile);
             writer.Close();
         }
-        public static List<Dialogue> OpenFile(string path)
+        public static string OpenFile(string path)
         {
             using StreamReader reader = new StreamReader(path);
             string json = reader.ReadToEnd();
             reader.Close();
-            string[] dialoguesList = json.Split(';');
+            return json;
+        }
+        public static List<Dialogue> OpenDialogueFile(string path)
+        {
+            using StreamReader reader = new StreamReader(path);
+            string json = reader.ReadToEnd();
+            reader.Close();
+            string[] dialoguesList = json.Split(new string[]{"||"},System.StringSplitOptions.None);
             return GetDialogues(dialoguesList);
         }
         public static void SaveFile(string path, string fileData)
@@ -85,7 +92,7 @@ namespace RR.DialogueTools.Engine
             }
             for (int i = 0; i < dialoguesList.Length; i++)
             {
-                string[] dialoguedata = dialoguesList[i].Split('_');
+                string[] dialoguedata = dialoguesList[i].Split(new string[]{";"},System.StringSplitOptions.None);
                 tmpDialogues.Add(new Dialogue());
                 tmpDialogues[i].name = dialoguedata[0];
                 tmpDialogues[i].expression = dialoguedata[1];
@@ -99,7 +106,7 @@ namespace RR.DialogueTools.Engine
             return tmpDialogues;
         }
     }
-    public static class Loaders
+    public static class Narration
     {
         public static Dialogue dialogue;
         public static List<Dialogue> dialogues;
@@ -121,7 +128,7 @@ namespace RR.DialogueTools.Engine
             string[] beepPath = beepDataPath.text.Split(';');
             for (int i = 0; i < spritePath.Length; i++)
             {
-                if(System.String.IsNullOrEmpty(spritePath[i])) continue;
+                if (System.String.IsNullOrEmpty(spritePath[i])) continue;
                 string name = spritePath[i].Substring(spritePath[i].LastIndexOf('/') + 1, spritePath[i].LastIndexOf(',') - spritePath[i].LastIndexOf('/') - 1);
                 string expression = spritePath[i].Substring(spritePath[i].LastIndexOf(',') + 1, spritePath[i].Length - spritePath[i].LastIndexOf(',') - 1);
                 dictActorSprite.Add(name + ";;" + expression, Resources.Load<Sprite>(spritePath[i]));
@@ -129,14 +136,14 @@ namespace RR.DialogueTools.Engine
             }
             for (int i = 0; i < spinePath.Length; i++)
             {
-                if(System.String.IsNullOrEmpty(spinePath[i])) continue;
+                if (System.String.IsNullOrEmpty(spinePath[i])) continue;
                 string name = spinePath[i].Substring(spinePath[i].LastIndexOf('/') + 1);
                 dictActorSpine.Add(name, new ActorSpine(name, "RR-Actors-Spine/" + name + "/skeleton_SkeletonData"));
                 yield return new WaitForFixedUpdate();
             }
             for (int i = 0; i < beepPath.Length; i++)
             {
-                if(System.String.IsNullOrEmpty(beepPath[i])) continue;
+                if (System.String.IsNullOrEmpty(beepPath[i])) continue;
                 string name = beepPath[i].Substring(beepPath[i].LastIndexOf('/') + 1);
                 dictActorBeep.Add(name, Resources.Load<AudioClip>(beepPath[i]));
                 yield return new WaitForFixedUpdate();
@@ -147,13 +154,13 @@ namespace RR.DialogueTools.Engine
 
         public static void LoadDialogueTable(string tableKey)
         {
-            LoadDialogueFile(Loaders.localizedDialogueTable.GetTable()[tableKey].LocalizedValue);
-            
+            LoadDialogueFile(Narration.localizedDialogueTable.GetTable()[tableKey].LocalizedValue);
+
         }
         public static void LoadDialogueFile(string _dialoguedata)
         {
             dictDialogues.Clear();
-            dialogues = Manager.GetDialogues(_dialoguedata.Split(';'));
+            dialogues = Manager.GetDialogues(_dialoguedata.Split(new string[]{"||"},System.StringSplitOptions.None));
             if (dialogues.Count < 1) dialogues.Add(new Dialogue());
             for (int i = 0; i < dialogues.Count; i++)
                 dictDialogues[dialogues[i].tags + ";" + dialogues[i].index] = dialogues[i];
@@ -170,16 +177,10 @@ namespace RR.DialogueTools.Engine
             }
             else dialogue.skeletonDataAsset = null;
         }
-        static List<string> GetDialogueName(List<Dialogue> _dialogues, List<string> _names)
-        {
-            for (int i = 0; i < _dialogues.Count; i++)
-                if (!_names.Contains(dialogues[i].name)) _names.Add(dialogues[i].name);
-            return _names;
-        }
     }
 }
 
-namespace RR.DialogueTools.Audio
+namespace RR.DialogueTools.Extra_Audio
 {
     public static class Player
     {
@@ -191,3 +192,41 @@ namespace RR.DialogueTools.Audio
     }
 }
 
+namespace RR.DialogueTools.Extra_Visual
+{
+    public class Visual
+    {
+        public int actorCount;
+        public List<VisualData> visualDatas = new List<VisualData>();
+    }
+    [System.Serializable]
+    public class VisualData
+    {
+        public string tags;
+        public int index;
+        public List<string> actor = new List<string>();
+        public List<Vector3> pos = new List<Vector3>(),
+        scale = new List<Vector3>();
+    }
+    public static class Visualization
+    {
+        public static Visual visual = new Visual();
+        public static VisualData visualData = new VisualData();
+        public static Dictionary<string,TextAsset> visualAssets = new Dictionary<string, TextAsset>();
+        public static Dictionary<string,VisualData> dictVisualDatas = new Dictionary<string, VisualData>();
+        public static void LoadVisualAsset(string visualAsset)
+        {
+            dictVisualDatas.Clear();
+            JsonUtility.FromJsonOverwrite(visualAsset,visual);
+            if (visual.visualDatas.Count < 1) visual.visualDatas.Add(new VisualData());
+            for (int i = 0; i < visual.visualDatas.Count; i++)
+                dictVisualDatas[visual.visualDatas[i].tags + ";" + visual.visualDatas[i].index] = visual.visualDatas[i];
+            LoadVisualData(visual.visualDatas[0].tags, visual.visualDatas[0].index);
+        }
+        public static void LoadVisualData(string tags, int index)
+        {
+            visualData = dictVisualDatas[tags+";"+index];
+        }
+    }
+    
+}

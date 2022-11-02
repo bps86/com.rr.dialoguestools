@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using RR.DialogueTools.Engine;
-using RR.DialogueTools.Audio;
+using RR.DialogueTools.Extra_Audio;
+using RR.DialogueTools.Extra_Visual;
 using TMPro;
 using Spine.Unity;
 
@@ -16,12 +17,14 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     // bool ready = false;
     public Button button;
     public SkeletonAnimation skeletonAnimation;
-    public Image image;
+    public SpriteRenderer sprite;
     public bool useBeep;
     public float minPitch = -0.2f, maxPitch = 0.2f, Range = 0;
     bool stop = false;
     public enum IsInverted { True = -1, False = 1 }
     public IsInverted isInverted = IsInverted.False;
+    public bool useExtra_Visual;
+    public RR_DialogueTools_Extra rR_DialogueTools_Extra;
     public List<string> Dialogues = new List<string>();
     public string currentDialogue;
     Color color = new Color(255, 255, 255, 0);
@@ -29,26 +32,29 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     Vector3 spriteV3, spineV3, spriteV3scale, spineV3scale;
     void Awake()
     {
-        image.color = color;
+        sprite.color = color;
         audioSource = gameObject.GetComponent<AudioSource>();
-        spriteV3 = image.gameObject.transform.position;
+        spriteV3 = sprite.gameObject.transform.position;
         spineV3 = skeletonAnimation.gameObject.transform.position;
-        spriteV3scale = image.gameObject.transform.localScale;
+        spriteV3scale = sprite.gameObject.transform.localScale;
         spineV3scale = skeletonAnimation.gameObject.transform.localScale;
-        for ( int i = 0; i < Dialogues.Count;i++)
-        Loaders.dialoguesData.Add(Dialogues[i], Resources.Load<TextAsset>("RR-Dialogues/"+Dialogues[i]));
+        for (int i = 0; i < Dialogues.Count; i++)
+        {
+            Narration.dialoguesData.Add(Dialogues[i], Resources.Load<TextAsset>("RR-Dialogues/" + Dialogues[i]));
+            if (useExtra_Visual)Visualization.visualAssets.Add(Dialogues[i], Resources.Load<TextAsset>("RR-Visual/" + Dialogues[i]));
+        }
         StartCoroutine(Load());
         button.onClick.AddListener(delegate { NextDialogue(); });
     }
 
     IEnumerator Load()
     {
-        Debug.Log(Loaders.isLoaded);
-        StartCoroutine(Loaders.LoadActorData());
-        yield return new WaitUntil(() => Loaders.isLoaded);
+        Debug.Log(Narration.isLoaded);
+        StartCoroutine(Narration.LoadActorData());
+        yield return new WaitUntil(() => Narration.isLoaded);
         // Loaders.LoadDialogueFile(Loaders.dialoguesData["Dialogue1"].text);
-        Loaders.LoadDialogueTable(currentDialogue);
-        _name.text = "failed loading statics";
+        Narration.LoadDialogueTable(currentDialogue);
+        if (useExtra_Visual) Visualization.LoadVisualAsset(Visualization.visualAssets[currentDialogue].text);
         Refresh(useBeep);
     }
 
@@ -60,68 +66,76 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.R))
         {
-            Loaders.LoadDialogueTable(currentDialogue);
+            Narration.LoadDialogueTable(currentDialogue);
             stop = true;
-            Loaders.LoadDialogueData(tags, index);
+            Narration.LoadDialogueData(tags, index);
             stop = false;
             Refresh(useBeep);
         }
     }
     public void NextDialogue()
     {
-        if (index < Loaders.dialogues.Count - 1) index += 1;
-        if (index >= Loaders.dialogues.Count) return;
+        if (index < Narration.dialogues.Count - 1) index += 1;
+        if (index >= Narration.dialogues.Count) return;
         stop = true;
-        Loaders.LoadDialogueData(tags, index);
+        Narration.LoadDialogueData(tags, index);
+        if (useExtra_Visual) Visualization.LoadVisualData(tags, index);
         stop = false;
         Refresh(useBeep);
     }
     void Refresh(bool isBeep = false)
     {
-        Debug.Log(Loaders.dialogue.nameShown);
-        _name.text = Loaders.dialogue.nameShown;
+        Debug.Log(Narration.dialogue.nameShown);
+        _name.text = Narration.dialogue.nameShown;
         audioSource.clip = null;
-        if (Loaders.dictActorBeep.ContainsKey(Loaders.dialogue.name))
+        if (Narration.dictActorBeep.ContainsKey(Narration.dialogue.name))
         {
-            audioSource.clip = Loaders.dictActorBeep[Loaders.dialogue.name];
+            audioSource.clip = Narration.dictActorBeep[Narration.dialogue.name];
         }
         if (isBeep)
         {
             Debug.Log("Beep Used");
             Beep();
         }
-        if (!isBeep) _dialogue.text = Loaders.dialogue.dialogue;
-        image.sprite = Loaders.dialogue.sprite;
-        if (Loaders.dictActorSprite.ContainsKey(Loaders.dialogue.name + ";;" + Loaders.dialogue.expression))
+        if (!isBeep) _dialogue.text = Narration.dialogue.dialogue;
+        if (!useExtra_Visual)
         {
-            image.sprite = Loaders.dictActorSprite[Loaders.dialogue.name + ";;" + Loaders.dialogue.expression];
-            color.a = 255;
-            image.transform.position = spriteV3 + new Vector3((float)Loaders.dialogue.charPos * Range, 1, 1);
-            image.gameObject.transform.localScale = Vector3.Scale(spriteV3scale, new Vector3((float)isInverted, 1, 1));
+            sprite.color = color;
+            if (Narration.dictActorSprite.ContainsKey(Narration.dialogue.name + ";;" + Narration.dialogue.expression))
+            {
+                sprite.sprite = Narration.dictActorSprite[Narration.dialogue.name + ";;" + Narration.dialogue.expression];
+                color.a = 255;
+                sprite.color = color;
+                sprite.transform.position = spriteV3 + new Vector3((float)Narration.dialogue.charPos * Range, 1, 1);
+                sprite.gameObject.transform.localScale = Vector3.Scale(spriteV3scale, new Vector3((float)isInverted, 1, 1));
+            }
+            else
+            {
+                sprite.sprite = null;
+                color.a = 0;
+            }
+            if (Narration.dialogue.skeletonDataAsset == null)
+            {
+                skeletonAnimation.gameObject.SetActive(false);
+                return;
+            }
+            if (!skeletonAnimation.gameObject.activeSelf) skeletonAnimation.gameObject.SetActive(true);
+            // skeletonAnimation.skeletonDataAsset.Clear();
+            skeletonAnimation.skeletonDataAsset = Narration.dialogue.skeletonDataAsset;
+            skeletonAnimation.Initialize(true);
+            skeletonAnimation.AnimationName = Narration.dialogue.expression;
+            skeletonAnimation.gameObject.transform.position = spineV3 + new Vector3((float)Narration.dialogue.charPos * Range, 1, 1);
+            skeletonAnimation.transform.localScale = Vector3.Scale(spineV3scale, new Vector3((float)isInverted, 1, 1));
         }
-        else
+        if (useExtra_Visual)
         {
-            image.sprite = null;
-            color.a = 0;
+            rR_DialogueTools_Extra.ChangeAnimPos();
         }
-        image.color = color;
-        if (Loaders.dialogue.skeletonDataAsset == null)
-        {
-            skeletonAnimation.gameObject.SetActive(false);
-            return;
-        }
-        if (!skeletonAnimation.gameObject.activeSelf) skeletonAnimation.gameObject.SetActive(true);
-        // skeletonAnimation.skeletonDataAsset.Clear();
-        skeletonAnimation.skeletonDataAsset = Loaders.dialogue.skeletonDataAsset;
-        skeletonAnimation.Initialize(true);
-        skeletonAnimation.AnimationName = Loaders.dialogue.expression;
-        skeletonAnimation.gameObject.transform.position = spineV3 + new Vector3((float)Loaders.dialogue.charPos * Range, 1, 1);
-        skeletonAnimation.transform.localScale = Vector3.Scale(spineV3scale, new Vector3((float)isInverted, 1, 1));
     }
     void Beep()
     {
         if (audioSource.clip == null) return;
-        StartCoroutine(PlayBeep(false, Loaders.dialogue, audioSource, 1 / beepPerSeconds));
+        StartCoroutine(PlayBeep(false, Narration.dialogue, audioSource, 1 / beepPerSeconds));
     }
 
     public IEnumerator PlayBeep(bool pause, Dialogue dialogue, AudioSource audioSource, float seconds = 0.1f)
