@@ -52,8 +52,8 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         Debug.Log(Narration.isLoaded);
         StartCoroutine(Narration.LoadActorData());
         yield return new WaitUntil(() => Narration.isLoaded);
-        // Loaders.LoadDialogueFile(Loaders.dialoguesData["Dialogue1"].text);
-        Narration.LoadDialogueTable(currentDialogue);
+        Narration.LoadDialogueFile(Narration.dialoguesData[currentDialogue].text);
+        // Narration.LoadDialogueTable(currentDialogue);
         if (useExtra_Visual) Visualization.LoadVisualAsset(Visualization.visualAssets[currentDialogue].text);
         Refresh(useBeep);
     }
