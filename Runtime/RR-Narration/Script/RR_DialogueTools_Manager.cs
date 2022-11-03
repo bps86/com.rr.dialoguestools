@@ -27,6 +27,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     public RR_DialogueTools_Extra rR_DialogueTools_Extra;
     public List<string> Dialogues = new List<string>();
     public string currentDialogue;
+    public bool useLocalization;
     Color color = new Color(255, 255, 255, 0);
     AudioSource audioSource;
     Vector3 spriteV3, spineV3, spriteV3scale, spineV3scale;
@@ -52,8 +53,8 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         Debug.Log(Narration.isLoaded);
         StartCoroutine(Narration.LoadActorData());
         yield return new WaitUntil(() => Narration.isLoaded);
-        Narration.LoadDialogueFile(Narration.dialoguesData[currentDialogue].text);
-        // Narration.LoadDialogueTable(currentDialogue);
+        if (!useLocalization) Narration.LoadDialogueFile(Narration.dialoguesData[currentDialogue].text);
+        else Narration.LoadDialogueTable(currentDialogue);
         if (useExtra_Visual) Visualization.LoadVisualAsset(Visualization.visualAssets[currentDialogue].text);
         Refresh(useBeep);
     }
@@ -66,7 +67,8 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.R))
         {
-            Narration.LoadDialogueTable(currentDialogue);
+            if (!useLocalization) Narration.LoadDialogueFile(Narration.dialoguesData[currentDialogue].text);
+            else Narration.LoadDialogueTable(currentDialogue);
             stop = true;
             Narration.LoadDialogueData(tags, index);
             stop = false;
