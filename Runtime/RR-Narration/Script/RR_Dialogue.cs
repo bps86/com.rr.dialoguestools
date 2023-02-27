@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Spine.Unity;
 
-public class RRDialogue
+public class RR_Dialogue
 {
     public string name;
     public string nameShown;
@@ -18,8 +18,7 @@ public class RRDialogue
     public CharPos charPos;
     public Sprite sprite;
     public SkeletonDataAsset skeletonDataAsset;
-    public RRDialogue(string _name = "name", string _expression = "expression", string _dialogue = "dialogue", string _tags = "tags", int _index = 0, NameMode _nameMode = NameMode.Normal, CharPos _charPos = CharPos.Center)
-    {
+    public RR_Dialogue(string _name = "name", string _expression = "expression", string _dialogue = "dialogue", string _tags = "tags", int _index = 0, NameMode _nameMode = NameMode.Normal, CharPos _charPos = CharPos.Center) {
         this.name = _name;
         this.expression = _expression;
         this.dialogue = _dialogue;
@@ -29,10 +28,15 @@ public class RRDialogue
         this.nameShown = GetName(_nameMode);
         this.charPos = _charPos;
     }
-    public string GetName(NameMode _nameMode)
-    {
-        if (_nameMode == NameMode.Hidden) return "?";
-        if (_nameMode == NameMode.None) return "";
-        return this.name;
+    public string GetName(NameMode _nameMode) {
+        switch (_nameMode) {
+            case NameMode.Hidden:
+                return "?";
+            case NameMode.None:
+                return "";
+            case NameMode.Normal:
+                return this.name;
+        }
+        return "Error";
     }
 }

@@ -164,9 +164,9 @@ public static class EditorTools
             }
             expression[tempSpine[i]] = name.ToArray();
         }
-        RR_NarrationManager.SaveFile(Application.dataPath + Path.AltDirectorySeparatorChar + "RR-Narration/Resources/spritePaths.txt", spritePaths);
-        RR_NarrationManager.SaveFile(Application.dataPath + Path.AltDirectorySeparatorChar + "RR-Narration/Resources/spinePaths.txt", spinePaths);
-        RR_NarrationManager.SaveFile(Application.dataPath + Path.AltDirectorySeparatorChar + "RR-Narration/Resources/beepPaths.txt", beepPaths);
+        RR_NarrationFunctions.SaveFile(Application.dataPath + Path.AltDirectorySeparatorChar + "RR-Narration/Resources/spritePaths.txt", spritePaths);
+        RR_NarrationFunctions.SaveFile(Application.dataPath + Path.AltDirectorySeparatorChar + "RR-Narration/Resources/spinePaths.txt", spinePaths);
+        RR_NarrationFunctions.SaveFile(Application.dataPath + Path.AltDirectorySeparatorChar + "RR-Narration/Resources/beepPaths.txt", beepPaths);
         AssetDatabase.Refresh();
     }
     // [MenuItem("Testing/AddSortLayer")]
@@ -261,7 +261,7 @@ public static class EditorTools
     {
         RR_NarrationVisualization.visual = new RR_NarrationVisual();
         string visualJson = JsonUtility.ToJson(RR_NarrationVisualization.visual);
-        RR_NarrationManager.SaveFile("Assets/RR-Narration/Resources/RR-Visual/" + EditorTools.fileName + ".json", visualJson);
+        RR_NarrationFunctions.SaveFile("Assets/RR-Narration/Resources/RR-Visual/" + EditorTools.fileName + ".json", visualJson);
     }
 
     static int GenerateUID()
