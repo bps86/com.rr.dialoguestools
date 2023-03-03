@@ -8,7 +8,7 @@ using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
 using UnityEngine.Localization.Tables;
 
-public static class EditorTools
+public static class RR_EditorTools
 {
     public static string fileName, fileData;
     static string[] spritePath = new string[] { };
@@ -22,17 +22,14 @@ public static class EditorTools
     public static int currentLocaleIndex;
     public static string getFileName;
     public static StringTableCollection rrDialoguesTable;
-    public static void GetDialogueIndex()
-    {
-        for (int i = 0; i < RR_Narration.dialogues.Count; i++)
-        {
-            EditorTools.actorDataIndex["Actor" + i] = 0;
-            EditorTools.actorDataIndex["Expression" + i] = 0;
+    public static void GetDialogueIndex() {
+        for (int i = 0; i < RR_Narration.dialogues.Count; i++) {
+            RR_EditorTools.actorDataIndex["Actor" + i] = 0;
+            RR_EditorTools.actorDataIndex["Expression" + i] = 0;
         }
     }
     [MenuItem("Tools/RR/Initialize RR Dir & Settings")]
-    public static void Initialize_RR_Dir()
-    {
+    public static void Initialize_RR_Dir() {
         LocalizationSettings localizationSettings = null;
         if (!Directory.Exists("Assets/RR-Narration")) Directory.CreateDirectory("Assets/RR-Narration");
         if (!Directory.Exists("Assets/RR-Narration/Resources")) Directory.CreateDirectory("Assets/RR-Narration/Resources");
@@ -46,17 +43,14 @@ public static class EditorTools
         if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Visual")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Visual");
         if (!Directory.Exists("Assets/Editor")) Directory.CreateDirectory("Assets/Editor");
         if (!Directory.Exists("Assets/Editor/RR-Thumbnail")) Directory.CreateDirectory("Assets/Editor/RR-Thumbnail");
-        if (LocalizationEditorSettings.ActiveLocalizationSettings != null)
-        {
+        if (LocalizationEditorSettings.ActiveLocalizationSettings != null) {
             localizationSettings = LocalizationEditorSettings.ActiveLocalizationSettings;
             if (LocalizationEditorSettings.GetLocales().Count > 0)
-                if (!File.Exists("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue.asset") || !File.Exists("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue Shared Data.asset"))
-                {
+                if (!File.Exists("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue.asset") || !File.Exists("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue Shared Data.asset")) {
                     LocalizationEditorSettings.CreateStringTableCollection("RR-Dialogue", "Assets/RR-Narration/Resources/RR-DialoguesTable", LocalizationEditorSettings.GetLocales());
                 }
         }
-        if (File.Exists("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue.asset"))
-        {
+        if (File.Exists("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue.asset")) {
             rrDialoguesTable = AssetDatabase.LoadAssetAtPath<StringTableCollection>("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue.asset");
             List<Locale> missingLocale = new List<Locale>();
             for (int i = 0; i < LocalizationEditorSettings.GetLocales().Count; i++)
@@ -66,13 +60,12 @@ public static class EditorTools
                 rrDialoguesTable.AddNewTable(missingLocale[i].Identifier);
         }
 
-        EditorTools.CheckSortingLayers();
+        RR_EditorTools.CheckSortingLayers();
 
-        EditorTools.Refresh_RR_DialogueTools();
+        RR_EditorTools.Refresh_RR_DialogueTools();
     }
     [MenuItem("Tools/RR/Refresh RR AssetPaths")]
-    public static void Refresh_RR_DialogueTools()
-    {
+    public static void Refresh_RR_DialogueTools() {
         spritePath = Directory.GetFiles("Assets/RR-Narration/Resources/RR-Actors/");
         spinePath = Directory.GetDirectories("Assets/RR-Narration/Resources/RR-Actors-Spine/");
         beepPath = Directory.GetFiles("Assets/RR-Narration/Resources/RR-Sound/Beep/");
@@ -90,10 +83,8 @@ public static class EditorTools
         if (!Directory.Exists("Assets/Editor")) Directory.CreateDirectory("Assets/Editor");
         if (!Directory.Exists("Assets/Editor/RR-Thumbnail")) Directory.CreateDirectory("Assets/Editor/RR-Thumbnail");
 
-        for (int i = 0; i < spritePath.Length; i++)
-        {
-            if (spritePath[i].Contains(".meta"))
-            {
+        for (int i = 0; i < spritePath.Length; i++) {
+            if (spritePath[i].Contains(".meta")) {
                 continue;
             }
             tempSprite.Add(spritePath[i].Substring(spritePath[i].LastIndexOf('/') + 1, spritePath[i].LastIndexOf('.') - spritePath[i].LastIndexOf('/') - 1));
@@ -102,8 +93,7 @@ public static class EditorTools
             File.Copy(spritePath[i], "Assets/Editor/RR-Thumbnail/Thumbnail-" + tempSprite[nameIndex] + ".png", true);
             nameIndex += 1;
             string name = spritePath[i].Substring(spritePath[i].LastIndexOf('/') + 1, spritePath[i].LastIndexOf(',') - spritePath[i].LastIndexOf('/') - 1);
-            if (temp.Contains(name))
-            {
+            if (temp.Contains(name)) {
                 continue;
             }
             temp.Add(name);
@@ -111,20 +101,16 @@ public static class EditorTools
             dictSprite[name] = new List<string>();
             index += 1;
         }
-        for (int i = 0; i < spinePath.Length; i++)
-        {
+        for (int i = 0; i < spinePath.Length; i++) {
             string name = spinePath[i].Substring(spinePath[i].LastIndexOf('/') + 1);
-            if (temp.Contains(name))
-            {
+            if (temp.Contains(name)) {
                 continue;
             }
             temp.Add(name);
             tempSpine.Add(name);
         }
-        for (int i = 0; i < beepPath.Length; i++)
-        {
-            if (beepPath[i].Contains(".meta"))
-            {
+        for (int i = 0; i < beepPath.Length; i++) {
+            if (beepPath[i].Contains(".meta")) {
                 continue;
             }
             string beepName = beepPath[i].Substring(beepPath[i].LastIndexOf('/') + 1, beepPath[i].LastIndexOf('.') - beepPath[i].LastIndexOf('/') - 1);
@@ -133,30 +119,25 @@ public static class EditorTools
             beepIndex += 1;
         }
         names = temp.ToArray();
-        for (int i = 0; i < tempSprite.Count; i++)
-        {
+        for (int i = 0; i < tempSprite.Count; i++) {
             string name = tempSprite[i].Substring(0, tempSprite[i].LastIndexOf(','));
             string expression = tempSprite[i].Substring(tempSprite[i].LastIndexOf(',') + 1, tempSprite[i].Length - tempSprite[i].LastIndexOf(',') - 1);
             dictSprite[name].Add(expression);
         }
-        for (int i = 0; i < tempSpriteActor.Count; i++)
-        {
+        for (int i = 0; i < tempSpriteActor.Count; i++) {
             expression[tempSpriteActor[i]] = dictSprite[tempSpriteActor[i]].ToArray();
         }
-        for (int i = 0; i < tempSpine.Count; i++)
-        {
+        for (int i = 0; i < tempSpine.Count; i++) {
             List<string> name = new List<string>();
             if (i > 0) spinePaths += ";";
             spinePaths += "RR-Narration/Resources/RR-Actors-Spine/" + tempSpine[i];
             Spine.Unity.SkeletonDataAsset skeletonDataAsset = AssetDatabase.LoadAssetAtPath<Spine.Unity.SkeletonDataAsset>("Assets/RR-Narration/Resources/RR-Actors-Spine/" + tempSpine[i] + "/skeleton_SkeletonData.asset");
             Spine.SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
             Spine.Animation[] animations = skeletonData.Animations.ToArray();
-            for (int _index = 0; _index < animations.Length; _index++)
-            {
+            for (int _index = 0; _index < animations.Length; _index++) {
                 name.Add(animations[_index].Name);
                 string thumbPath = "Assets/RR-Narration/Resources/RR-Actors-Spine/" + tempSpine[i] + "/Thumbnail-" + tempSpine[i] + "," + animations[_index].Name + ".png";
-                if (File.Exists(thumbPath))
-                {
+                if (File.Exists(thumbPath)) {
                     File.Copy(thumbPath, "Assets/Editor/RR-Thumbnail/Thumbnail-" + tempSpine[i] + "," + animations[_index].Name + ".png", true);
                     File.Delete(thumbPath);
                     File.Delete(thumbPath + ".meta");
@@ -170,8 +151,7 @@ public static class EditorTools
         AssetDatabase.Refresh();
     }
     // [MenuItem("Testing/AddSortLayer")]
-    public static void CheckSortingLayers()
-    {
+    public static void CheckSortingLayers() {
         var tagMan = AssetDatabase.LoadMainAssetAtPath("ProjectSettings/TagManager.asset");
         if (tagMan == null) return;
         var so = new SerializedObject(tagMan);
@@ -188,15 +168,12 @@ public static class EditorTools
         AssetDatabase.Refresh();
     }
 
-    public static int CheckIdDuplicates(SerializedProperty sp)
-    {
+    public static int CheckIdDuplicates(SerializedProperty sp) {
         int uniqueID = GenerateUID();
-        for (int i = 0; i < sp.arraySize; i++)
-        {
+        for (int i = 0; i < sp.arraySize; i++) {
             if (sp.GetArrayElementAtIndex(i).FindPropertyRelative("uniqueId") == null)
                 continue;
-            if (uniqueID == 0 || uniqueID == sp.GetArrayElementAtIndex(i).FindPropertyRelative("uniqueId").intValue)
-            {
+            if (uniqueID == 0 || uniqueID == sp.GetArrayElementAtIndex(i).FindPropertyRelative("uniqueId").intValue) {
                 uniqueID = GenerateUID();
                 i = -1;
                 continue;
@@ -206,11 +183,9 @@ public static class EditorTools
         return uniqueID;
     }
 
-    public static void CreateRRLayers(string name, int uid, SerializedObject so, SerializedProperty m_SortingLayers)
-    {
+    public static void CreateRRLayers(string name, int uid, SerializedObject so, SerializedProperty m_SortingLayers) {
         var num_SortingLayers = m_SortingLayers.arraySize;
-        for (int i = 0; i < num_SortingLayers; i++)
-        {
+        for (int i = 0; i < num_SortingLayers; i++) {
             if (name == m_SortingLayers.GetArrayElementAtIndex(i).FindPropertyRelative("name").stringValue) return;
         }
         m_SortingLayers.InsertArrayElementAtIndex(num_SortingLayers);
@@ -221,19 +196,15 @@ public static class EditorTools
         so.Update();
     }
 
-    public static void ToStringTable(string _filename, string _fileData, StringTableCollection stringTableCollection)
-    {
-        if (EditorTools.currentLocaleIndex == EditorTools.locales.Length - 1) return;
-        for (int i = 0; i < stringTableCollection.StringTables.Count; i++)
-        {
-            if (stringTableCollection.StringTables[i].name == "RR-Dialogue_" + EditorTools.currentLocale)
-            {
-                SetStringTable(_filename, _fileData, AssetDatabase.LoadAssetAtPath<StringTable>("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue_" + EditorTools.currentLocale + ".asset"));
+    public static void ToStringTable(string _filename, string _fileData, StringTableCollection stringTableCollection) {
+        if (RR_EditorTools.currentLocaleIndex == RR_EditorTools.locales.Length - 1) return;
+        for (int i = 0; i < stringTableCollection.StringTables.Count; i++) {
+            if (stringTableCollection.StringTables[i].name == "RR-Dialogue_" + RR_EditorTools.currentLocale) {
+                SetStringTable(_filename, _fileData, AssetDatabase.LoadAssetAtPath<StringTable>("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue_" + RR_EditorTools.currentLocale + ".asset"));
             }
         }
     }
-    public static void SetStringTable(string _filename, string _fileData, StringTable stringTable)
-    {
+    public static void SetStringTable(string _filename, string _fileData, StringTable stringTable) {
         StringTableEntry entry = GetStringTableEntry(stringTable, _filename);
         entry.Value = _fileData;
         EditorUtility.SetDirty(stringTable);
@@ -241,31 +212,26 @@ public static class EditorTools
         AssetDatabase.Refresh();
     }
 
-    public static StringTableEntry GetStringTableEntry(StringTable stringTable, string entry)
-    {
+    public static StringTableEntry GetStringTableEntry(StringTable stringTable, string entry) {
         return stringTable.GetEntry(entry) ?? stringTable.AddEntry(entry, string.Empty);
     }
 
-    public static string[] GetLocales(string[] localesArray)
-    {
+    public static string[] GetLocales(string[] localesArray) {
         List<string> names = new List<string>();
-        for (int i = 0; i < LocalizationEditorSettings.GetLocales().Count; i++)
-        {
+        for (int i = 0; i < LocalizationEditorSettings.GetLocales().Count; i++) {
             names.Add(LocalizationEditorSettings.GetLocales()[i].Identifier.Code);
         }
         names.Add("<None>");
         return names.ToArray();
     }
 
-    public static void CreateNewVisualAsset()
-    {
+    public static void CreateNewVisualAsset() {
         RR_NarrationVisualization.visual = new RR_NarrationVisual();
         string visualJson = JsonUtility.ToJson(RR_NarrationVisualization.visual);
-        RR_NarrationFunctions.SaveFile("Assets/RR-Narration/Resources/RR-Visual/" + EditorTools.fileName + ".json", visualJson);
+        RR_NarrationFunctions.SaveFile("Assets/RR-Narration/Resources/RR-Visual/" + RR_EditorTools.fileName + ".json", visualJson);
     }
 
-    static int GenerateUID()
-    {
+    static int GenerateUID() {
         int newGuid = System.Guid.NewGuid().GetHashCode();
         if (newGuid < 0) newGuid *= -1;
         return newGuid;

@@ -5,6 +5,7 @@ using UnityEngine;
 public class RR_Narration_AssetManagement
 {
     public Dictionary<string, TextAsset> dialoguesData = new Dictionary<string, TextAsset>();
+    public Dictionary<string, TextAsset> visualAssets = new Dictionary<string, TextAsset>();
     public Dictionary<string, Sprite> dictActorSprite = new Dictionary<string, Sprite>();
     public Dictionary<string, RR_ActorSpine> dictActorSpine = new Dictionary<string, RR_ActorSpine>();
     public Dictionary<string, AudioClip> dictActorBeep = new Dictionary<string, AudioClip>();

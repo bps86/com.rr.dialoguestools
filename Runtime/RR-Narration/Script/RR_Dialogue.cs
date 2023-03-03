@@ -12,9 +12,7 @@ public class RR_Dialogue
     public string dialogue;
     public string tags;
     public int index;
-    public enum NameMode { Normal = 0, Hidden = 1, None = 2 }
     public NameMode nameMode;
-    public enum CharPos { Left = -1, Center = 0, Right = 1 }
     public CharPos charPos;
     public Sprite sprite;
     public SkeletonDataAsset skeletonDataAsset;

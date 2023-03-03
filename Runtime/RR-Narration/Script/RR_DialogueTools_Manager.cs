@@ -8,40 +8,48 @@ using Spine.Unity;
 [RequireComponent(typeof(AudioSource))]
 public class RR_DialogueTools_Manager : MonoBehaviour
 {
-    public string tags;
-    public int index, beepPerSeconds;
-    public TMP_Text _name, _dialogue;
-    // bool ready = false;
-    public Button button;
-    public SkeletonAnimation skeletonAnimation;
-    public SpriteRenderer sprite;
-    public bool useBeep;
-    public float minPitch = -0.2f, maxPitch = 0.2f, Range = 0;
-    bool stop = false;
-    public enum IsInverted { True = -1, False = 1 }
-    public IsInverted isInverted = IsInverted.False;
-    public bool useExtra_Visual;
-    public RR_DialogueTools_Extra rR_DialogueTools_Extra;
-    public List<string> Dialogues = new List<string>();
-    public string currentDialogue;
-    public bool useLocalization;
+    [SerializeField] private Button button;
+    [SerializeField] private SkeletonAnimation skeletonAnimation;
+    [SerializeField] private SpriteRenderer sprite;
+    [SerializeField] private TMP_Text _name;
+    [SerializeField] private TMP_Text _dialogue;
+    [SerializeField] private RR_DialogueTools_Extra rR_DialogueTools_Extra;
+    [SerializeField] private IsInverted isInverted = IsInverted.False;
+    [SerializeField] private List<string> _dialogues = new List<string>();
+    [SerializeField] private string currentDialogue;
+    [SerializeField] private string tags;
+    [SerializeField] private int index;
+    [SerializeField] private int beepPerSeconds;
+    [SerializeField] private float minPitch = -0.2f;
+    [SerializeField] private float maxPitch = 0.2f;
+    [SerializeField] private float Range = 0;
+    [SerializeField] private bool useExtra_Visual;
+    [SerializeField] private bool useBeep;
+    [SerializeField] private bool useLocalization;
     private RR_Narration_AssetManagement rR_Narration_AssetManagement;
+    private RR_Narration_Visualization rR_Narration_Visualization;
     private RR_Narration rR_Narration;
-    Color color = new Color(255, 255, 255, 0);
-    AudioSource audioSource;
-    Vector3 spriteV3, spineV3, spriteV3scale, spineV3scale;
+    private Color color = new Color(255, 255, 255, 0);
+    private AudioSource audioSource;
+    private Vector3 spriteV3;
+    private Vector3 spineV3;
+    private Vector3 spriteV3scale;
+    private Vector3 spineV3scale;
+    bool stop = false;
     void Awake() {
         rR_Narration = new RR_Narration();
+        rR_Narration_AssetManagement = new RR_Narration_AssetManagement();
+        rR_Narration_Visualization = new RR_Narration_Visualization();
         sprite.color = color;
         audioSource = gameObject.GetComponent<AudioSource>();
         spriteV3 = sprite.gameObject.transform.position;
         spineV3 = skeletonAnimation.gameObject.transform.position;
         spriteV3scale = sprite.gameObject.transform.localScale;
         spineV3scale = skeletonAnimation.gameObject.transform.localScale;
-        for (int i = 0; i < Dialogues.Count; i++) {
-            rR_Narration_AssetManagement.dialoguesData.Add(Dialogues[i], Resources.Load<TextAsset>("RR-Dialogues/" + Dialogues[i]));
+        for (int i = 0; i < _dialogues.Count; i++) {
+            rR_Narration_AssetManagement.dialoguesData.Add(_dialogues[i], Resources.Load<TextAsset>("RR-Dialogues/" + _dialogues[i]));
             if (useExtra_Visual) {
-                RR_NarrationVisualization.visualAssets.Add(Dialogues[i], Resources.Load<TextAsset>("RR-Visual/" + Dialogues[i]));
+                rR_Narration_AssetManagement.visualAssets.Add(_dialogues[i], Resources.Load<TextAsset>("RR-Visual/" + _dialogues[i]));
             }
         }
         StartCoroutine(Load());
@@ -58,7 +66,8 @@ public class RR_DialogueTools_Manager : MonoBehaviour
             rR_Narration.LoadDialogueTable(currentDialogue);
         }
         if (useExtra_Visual) {
-            RR_NarrationVisualization.LoadVisualAsset(RR_NarrationVisualization.visualAssets[currentDialogue].text);
+            Debug.Log(rR_Narration_AssetManagement.visualAssets[currentDialogue].text);
+            rR_Narration_Visualization.LoadVisualAsset(rR_Narration_AssetManagement.visualAssets[currentDialogue].text);
         }
         Refresh(useBeep);
     }
@@ -87,7 +96,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
             stop = true;
             rR_Narration.LoadDialogueData(tags, index);
             if (useExtra_Visual) {
-                RR_NarrationVisualization.LoadVisualData(tags, index);
+                rR_Narration_Visualization.LoadVisualData(tags, index);
             }
             stop = false;
         }
@@ -133,7 +142,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
             skeletonAnimation.transform.localScale = Vector3.Scale(spineV3scale, new Vector3((float)isInverted, 1, 1));
         }
         if (useExtra_Visual) {
-            rR_DialogueTools_Extra.ChangeAnimPos(rR_Narration, rR_Narration_AssetManagement);
+            rR_DialogueTools_Extra.ChangeAnimPos(rR_Narration, rR_Narration_AssetManagement, rR_Narration_Visualization);
         }
     }
     void Beep() {

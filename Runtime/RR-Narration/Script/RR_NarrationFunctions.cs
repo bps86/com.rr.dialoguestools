@@ -47,9 +47,9 @@ public class RR_NarrationFunctions
             tmpDialogues[i].dialogue = dialoguedata[2];
             tmpDialogues[i].tags = dialoguedata[3];
             tmpDialogues[i].index = int.Parse(dialoguedata[4]);
-            tmpDialogues[i].nameMode = (RR_Dialogue.NameMode)int.Parse(dialoguedata[5]);
+            tmpDialogues[i].nameMode = (NameMode)int.Parse(dialoguedata[5]);
             tmpDialogues[i].nameShown = tmpDialogues[i].GetName(tmpDialogues[i].nameMode);
-            tmpDialogues[i].charPos = (RR_Dialogue.CharPos)int.Parse(dialoguedata[6]);
+            tmpDialogues[i].charPos = (CharPos)int.Parse(dialoguedata[6]);
         }
         return tmpDialogues;
     }
