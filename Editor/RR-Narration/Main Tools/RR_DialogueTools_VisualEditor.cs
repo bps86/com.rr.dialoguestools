@@ -12,32 +12,36 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
     public static bool ready = false;
     private Vector2 scrollPos = Vector2.zero, scrollPos2 = Vector2.zero;
     Rect cursorChangeRect;
-    public static EditorWindow getWindow, thisWindow;
-    public static Object textAsset;
+    // public static EditorWindow getWindow, thisWindow;
+    public Object textAsset;
     public TextAsset config;
     public List<string> clipboardActor;
     public List<Vector3> clipboardPos = new List<Vector3>(),
     clipboardScale = new List<Vector3>();
     RR_Narration_Visualization rR_Narration_Visualization;
+    RR_Narration rR_Narration;
+    RR_DialogueTools_FileManagerWindow rR_DialogueTools_FileManagerWindow;
 
     [MenuItem("Window/RR/Visual Editor")]
-    static void init() {
+    public static void init() {
         Debug.Log("a");
-        EditorTools.Initialize_RR_Dir();
-        if (textAsset == null) rR_Narration_Visualization.visual = new RR_NarrationVisual();
-        thisWindow = (RR_DialogueTools_VisualEditor)EditorWindow.GetWindow(typeof(RR_DialogueTools_VisualEditor));
+        RR_EditorTools.Initialize_RR_Dir();
+        RR_DialogueTools_VisualEditor thisWindow = (RR_DialogueTools_VisualEditor)EditorWindow.GetWindow(typeof(RR_DialogueTools_VisualEditor));
         thisWindow.position = new Rect(Screen.width / 2, Screen.height / 2, 1000, 600);
+        thisWindow.textAsset = new Object();
+        thisWindow.rR_Narration_Visualization = new RR_Narration_Visualization();
+        thisWindow.rR_Narration_Visualization.visual = new RR_NarrationVisual();
         thisWindow.Show();
     }
     void OnEnable() {
-        EditorTools.locales = EditorTools.GetLocales(new string[] { });
-        if (RR_Narration.dialogues == null) EditorTools.currentLocaleIndex = EditorTools.locales.Length - 1;
+        RR_EditorTools.locales = RR_EditorTools.GetLocales(new string[] { });
+        if (rR_Narration.dialogues == null) RR_EditorTools.currentLocaleIndex = RR_EditorTools.locales.Length - 1;
         currentScrollViewWidth = this.position.width / 2;
         cursorChangeRect = new Rect(currentScrollViewWidth, 0, 2f, this.position.height);
     }
 
     void OnGUI() {
-        // if (Loaders.dialogues != null) EditorTools.fileData = DialoguesToString();
+        // if (Loaders.dialogues != null) RR_EditorTools.fileData = DialoguesToString();
         GUILayout.BeginHorizontal();
         DrawOptions();
         EditorDrawTools.ResizeScrollView(ref cursorChangeRect, this.position, ref resize, ref currentScrollViewWidth);
@@ -63,7 +67,7 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
             string visualJson = JsonUtility.ToJson(rR_Narration_Visualization.visual);
             Debug.Log(visualJson);
             RR_NarrationFunctions.SaveFile("Assets/RR-Narration/Resources/RR-Visual/" + textAsset.name + ".json", visualJson);
-            EditorTools.Refresh_RR_DialogueTools();
+            RR_EditorTools.Refresh_RR_DialogueTools();
         }
         GUILayout.EndScrollView();
         GUILayout.EndVertical();
@@ -157,9 +161,9 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
     }
     private void Saving() {
         string data = JsonUtility.ToJson(rR_Narration_Visualization.visual);
-        // EditorUtility.SetDirty(textAsset);
-        // RR_DialogueTools_SaveFileWindow.init();
-        // GUIUtility.ExitGUI();
+        EditorUtility.SetDirty(textAsset);
+        rR_DialogueTools_FileManagerWindow.init_Window(FileMode.Save);
+        GUIUtility.ExitGUI();
         ready = true;
     }
 }

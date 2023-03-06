@@ -7,8 +7,9 @@ using UnityEditor.Localization;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
 using UnityEngine.Localization.Tables;
+using Spine.Unity;
 
-public static class RR_EditorTools
+public class RR_EditorTools
 {
     public static string fileName, fileData;
     static string[] spritePath = new string[] { };
@@ -22,13 +23,15 @@ public static class RR_EditorTools
     public static int currentLocaleIndex;
     public static string getFileName;
     public static StringTableCollection rrDialoguesTable;
-    public static void GetDialogueIndex() {
-        for (int i = 0; i < RR_Narration.dialogues.Count; i++) {
-            RR_EditorTools.actorDataIndex["Actor" + i] = 0;
-            RR_EditorTools.actorDataIndex["Expression" + i] = 0;
+    public RR_Narration_Visualization rR_Narration_Visualization;
+    public static void GetDialogueIndex(RR_Narration rR_Narration) {
+        for (int i = 0; i < rR_Narration.dialogues.Count; i++) {
+            actorDataIndex["Actor" + i] = 0;
+            actorDataIndex["Expression" + i] = 0;
         }
     }
     [MenuItem("Tools/RR/Initialize RR Dir & Settings")]
+
     public static void Initialize_RR_Dir() {
         LocalizationSettings localizationSettings = null;
         if (!Directory.Exists("Assets/RR-Narration")) Directory.CreateDirectory("Assets/RR-Narration");
@@ -131,7 +134,11 @@ public static class RR_EditorTools
             List<string> name = new List<string>();
             if (i > 0) spinePaths += ";";
             spinePaths += "RR-Narration/Resources/RR-Actors-Spine/" + tempSpine[i];
-            Spine.Unity.SkeletonDataAsset skeletonDataAsset = AssetDatabase.LoadAssetAtPath<Spine.Unity.SkeletonDataAsset>("Assets/RR-Narration/Resources/RR-Actors-Spine/" + tempSpine[i] + "/skeleton_SkeletonData.asset");
+            Debug.Log($"Current {i}");
+            Debug.Log(tempSpine[i]);
+            SkeletonDataAsset skeletonDataAsset = AssetDatabase.LoadAssetAtPath<SkeletonDataAsset>("Assets/RR-Narration/Resources/RR-Actors-Spine/" + tempSpine[i] + "/skeleton_SkeletonData.asset");
+            Debug.Log(skeletonDataAsset.name);
+            Debug.Log(skeletonDataAsset.GetSkeletonData(true).Animations.Count);
             Spine.SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
             Spine.Animation[] animations = skeletonData.Animations.ToArray();
             for (int _index = 0; _index < animations.Length; _index++) {
@@ -226,8 +233,8 @@ public static class RR_EditorTools
     }
 
     public static void CreateNewVisualAsset() {
-        RR_NarrationVisualization.visual = new RR_NarrationVisual();
-        string visualJson = JsonUtility.ToJson(RR_NarrationVisualization.visual);
+        RR_NarrationVisual visual = new RR_NarrationVisual();
+        string visualJson = JsonUtility.ToJson(visual);
         RR_NarrationFunctions.SaveFile("Assets/RR-Narration/Resources/RR-Visual/" + RR_EditorTools.fileName + ".json", visualJson);
     }
 

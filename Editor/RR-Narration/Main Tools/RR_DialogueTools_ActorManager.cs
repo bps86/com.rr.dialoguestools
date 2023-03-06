@@ -17,28 +17,28 @@ public class RR_DialogueTools_ActorManager : EditorWindow
     static List<string> tempExpression;
     public enum Mode { Dialogue, Visual }
     public static Mode mode;
+    RR_Narration rR_Narration;
+    RR_Narration_Visualization rR_Narration_Visualization;
 
 
     // [MenuItem("Window/RR/ActorManager")]
-    public static void init(RR_DialogueTools_ActorManager.Mode selectedMode, int currentIndex, int secondIndex = 0)
-    {
+    public static void init(RR_DialogueTools_ActorManager.Mode selectedMode, int currentIndex, int secondIndex = 0) {
         dynamicIndex = currentIndex;
         optionalIndex = secondIndex;
         mode = selectedMode;
-        EditorTools.Refresh_RR_DialogueTools();
-        tempName = EditorTools.names[index];
-        tempExpression = GetExpression(EditorTools.expression[EditorTools.names[index]], new List<string>());
+        RR_EditorTools.Refresh_RR_DialogueTools();
+        tempName = RR_EditorTools.names[index];
+        tempExpression = GetExpression(RR_EditorTools.expression[RR_EditorTools.names[index]], new List<string>());
         RR_DialogueTools_ActorManager window = (RR_DialogueTools_ActorManager)EditorWindow.GetWindow(typeof(RR_DialogueTools_ActorManager));
         window.position = new Rect(Screen.width / 2, Screen.height / 2, 400, 300);
+        window.rR_Narration = new RR_Narration();
         window.Show();
     }
-    void OnEnable()
-    {
+    void OnEnable() {
         currentScrollViewWidth = this.position.width / 2;
         cursorChangeRect = new Rect(currentScrollViewWidth, 0, 2f, this.position.height);
     }
-    void OnGUI()
-    {
+    void OnGUI() {
         GUILayout.BeginHorizontal();
         GetActors();
         EditorDrawTools.ResizeScrollView(ref cursorChangeRect, this.position, ref resize, ref currentScrollViewWidth);
@@ -46,46 +46,37 @@ public class RR_DialogueTools_ActorManager : EditorWindow
         GUILayout.EndHorizontal();
         Repaint();
     }
-    void GetActors()
-    {
+    void GetActors() {
         scrollPos = GUILayout.BeginScrollView(scrollPos, GUILayout.Width(currentScrollViewWidth));
         GUILayout.Label("Actors");
-        for (int i = 0; i < EditorTools.names.Length; i++)
-        {
-            if (GUILayout.Button(EditorTools.names[i]))
-            {
+        for (int i = 0; i < RR_EditorTools.names.Length; i++) {
+            if (GUILayout.Button(RR_EditorTools.names[i])) {
                 index = i;
-                tempName = EditorTools.names[i];
-                tempExpression = GetExpression(EditorTools.expression[EditorTools.names[i]], new List<string>());
+                tempName = RR_EditorTools.names[i];
+                tempExpression = GetExpression(RR_EditorTools.expression[RR_EditorTools.names[i]], new List<string>());
             }
         }
         GUILayout.EndScrollView();
     }
-    void DrawActorData()
-    {
+    void DrawActorData() {
         scrollPos2 = GUILayout.BeginScrollView(scrollPos2, GUILayout.Width(this.position.width - currentScrollViewWidth));
         GUILayout.Space(10);
         GUILayout.Label(tempName);
         for (int i = 0; i < tempExpression.Count; i++)
-            if (GUILayout.Button(AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/RR-Thumbnail/Thumbnail-" + tempName + "," + tempExpression[i] + ".png"), GUILayout.Width(100), GUILayout.Height(100)))
-            {
-                if (mode == RR_DialogueTools_ActorManager.Mode.Dialogue)
-                {
-                    RR_Narration.dialogues[dynamicIndex].name = tempName;
-                    RR_Narration.dialogues[dynamicIndex].expression = tempExpression[i];
+            if (GUILayout.Button(AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/RR-Thumbnail/Thumbnail-" + tempName + "," + tempExpression[i] + ".png"), GUILayout.Width(100), GUILayout.Height(100))) {
+                if (mode == RR_DialogueTools_ActorManager.Mode.Dialogue) {
+                    rR_Narration.dialogues[dynamicIndex].name = tempName;
+                    rR_Narration.dialogues[dynamicIndex].expression = tempExpression[i];
                 }
-                if (mode == RR_DialogueTools_ActorManager.Mode.Visual)
-                {
-                    RR_NarrationVisualization.visual.visualDatas[dynamicIndex].actor[optionalIndex] = tempName + ";;" + tempExpression[i];
+                if (mode == RR_DialogueTools_ActorManager.Mode.Visual) {
+                    rR_Narration_Visualization.visual.visualDatas[dynamicIndex].actor[optionalIndex] = tempName + ";;" + tempExpression[i];
                 }
                 Close();
             }
         GUILayout.EndScrollView();
     }
-    static List<string> GetExpression(string[] expressions, List<string> expressions2)
-    {
-        for (int i = 0; i < expressions.Length; i++)
-        {
+    static List<string> GetExpression(string[] expressions, List<string> expressions2) {
+        for (int i = 0; i < expressions.Length; i++) {
             expressions2.Add(expressions[i]);
         }
         return expressions2;
