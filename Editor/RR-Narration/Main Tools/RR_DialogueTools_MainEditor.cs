@@ -15,7 +15,9 @@ public class RR_DialogueTools_MainEditor : EditorWindow
     // public static EditorWindow getWindow, thisWindow;
     RR_Narration rR_Narration;
     RR_Narration_Visualization rR_Narration_Visualization;
-    RR_DialogueTools_FileManagerWindow rR_DialogueTools_FileManagerWindow;
+    string fileName;
+    string fileData;
+    // RR_DialogueTools_FileManagerWindow rR_DialogueTools_FileManagerWindow;
 
 
     [MenuItem("Window/RR/Narration")]
@@ -23,9 +25,6 @@ public class RR_DialogueTools_MainEditor : EditorWindow
         RR_EditorTools.Initialize_RR_Dir();
         RR_DialogueTools_MainEditor thisWindow = (RR_DialogueTools_MainEditor)EditorWindow.GetWindow(typeof(RR_DialogueTools_MainEditor));
         thisWindow.position = new Rect(Screen.width / 2, Screen.height / 2, 1000, 600);
-        // thisWindow.rR_Narration = new RR_Narration();
-        // thisWindow.rR_Narration_Visualization = new RR_Narration_Visualization();
-        // thisWindow.rR_DialogueTools_FileManagerWindow = new RR_DialogueTools_FileManagerWindow();
         thisWindow.Show();
     }
 
@@ -33,9 +32,6 @@ public class RR_DialogueTools_MainEditor : EditorWindow
         Debug.Log("Enabled");
         rR_Narration = new RR_Narration();
         rR_Narration_Visualization = new RR_Narration_Visualization();
-        rR_DialogueTools_FileManagerWindow = (RR_DialogueTools_FileManagerWindow)ScriptableObject.CreateInstance(typeof(RR_DialogueTools_FileManagerWindow));
-        rR_DialogueTools_FileManagerWindow.init();
-        rR_DialogueTools_FileManagerWindow.Open += OnOpen;
         RR_EditorTools.locales = RR_EditorTools.GetLocales(new string[] { });
         if (rR_Narration.dialogues == null) Debug.Log("is Null");
         if (rR_Narration.dialogues == null) RR_EditorTools.currentLocaleIndex = RR_EditorTools.locales.Length - 1;
@@ -45,7 +41,7 @@ public class RR_DialogueTools_MainEditor : EditorWindow
 
     void OnGUI() {
         if (rR_Narration.dialogues != null) {
-            RR_EditorTools.fileData = DialoguesToString();
+            fileData = DialoguesToString();
             rR_Narration_Visualization.visual = GetVisualAsset();
         }
         GUILayout.BeginHorizontal();
@@ -56,18 +52,35 @@ public class RR_DialogueTools_MainEditor : EditorWindow
         Repaint();
     }
 
+    private void OpenFileManagerWindow(FileMode fileMode) {
+        // RR_DialogueTools_FileManagerWindow rR_DialogueTools_FileManagerWindow = new RR_DialogueTools_FileManagerWindow(fileName, fileData);
+        RR_DialogueTools_FileManagerWindow rR_DialogueTools_FileManagerWindow = (RR_DialogueTools_FileManagerWindow)ScriptableObject.CreateInstance(typeof(RR_DialogueTools_FileManagerWindow));
+        rR_DialogueTools_FileManagerWindow.init(rR_Narration, rR_Narration_Visualization);
+        rR_DialogueTools_FileManagerWindow.SetData(fileName, fileData);
+        rR_DialogueTools_FileManagerWindow.Open += OnOpen;
+        rR_DialogueTools_FileManagerWindow.init_Window(fileMode);
+        GUIUtility.ExitGUI();
+    }
+
+    private void OpenActorManagerWindow(int index) {
+        RR_DialogueTools_ActorManager rR_DialogueTools_ActorManager = (RR_DialogueTools_ActorManager)ScriptableObject.CreateInstance(typeof(RR_DialogueTools_ActorManager));
+        rR_DialogueTools_ActorManager.init(RR_DialogueTools_ActorManager.Mode.Dialogue, index);
+        rR_DialogueTools_ActorManager.SetRRVar(rR_Narration, rR_Narration_Visualization);
+        rR_DialogueTools_ActorManager.SetRRVarEvent += OnActorSelected;
+        rR_DialogueTools_ActorManager.init_Window();
+        GUIUtility.ExitGUI();
+    }
+
     private void DrawOptions() {
         GUILayout.BeginVertical();
         scrollPos = GUILayout.BeginScrollView(scrollPos, GUILayout.Width(currentScrollViewWidth));
         if (GUILayout.Button("New")) {
             ready = false;
-            rR_DialogueTools_FileManagerWindow.init_Window(FileMode.New);
-            GUIUtility.ExitGUI();
+            OpenFileManagerWindow(FileMode.New);
         }
         if (GUILayout.Button("Open")) {
             ready = false;
-            rR_DialogueTools_FileManagerWindow.init_Window(FileMode.Open);
-            GUIUtility.ExitGUI();
+            OpenFileManagerWindow(FileMode.Open);
         }
         if (GUILayout.Button("Refresh")) {
             RR_EditorTools.Refresh_RR_DialogueTools();
@@ -75,8 +88,7 @@ public class RR_DialogueTools_MainEditor : EditorWindow
         if (rR_Narration.dialogues != null) {
             if (GUILayout.Button("Save")) {
                 ready = false;
-                rR_DialogueTools_FileManagerWindow.init_Window(FileMode.Save);
-                GUIUtility.ExitGUI();
+                OpenFileManagerWindow(FileMode.Save);
             }
             if (GUILayout.Button("New Dialogue")) rR_Narration.dialogues.Add(new RR_Dialogue());
         }
@@ -96,8 +108,9 @@ public class RR_DialogueTools_MainEditor : EditorWindow
                 GUILayout.Label(nameThumb);
                 if (GUILayout.Button(AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/RR-Thumbnail/Thumbnail-" + nameThumb + "," + expressionThumb + ".png"), GUILayout.Width(100), GUILayout.Height(100))) {
                     int index = i;
-                    RR_DialogueTools_ActorManager.init(RR_DialogueTools_ActorManager.Mode.Dialogue, index);
-                    GUIUtility.ExitGUI();
+                    OpenActorManagerWindow(i);
+                    // rR_DialogueTools_ActorManager.init(RR_DialogueTools_ActorManager.Mode.Dialogue, index);
+                    // GUIUtility.ExitGUI();
                 }
                 GUILayout.EndVertical();
                 rR_Narration.dialogues[i].dialogue = GUILayout.TextArea(rR_Narration.dialogues[i].dialogue, GUILayout.Width(300), GUILayout.Height(117));
@@ -143,11 +156,14 @@ public class RR_DialogueTools_MainEditor : EditorWindow
         }
         return rR_Narration_Visualization.visual;
     }
-    // static Visual CreateVisualAsset()
-    // {
+    private void OnOpen(string fileName, string fileData, RR_Narration selected_RR_Narration, RR_Narration_Visualization selected_RR_Narration_Visualization) {
+        this.fileName = fileName;
+        this.fileData = fileData;
+        this.rR_Narration = selected_RR_Narration;
+        this.rR_Narration_Visualization = selected_RR_Narration_Visualization;
+    }
 
-    // }
-    private void OnOpen(RR_Narration selected_RR_Narration, RR_Narration_Visualization selected_RR_Narration_Visualization) {
+    private void OnActorSelected(RR_Narration selected_RR_Narration, RR_Narration_Visualization selected_RR_Narration_Visualization) {
         this.rR_Narration = selected_RR_Narration;
         this.rR_Narration_Visualization = selected_RR_Narration_Visualization;
     }

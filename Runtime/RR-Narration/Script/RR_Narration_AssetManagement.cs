@@ -13,6 +13,7 @@ public class RR_Narration_AssetManagement
 
     public IEnumerator LoadActorData() {
         if (isLoaded) yield break;
+        Debug.Log("Loading actors");
         string name = "";
         string expression = "";
         TextAsset spriteDataPath = Resources.Load<TextAsset>("spritePaths");
@@ -28,6 +29,8 @@ public class RR_Narration_AssetManagement
             name = spritePath[i].Substring(spritePath[i].LastIndexOf('/') + 1, spritePath[i].LastIndexOf(',') - spritePath[i].LastIndexOf('/') - 1);
             expression = spritePath[i].Substring(spritePath[i].LastIndexOf(',') + 1, spritePath[i].Length - spritePath[i].LastIndexOf(',') - 1);
             dictActorSprite.Add(name + ";;" + expression, Resources.Load<Sprite>(spritePath[i]));
+
+            // Debug.Log(name + "sprite path");
             yield return new WaitForFixedUpdate();
         }
         for (int i = 0; i < spinePath.Length; i++) {
@@ -36,6 +39,7 @@ public class RR_Narration_AssetManagement
             }
             name = spinePath[i].Substring(spinePath[i].LastIndexOf('/') + 1);
             dictActorSpine.Add(name, new RR_ActorSpine(name, "RR-Actors-Spine/" + name + "/skeleton_SkeletonData"));
+            // Debug.Log(name + "spine path");
             yield return new WaitForFixedUpdate();
         }
         for (int i = 0; i < beepPath.Length; i++) {
@@ -44,6 +48,7 @@ public class RR_Narration_AssetManagement
             }
             name = beepPath[i].Substring(beepPath[i].LastIndexOf('/') + 1);
             dictActorBeep.Add(name, Resources.Load<AudioClip>(beepPath[i]));
+            // Debug.Log(name + "beep path");
             yield return new WaitForFixedUpdate();
         }
         isLoaded = true;
@@ -59,9 +64,12 @@ public class RR_Narration_AssetManagement
     }
 
     public RR_ActorSpine getActorSpine(RR_Dialogue dialogue) {
-        if (dictActorSprite.ContainsKey(dialogue.name + ";;" + dialogue.expression)) {
-            return dictActorSpine[dialogue.name + ";;" + dialogue.expression];
+        Debug.Log(dialogue.name);
+        if (dictActorSpine.ContainsKey(dialogue.name)) {
+            // Debug.Log("Contained");
+            return dictActorSpine[dialogue.name];
         } else {
+            // Debug.Log("UnContained");
             return null;
         }
     }

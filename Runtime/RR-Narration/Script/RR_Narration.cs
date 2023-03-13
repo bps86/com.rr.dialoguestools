@@ -29,6 +29,7 @@ public class RR_Narration
     public void LoadDialogueData(string tags, int index, RR_Narration_AssetManagement rR_Narration_AssetManagement = null) {
         dialogue = dictDialogues[tags + ";" + index];
         if (rR_Narration_AssetManagement != null) {
+            Debug.Log(rR_Narration_AssetManagement.dictActorSpine.Count);
             dialogue.sprite = rR_Narration_AssetManagement.getActorSprite(dialogue);
             dialogue.skeletonDataAsset = rR_Narration_AssetManagement.getActorSpine(dialogue).skeletonDataAsset;
         }

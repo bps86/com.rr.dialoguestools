@@ -11,7 +11,7 @@ using Spine.Unity;
 
 public class RR_EditorTools
 {
-    public static string fileName, fileData;
+    // public static string fileName, fileData;
     static string[] spritePath = new string[] { };
     static string[] spinePath = new string[] { };
     static string[] beepPath = new string[] { };
@@ -232,10 +232,10 @@ public class RR_EditorTools
         return names.ToArray();
     }
 
-    public static void CreateNewVisualAsset() {
+    public static void CreateNewVisualAsset(string fileName) {
         RR_NarrationVisual visual = new RR_NarrationVisual();
         string visualJson = JsonUtility.ToJson(visual);
-        RR_NarrationFunctions.SaveFile("Assets/RR-Narration/Resources/RR-Visual/" + RR_EditorTools.fileName + ".json", visualJson);
+        RR_NarrationFunctions.SaveFile("Assets/RR-Narration/Resources/RR-Visual/" + fileName + ".json", visualJson);
     }
 
     static int GenerateUID() {

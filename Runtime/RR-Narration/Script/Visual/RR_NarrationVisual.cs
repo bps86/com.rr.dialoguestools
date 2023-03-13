@@ -6,5 +6,6 @@ using UnityEngine;
 public class RR_NarrationVisual
 {
     public int actorCount;
+    public TransitionMode animMode;
     public List<RR_NarrationVisualData> visualDatas = new List<RR_NarrationVisualData>();
 }

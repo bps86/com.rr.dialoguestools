@@ -9,8 +9,8 @@ using Spine.Unity;
 public class RR_DialogueTools_Manager : MonoBehaviour
 {
     [SerializeField] private Button button;
-    [SerializeField] private SkeletonAnimation skeletonAnimation;
-    [SerializeField] private SpriteRenderer sprite;
+    [SerializeField] private SkeletonGraphic skeletonGraphics;
+    [SerializeField] private Image sprite;
     [SerializeField] private TMP_Text _name;
     [SerializeField] private TMP_Text _dialogue;
     [SerializeField] private RR_DialogueTools_Extra rR_DialogueTools_Extra;
@@ -29,7 +29,6 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     private RR_Narration_AssetManagement rR_Narration_AssetManagement;
     private RR_Narration_Visualization rR_Narration_Visualization;
     private RR_Narration rR_Narration;
-    private Color color = new Color(255, 255, 255, 0);
     private AudioSource audioSource;
     private Vector3 spriteV3;
     private Vector3 spineV3;
@@ -40,12 +39,12 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         rR_Narration = new RR_Narration();
         rR_Narration_AssetManagement = new RR_Narration_AssetManagement();
         rR_Narration_Visualization = new RR_Narration_Visualization();
-        sprite.color = color;
+        sprite.color = Color.clear;
         audioSource = gameObject.GetComponent<AudioSource>();
         spriteV3 = sprite.gameObject.transform.position;
-        spineV3 = skeletonAnimation.gameObject.transform.position;
+        spineV3 = skeletonGraphics.gameObject.transform.position;
         spriteV3scale = sprite.gameObject.transform.localScale;
-        spineV3scale = skeletonAnimation.gameObject.transform.localScale;
+        spineV3scale = skeletonGraphics.gameObject.transform.localScale;
         for (int i = 0; i < _dialogues.Count; i++) {
             rR_Narration_AssetManagement.dialoguesData.Add(_dialogues[i], Resources.Load<TextAsset>("RR-Dialogues/" + _dialogues[i]));
             if (useExtra_Visual) {
@@ -57,7 +56,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     }
 
     IEnumerator Load() {
-        Debug.Log(rR_Narration_AssetManagement.isLoaded);
+        // Debug.Log(rR_Narration_AssetManagement.isLoaded);
         StartCoroutine(rR_Narration_AssetManagement.LoadActorData());
         yield return new WaitUntil(() => rR_Narration_AssetManagement.isLoaded);
         if (!useLocalization) {
@@ -66,9 +65,9 @@ public class RR_DialogueTools_Manager : MonoBehaviour
             rR_Narration.LoadDialogueTable(currentDialogue);
         }
         if (useExtra_Visual) {
-            Debug.Log(rR_Narration_AssetManagement.visualAssets[currentDialogue].text);
             rR_Narration_Visualization.LoadVisualAsset(rR_Narration_AssetManagement.visualAssets[currentDialogue].text);
         }
+        rR_Narration.LoadDialogueData(tags, index, rR_Narration_AssetManagement);
         Refresh(useBeep);
     }
 
@@ -83,7 +82,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
                 rR_Narration.LoadDialogueTable(currentDialogue);
             }
             stop = true;
-            rR_Narration.LoadDialogueData(tags, index);
+            rR_Narration.LoadDialogueData(tags, index, rR_Narration_AssetManagement);
             stop = false;
             Refresh(useBeep);
         }
@@ -94,7 +93,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         }
         if (index < rR_Narration.dialogues.Count) {
             stop = true;
-            rR_Narration.LoadDialogueData(tags, index);
+            rR_Narration.LoadDialogueData(tags, index, rR_Narration_AssetManagement);
             if (useExtra_Visual) {
                 rR_Narration_Visualization.LoadVisualData(tags, index);
             }
@@ -103,43 +102,43 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         Refresh(useBeep);
     }
     void Refresh(bool isBeep = false) {
-        Debug.Log(rR_Narration.dialogue.nameShown);
+        // Debug.Log(rR_Narration.dialogue.nameShown);
         _name.text = rR_Narration.dialogue.nameShown;
         audioSource.clip = null;
         if (rR_Narration_AssetManagement.dictActorBeep.ContainsKey(rR_Narration.dialogue.name)) {
             audioSource.clip = rR_Narration_AssetManagement.dictActorBeep[rR_Narration.dialogue.name];
         }
         if (isBeep) {
-            Debug.Log("Beep Used");
+            // Debug.Log("Beep Used");
             Beep();
         } else {
             _dialogue.text = rR_Narration.dialogue.dialogue;
         }
         if (!useExtra_Visual) {
-            sprite.color = color;
+            sprite.color = Color.clear;
             if (rR_Narration_AssetManagement.dictActorSprite.ContainsKey(rR_Narration.dialogue.name + ";;" + rR_Narration.dialogue.expression)) {
                 sprite.sprite = rR_Narration_AssetManagement.dictActorSprite[rR_Narration.dialogue.name + ";;" + rR_Narration.dialogue.expression];
-                color.a = 255;
-                sprite.color = color;
+                sprite.color = Color.white;
                 sprite.transform.position = spriteV3 + new Vector3((float)rR_Narration.dialogue.charPos * Range, 1, 1);
                 sprite.gameObject.transform.localScale = Vector3.Scale(spriteV3scale, new Vector3((float)isInverted, 1, 1));
             } else {
                 sprite.sprite = null;
-                color.a = 0;
             }
+            // Debug.Log(rR_Narration.dialogue.skeletonDataAsset.name);
             if (rR_Narration.dialogue.skeletonDataAsset == null) {
-                skeletonAnimation.gameObject.SetActive(false);
+                skeletonGraphics.gameObject.SetActive(false);
                 return;
             }
-            if (!skeletonAnimation.gameObject.activeSelf) {
-                skeletonAnimation.gameObject.SetActive(true);
+            if (!skeletonGraphics.gameObject.activeSelf) {
+                skeletonGraphics.gameObject.SetActive(true);
             }
             // skeletonAnimation.skeletonDataAsset.Clear();
-            skeletonAnimation.skeletonDataAsset = rR_Narration.dialogue.skeletonDataAsset;
-            skeletonAnimation.Initialize(true);
-            skeletonAnimation.AnimationName = rR_Narration.dialogue.expression;
-            skeletonAnimation.gameObject.transform.position = spineV3 + new Vector3((float)rR_Narration.dialogue.charPos * Range, 1, 1);
-            skeletonAnimation.transform.localScale = Vector3.Scale(spineV3scale, new Vector3((float)isInverted, 1, 1));
+            skeletonGraphics.skeletonDataAsset = rR_Narration.dialogue.skeletonDataAsset;
+            skeletonGraphics.startingAnimation = rR_Narration.dialogue.expression;
+            skeletonGraphics.Initialize(true);
+            skeletonGraphics.rectTransform.localPosition = spineV3 + new Vector3((float)rR_Narration.dialogue.charPos * Range, 1, 1);
+            skeletonGraphics.rectTransform.localScale = Vector3.Scale(spineV3scale, new Vector3((float)isInverted, 1, 1));
+            skeletonGraphics.color = Color.white;
         }
         if (useExtra_Visual) {
             rR_DialogueTools_Extra.ChangeAnimPos(rR_Narration, rR_Narration_AssetManagement, rR_Narration_Visualization);
@@ -154,7 +153,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         int index = 0;
         int skipIndex = -1;
         bool scanDone = false;
-        Debug.Log("dialogue length: " + dialogue.dialogue.Length);
+        // Debug.Log("dialogue length: " + dialogue.dialogue.Length);
         for (int i = 0; i < dialogue.dialogue.Length; i++) {
             if (stop) yield break;
             if (index < skipIndex) {
@@ -180,7 +179,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     int getIndex(int index, string dialogue, ref bool scanDone) {
         for (int i = index; i < dialogue.Length; i++) {
             if (dialogue[i].ToString() == ">") {
-                Debug.Log(dialogue.Substring(index, i - index + 1));
+                // Debug.Log(dialogue.Substring(index, i - index + 1));
                 scanDone = true;
                 return i;
             }
