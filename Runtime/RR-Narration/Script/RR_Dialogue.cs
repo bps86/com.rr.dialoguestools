@@ -52,7 +52,11 @@ public class RR_Dialogue
             case NameMode.None:
                 return "";
             case NameMode.Normal:
-                return this.actorName;
+                if (this.actorName.Contains("_")) {
+                    return this.actorName.Substring(0, this.actorName.IndexOf('_'));
+                } else {
+                    return this.actorName;
+                }
         }
         return "Error";
     }

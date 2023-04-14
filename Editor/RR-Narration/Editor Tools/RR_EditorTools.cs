@@ -173,6 +173,7 @@ public class RR_EditorTools
         for (int i = 0; i < tempSpriteActor.Count; i++) {
             expression[tempSpriteActor[i]] = dictSprite[tempSpriteActor[i]].ToArray();
         }
+        Debug.Log("scanning Actor Spine");
         for (int i = 0; i < tempSpine.Count; i++) {
             List<string> name = new List<string>();
             if (i > 0) spinePaths += ";";
