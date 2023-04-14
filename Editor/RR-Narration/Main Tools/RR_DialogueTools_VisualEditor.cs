@@ -27,7 +27,7 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
         Debug.Log("a");
         RR_EditorTools.Initialize_RR_Dir();
         RR_DialogueTools_VisualEditor thisWindow = (RR_DialogueTools_VisualEditor)EditorWindow.GetWindow(typeof(RR_DialogueTools_VisualEditor));
-        thisWindow.position = new Rect(Screen.width / 2, Screen.height / 2, 1000, 600);
+        thisWindow.position = new Rect(Screen.width / 2, Screen.height / 2, 1080, 600);
         thisWindow.Show();
     }
     void OnEnable() {
@@ -90,7 +90,7 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
             if (rR_DialogueTools_Visualization.visual != null) {
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Actors: ", GUILayout.Width(60));
-                rR_DialogueTools_Visualization.visual.actorCount = EditorGUILayout.IntField(rR_DialogueTools_Visualization.visual.actorCount, GUILayout.Width(60));
+                rR_DialogueTools_Visualization.visual.actorCount = EditorGUILayout.IntSlider(rR_DialogueTools_Visualization.visual.actorCount, 1, 4);
                 rR_DialogueTools_Visualization.visual.animMode = (TransitionMode)EditorGUILayout.EnumPopup("Transition Mode", rR_DialogueTools_Visualization.visual.animMode);
                 GUILayout.EndHorizontal();
             }
@@ -127,27 +127,29 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
                     rR_DialogueTools_Visualization.visual.visualDatas[i].transitionDuration = EditorGUILayout.FloatField(rR_DialogueTools_Visualization.visual.visualDatas[i].transitionDuration);
                     GUILayout.EndHorizontal();
                 }
+                GUILayout.BeginHorizontal();
                 for (int ii = 0; ii < rR_DialogueTools_Visualization.visual.visualDatas[i].endPos.Count; ii++) {
                     if (rR_DialogueTools_Visualization.visual.animMode == TransitionMode.Static) {
-                        GUILayout.BeginHorizontal();
-                        rR_DialogueTools_Visualization.visual.visualDatas[i].endPos[ii] = EditorGUILayout.Vector3Field("pos " + ii + ": ", rR_DialogueTools_Visualization.visual.visualDatas[i].endPos[ii], GUILayout.Width(400));
-                        rR_DialogueTools_Visualization.visual.visualDatas[i].endScale[ii] = EditorGUILayout.Vector3Field("scale " + ii + ": ", rR_DialogueTools_Visualization.visual.visualDatas[i].endScale[ii], GUILayout.Width(400));
-                        GUILayout.EndHorizontal();
+                        GUILayout.BeginVertical();
+                        rR_DialogueTools_Visualization.visual.visualDatas[i].endPos[ii] = EditorGUILayout.Vector3Field("pos " + ii + ": ", rR_DialogueTools_Visualization.visual.visualDatas[i].endPos[ii]);
+                        rR_DialogueTools_Visualization.visual.visualDatas[i].endScale[ii] = EditorGUILayout.Vector3Field("scale " + ii + ": ", rR_DialogueTools_Visualization.visual.visualDatas[i].endScale[ii]);
+                        GUILayout.EndVertical();
                         GUILayout.Space(10);
                     } else if (rR_DialogueTools_Visualization.visual.animMode == TransitionMode.MovePosition) {
+                        GUILayout.BeginVertical();
                         GUILayout.BeginHorizontal();
-                        GUILayout.BeginVertical();
-                        rR_DialogueTools_Visualization.visual.visualDatas[i].startPos[ii] = EditorGUILayout.Vector3Field("Start pos " + ii + ": ", rR_DialogueTools_Visualization.visual.visualDatas[i].startPos[ii], GUILayout.Width(400));
-                        rR_DialogueTools_Visualization.visual.visualDatas[i].endPos[ii] = EditorGUILayout.Vector3Field("End pos " + ii + ": ", rR_DialogueTools_Visualization.visual.visualDatas[i].endPos[ii], GUILayout.Width(400));
-                        GUILayout.EndVertical();
-                        GUILayout.BeginVertical();
-                        rR_DialogueTools_Visualization.visual.visualDatas[i].startScale[ii] = EditorGUILayout.Vector3Field("Start scale " + ii + ": ", rR_DialogueTools_Visualization.visual.visualDatas[i].startScale[ii], GUILayout.Width(400));
-                        rR_DialogueTools_Visualization.visual.visualDatas[i].endScale[ii] = EditorGUILayout.Vector3Field("End scale " + ii + ": ", rR_DialogueTools_Visualization.visual.visualDatas[i].endScale[ii], GUILayout.Width(400));
-                        GUILayout.EndVertical();
+                        rR_DialogueTools_Visualization.visual.visualDatas[i].startPos[ii] = EditorGUILayout.Vector3Field("Start pos " + ii + ": ", rR_DialogueTools_Visualization.visual.visualDatas[i].startPos[ii]);
+                        rR_DialogueTools_Visualization.visual.visualDatas[i].endPos[ii] = EditorGUILayout.Vector3Field("End pos " + ii + ": ", rR_DialogueTools_Visualization.visual.visualDatas[i].endPos[ii]);
                         GUILayout.EndHorizontal();
+                        GUILayout.BeginHorizontal();
+                        rR_DialogueTools_Visualization.visual.visualDatas[i].startScale[ii] = EditorGUILayout.Vector3Field("Start scale " + ii + ": ", rR_DialogueTools_Visualization.visual.visualDatas[i].startScale[ii]);
+                        rR_DialogueTools_Visualization.visual.visualDatas[i].endScale[ii] = EditorGUILayout.Vector3Field("End scale " + ii + ": ", rR_DialogueTools_Visualization.visual.visualDatas[i].endScale[ii]);
+                        GUILayout.EndHorizontal();
+                        GUILayout.EndVertical();
                         GUILayout.Space(20);
                     }
                 }
+                GUILayout.EndHorizontal();
                 GUILayout.BeginHorizontal();
                 if (GUILayout.Button("Copy Actor", GUILayout.Width(80))) {
                     clipboardActor = rR_DialogueTools_Visualization.visual.visualDatas[i].actorName;
@@ -188,7 +190,7 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
             }
             for (int ii = rR_DialogueTools_Visualization.visual.visualDatas[i].actorName.Count - 1; ii >= 0; ii--) {
                 if (rR_DialogueTools_Visualization.visual.visualDatas[i].actorName.Count > rR_DialogueTools_Visualization.visual.actorCount) {
-                    rR_DialogueTools_Visualization.visual.visualDatas[i].actorName.RemoveAt(ii);
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].actorName.RemoveAt(rR_DialogueTools_Visualization.visual.visualDatas[i].actorName.Count - 1);
                 }
             }
             for (int ii = 0; ii < rR_DialogueTools_Visualization.visual.actorCount; ii++) {
@@ -198,7 +200,7 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
             }
             for (int ii = 0; ii < rR_DialogueTools_Visualization.visual.actorCount; ii++) {
                 if (rR_DialogueTools_Visualization.visual.visualDatas[i].expression.Count > rR_DialogueTools_Visualization.visual.actorCount) {
-                    rR_DialogueTools_Visualization.visual.visualDatas[i].expression.RemoveAt(ii);
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].expression.RemoveAt(rR_DialogueTools_Visualization.visual.visualDatas[i].expression.Count - 1);
                 }
             }
             for (int ii = 0; ii < rR_DialogueTools_Visualization.visual.actorCount; ii++) {
@@ -208,7 +210,7 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
             }
             for (int ii = rR_DialogueTools_Visualization.visual.visualDatas[i].endPos.Count - 1; ii >= 0; ii--) {
                 if (rR_DialogueTools_Visualization.visual.visualDatas[i].endPos.Count > rR_DialogueTools_Visualization.visual.actorCount) {
-                    rR_DialogueTools_Visualization.visual.visualDatas[i].endPos.RemoveAt(ii);
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].endPos.RemoveAt(rR_DialogueTools_Visualization.visual.visualDatas[i].endPos.Count - 1);
                 }
             }
             for (int ii = 0; ii < rR_DialogueTools_Visualization.visual.actorCount; ii++) {
@@ -216,12 +218,11 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
                     rR_DialogueTools_Visualization.visual.visualDatas[i].endScale.Add(new Vector3(1, 1, 1));
                 }
             }
-            for (int ii = rR_DialogueTools_Visualization.visual.visualDatas[i].endPos.Count - 1; ii >= 0; ii--) {
+            for (int ii = rR_DialogueTools_Visualization.visual.visualDatas[i].endScale.Count - 1; ii >= 0; ii--) {
                 if (rR_DialogueTools_Visualization.visual.visualDatas[i].endScale.Count > rR_DialogueTools_Visualization.visual.actorCount) {
-                    rR_DialogueTools_Visualization.visual.visualDatas[i].endScale.RemoveAt(ii);
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].endScale.RemoveAt(rR_DialogueTools_Visualization.visual.visualDatas[i].endScale.Count - 1);
                 }
             }
-
 
             for (int ii = 0; ii < rR_DialogueTools_Visualization.visual.actorCount; ii++) {
                 if (rR_DialogueTools_Visualization.visual.visualDatas[i].startPos.Count < rR_DialogueTools_Visualization.visual.actorCount) {
@@ -230,7 +231,7 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
             }
             for (int ii = rR_DialogueTools_Visualization.visual.visualDatas[i].startPos.Count - 1; ii >= 0; ii--) {
                 if (rR_DialogueTools_Visualization.visual.visualDatas[i].startPos.Count > rR_DialogueTools_Visualization.visual.actorCount) {
-                    rR_DialogueTools_Visualization.visual.visualDatas[i].startPos.RemoveAt(ii);
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].startPos.RemoveAt(rR_DialogueTools_Visualization.visual.visualDatas[i].startPos.Count - 1);
                 }
             }
             for (int ii = 0; ii < rR_DialogueTools_Visualization.visual.actorCount; ii++) {
@@ -238,9 +239,9 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
                     rR_DialogueTools_Visualization.visual.visualDatas[i].startScale.Add(new Vector3(1, 1, 1));
                 }
             }
-            for (int ii = rR_DialogueTools_Visualization.visual.visualDatas[i].startPos.Count - 1; ii >= 0; ii--) {
+            for (int ii = rR_DialogueTools_Visualization.visual.visualDatas[i].startScale.Count - 1; ii >= 0; ii--) {
                 if (rR_DialogueTools_Visualization.visual.visualDatas[i].startScale.Count > rR_DialogueTools_Visualization.visual.actorCount) {
-                    rR_DialogueTools_Visualization.visual.visualDatas[i].startScale.RemoveAt(ii);
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].startScale.RemoveAt(rR_DialogueTools_Visualization.visual.visualDatas[i].startScale.Count - 1);
                 }
             }
         }

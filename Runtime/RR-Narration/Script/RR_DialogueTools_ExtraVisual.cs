@@ -11,6 +11,7 @@ public class RR_DialogueTools_ExtraVisual : MonoBehaviour
     [SerializeField] private Color dimColor;
     [SerializeField] private bool disableAutoSetAnchor;
     [SerializeField] private string defaultAnimation;
+    [SpineEvent] private string defaultSpineAnim;
     public List<Image> images;
     public List<SkeletonGraphic> skeletonGraphics;
     public bool isDim;
@@ -36,13 +37,6 @@ public class RR_DialogueTools_ExtraVisual : MonoBehaviour
                 skeletonGraphics[i].rectTransform.anchorMax = new Vector2(0.5f, 0);
             }
         }
-        // if (!String.IsNullOrEmpty(defaultAnimation)) {
-        //     for (int i = 0; i < skeletonGraphics.Count; i++) {
-        //         skeletonGraphics[i].AnimationState.End += delegate (TrackEntry trackEntry) {
-        //             ResetAnim(trackEntry, skeletonGraphics[i]);
-        //         };
-        //     }
-        // }
     }
 
     private void Update() {
@@ -90,6 +84,9 @@ public class RR_DialogueTools_ExtraVisual : MonoBehaviour
             if (skeletonGraphics[i].skeletonDataAsset != null) {
                 skeletonGraphics[i].gameObject.SetActive(true);
                 skeletonGraphics[i].Initialize(true);
+
+                SetResetAnim(skeletonGraphics[i]);
+
                 if (isDim) {
                     if (visualData.actorName[i] != dialogue.actorName) {
                         skeletonGraphics[i].color = dimColor;
@@ -116,14 +113,6 @@ public class RR_DialogueTools_ExtraVisual : MonoBehaviour
         }
     }
 
-    // private void ResetAnim(TrackEntry trackEntry, SkeletonGraphic skeletonGraphic) {
-    //     Debug.Log("We in");
-    //     if (skeletonGraphic.startingAnimation == defaultAnimation) return;
-    //     skeletonGraphic.startingAnimation = defaultAnimation;
-    //     skeletonGraphic.startingLoop = true;
-    //     skeletonGraphic.Initialize(true);
-    // }
-
     private Image SetActorSprite(Image image, string name, string expression, int actorIndex, RR_DialogueTools_VisualData visualData, RR_DialogueTools_AssetManager rR_DialogueTools_AssetManager) {
         if (transitionMode == TransitionMode.MovePosition) {
             return RR_DialogueTools_FunctionsVisual.SetActorSprite(image, rR_DialogueTools_AssetManager.GetActorSprite(name, expression), visualData.startPos[actorIndex], visualData.startScale[actorIndex]);
@@ -140,15 +129,16 @@ public class RR_DialogueTools_ExtraVisual : MonoBehaviour
         } else {
             skeletonGraphic = RR_DialogueTools_FunctionsVisual.SetActorSkeletonGraphics(skeletonGraphic, rR_DialogueTools_AssetManager.GetActorSpine(name).skeletonDataAsset, expression, visualData.endPos[actorIndex], visualData.endScale[actorIndex]);
         }
-        if (skeletonGraphic.skeletonDataAsset != null) {
-            Debug.Log("actionAdded");
-            skeletonGraphic.AnimationState.Complete += ResetAnim;
-            Debug.Log(skeletonGraphic.AnimationState.Tracks.Count);
-        }
         return skeletonGraphic;
     }
 
-    private void ResetAnim(TrackEntry trackEntry) {
-        Debug.Log(trackEntry.IsComplete);
+    private void SetResetAnim(SkeletonGraphic skeletonGraphic) {
+        skeletonGraphic.AnimationState.Complete += delegate {
+            ResetAnim(skeletonGraphic);
+        };
+    }
+
+    private void ResetAnim(SkeletonGraphic skeletonGraphic) {
+        skeletonGraphic.AnimationState.SetAnimation(0, defaultAnimation, true);
     }
 }
