@@ -5,157 +5,157 @@ using UnityEngine.UI;
 using TMPro;
 using Spine.Unity;
 
-[RequireComponent(typeof(AudioSource))]
 public class RR_DialogueTools_Manager : MonoBehaviour
 {
-    [SerializeField] private Button button;
     [SerializeField] private SkeletonGraphic skeletonGraphics;
     [SerializeField] private Image sprite;
+    [SerializeField] private AudioSource beepAudioSource;
+    [SerializeField] private AudioSource voiceActAudioSource;
+    [SerializeField] private AudioSource sfxAudioSource;
+    [SerializeField] private AudioSource bgmAudioSource;
     [SerializeField] private TMP_Text _name;
     [SerializeField] private TMP_Text _dialogue;
-    [SerializeField] private RR_DialogueTools_Extra rR_DialogueTools_Extra;
-    [SerializeField] private IsInverted isInverted = IsInverted.False;
+    [SerializeField] private RectTransform shakingObject;
+    [SerializeField] private RR_DialogueTools_ExtraVisual rR_DialogueTools_ExtraVisual;
     [SerializeField] private List<string> _dialogues = new List<string>();
     [SerializeField] private string currentDialogue;
     [SerializeField] private string tags;
     [SerializeField] private int index;
-    [SerializeField] private int beepPerSeconds;
+    [SerializeField] private int textSpeed;
+    [SerializeField] private int shakeTotal;
     [SerializeField] private float minPitch = -0.2f;
     [SerializeField] private float maxPitch = 0.2f;
-    [SerializeField] private float Range = 0;
-    [SerializeField] private bool useExtra_Visual;
-    [SerializeField] private bool useBeep;
+    [SerializeField] private float shakeDuration;
+    [SerializeField] private float shakeRange;
+    [SerializeField] private bool useBeepAudio;
+    [SerializeField] private bool useGeneralAudio;
     [SerializeField] private bool useLocalization;
-    private RR_Narration_AssetManagement rR_Narration_AssetManagement;
-    private RR_Narration_Visualization rR_Narration_Visualization;
+    private RR_DialogueTools_AssetManager rR_DialogueTools_AssetManager;
+    private RR_DialogueTools_Visualization rR_DialogueTools_Visualization;
     private RR_Narration rR_Narration;
-    private AudioSource audioSource;
-    private Vector3 spriteV3;
-    private Vector3 spineV3;
-    private Vector3 spriteV3scale;
-    private Vector3 spineV3scale;
-    bool stop = false;
-    void Awake() {
+    private Vector3 shakeDefaultPosition;
+    private Vector3 shakeProgressPosition;
+    private float shakeProgress;
+    private bool stop = false;
+    private void Awake() {
         rR_Narration = new RR_Narration();
-        rR_Narration_AssetManagement = new RR_Narration_AssetManagement();
-        rR_Narration_Visualization = new RR_Narration_Visualization();
+        rR_DialogueTools_AssetManager = new RR_DialogueTools_AssetManager();
+        rR_DialogueTools_Visualization = new RR_DialogueTools_Visualization();
         sprite.color = Color.clear;
-        audioSource = gameObject.GetComponent<AudioSource>();
-        spriteV3 = sprite.gameObject.transform.position;
-        spineV3 = skeletonGraphics.gameObject.transform.position;
-        spriteV3scale = sprite.gameObject.transform.localScale;
-        spineV3scale = skeletonGraphics.gameObject.transform.localScale;
+        if (shakingObject != null) {
+            shakeProgress = shakeTotal * 360;
+            shakeDefaultPosition = shakingObject.localPosition;
+        }
         for (int i = 0; i < _dialogues.Count; i++) {
-            rR_Narration_AssetManagement.dialoguesData.Add(_dialogues[i], Resources.Load<TextAsset>("RR-Dialogues/" + _dialogues[i]));
-            if (useExtra_Visual) {
-                rR_Narration_AssetManagement.visualAssets.Add(_dialogues[i], Resources.Load<TextAsset>("RR-Visual/" + _dialogues[i]));
+            rR_DialogueTools_AssetManager.dialoguesData.Add(_dialogues[i], Resources.Load<TextAsset>("RR-Dialogues/" + _dialogues[i]));
+            if (rR_DialogueTools_ExtraVisual != null) {
+                rR_DialogueTools_AssetManager.visualAssets.Add(_dialogues[i], Resources.Load<TextAsset>("RR-Visual/" + _dialogues[i]));
             }
         }
         StartCoroutine(Load());
-        button.onClick.AddListener(delegate { NextDialogue(); });
     }
+
+
 
     IEnumerator Load() {
-        // Debug.Log(rR_Narration_AssetManagement.isLoaded);
-        StartCoroutine(rR_Narration_AssetManagement.LoadActorData());
-        yield return new WaitUntil(() => rR_Narration_AssetManagement.isLoaded);
-        if (!useLocalization) {
-            rR_Narration.LoadDialogueFile(rR_Narration_AssetManagement.dialoguesData[currentDialogue].text);
-        } else {
-            rR_Narration.LoadDialogueTable(currentDialogue);
-        }
-        if (useExtra_Visual) {
-            rR_Narration_Visualization.LoadVisualAsset(rR_Narration_AssetManagement.visualAssets[currentDialogue].text);
-        }
-        rR_Narration.LoadDialogueData(tags, index, rR_Narration_AssetManagement);
-        Refresh(useBeep);
+        StartCoroutine(rR_DialogueTools_AssetManager.LoadAssets(useGeneralAudio));
+        yield return new WaitUntil(() => rR_DialogueTools_AssetManager.isLoaded);
+        LoadDialogue(currentDialogue);
     }
 
-    void Update() {
+    private void Update() {
         if (Input.GetKeyDown(KeyCode.Return)) {
             NextDialogue();
         }
         if (Input.GetKeyDown(KeyCode.R)) {
-            if (!useLocalization) {
-                rR_Narration.LoadDialogueFile(rR_Narration_AssetManagement.dialoguesData[currentDialogue].text);
-            } else {
-                rR_Narration.LoadDialogueTable(currentDialogue);
-            }
+            SetDialogue(currentDialogue);
             stop = true;
-            rR_Narration.LoadDialogueData(tags, index, rR_Narration_AssetManagement);
+            rR_Narration.LoadDialogueData(tags, index, rR_DialogueTools_AssetManager);
             stop = false;
-            Refresh(useBeep);
+            Refresh();
         }
+        ShakeObject();
     }
+
     public void NextDialogue() {
         if (index < rR_Narration.dialogues.Count - 1) {
             index += 1;
         }
         if (index < rR_Narration.dialogues.Count) {
             stop = true;
-            rR_Narration.LoadDialogueData(tags, index, rR_Narration_AssetManagement);
-            if (useExtra_Visual) {
-                rR_Narration_Visualization.LoadVisualData(tags, index);
+            rR_Narration.LoadDialogueData(tags, index, rR_DialogueTools_AssetManager);
+            if (rR_DialogueTools_ExtraVisual != null) {
+                rR_DialogueTools_Visualization.LoadVisualData(tags, index);
             }
             stop = false;
         }
-        Refresh(useBeep);
+        Refresh();
     }
-    void Refresh(bool isBeep = false) {
-        // Debug.Log(rR_Narration.dialogue.nameShown);
-        _name.text = rR_Narration.dialogue.nameShown;
-        audioSource.clip = null;
-        if (rR_Narration_AssetManagement.dictActorBeep.ContainsKey(rR_Narration.dialogue.name)) {
-            audioSource.clip = rR_Narration_AssetManagement.dictActorBeep[rR_Narration.dialogue.name];
-        }
-        if (isBeep) {
-            // Debug.Log("Beep Used");
-            Beep();
+
+    private void LoadDialogue(string dialogueTitle) {
+        SetDialogue(dialogueTitle);
+        SetVisualAsset(dialogueTitle);
+        rR_Narration.LoadDialogueData(tags, index, rR_DialogueTools_AssetManager);
+        Refresh();
+    }
+
+    private void SetDialogue(string dialogueTitle) {
+        if (!useLocalization) {
+            rR_Narration.LoadDialogueFile(rR_DialogueTools_AssetManager.dialoguesData[dialogueTitle].text);
         } else {
-            _dialogue.text = rR_Narration.dialogue.dialogue;
+            rR_Narration.LoadDialogueTable(dialogueTitle);
         }
-        if (!useExtra_Visual) {
-            sprite.color = Color.clear;
-            if (rR_Narration_AssetManagement.dictActorSprite.ContainsKey(rR_Narration.dialogue.name + ";;" + rR_Narration.dialogue.expression)) {
-                sprite.sprite = rR_Narration_AssetManagement.dictActorSprite[rR_Narration.dialogue.name + ";;" + rR_Narration.dialogue.expression];
-                sprite.color = Color.white;
-                sprite.transform.position = spriteV3 + new Vector3((float)rR_Narration.dialogue.charPos * Range, 1, 1);
-                sprite.gameObject.transform.localScale = Vector3.Scale(spriteV3scale, new Vector3((float)isInverted, 1, 1));
+    }
+
+    private void SetVisualAsset(string dialogueTitle) {
+        if (rR_DialogueTools_ExtraVisual == null) return;
+
+        rR_DialogueTools_Visualization.LoadVisualAsset(rR_DialogueTools_AssetManager.visualAssets[dialogueTitle].text);
+    }
+
+    private void Refresh() {
+        SetDialogueText();
+        ResetShakeObject();
+        RunGeneralAudio();
+        if (rR_DialogueTools_ExtraVisual == null) {
+            if (rR_DialogueTools_AssetManager.dictActorSprite.ContainsKey(rR_Narration.dialogue.actorName + ";;" + rR_Narration.dialogue.expression)) {
+                sprite = SetActorSprite(sprite, rR_Narration.dialogue);
             } else {
-                sprite.sprite = null;
+                sprite = RR_DialogueTools_FunctionsVisual.ResetActorSprite(sprite);
             }
-            // Debug.Log(rR_Narration.dialogue.skeletonDataAsset.name);
-            if (rR_Narration.dialogue.skeletonDataAsset == null) {
+            if (rR_Narration.dialogue.skeletonDataAsset != null) {
+                skeletonGraphics.gameObject.SetActive(true);
+                skeletonGraphics = SetActorSpine(skeletonGraphics, rR_Narration.dialogue);
+                skeletonGraphics.Initialize(true);
+            } else {
                 skeletonGraphics.gameObject.SetActive(false);
                 return;
             }
-            if (!skeletonGraphics.gameObject.activeSelf) {
-                skeletonGraphics.gameObject.SetActive(true);
-            }
-            // skeletonAnimation.skeletonDataAsset.Clear();
-            skeletonGraphics.skeletonDataAsset = rR_Narration.dialogue.skeletonDataAsset;
-            skeletonGraphics.startingAnimation = rR_Narration.dialogue.expression;
-            skeletonGraphics.Initialize(true);
-            skeletonGraphics.rectTransform.localPosition = spineV3 + new Vector3((float)rR_Narration.dialogue.charPos * Range, 1, 1);
-            skeletonGraphics.rectTransform.localScale = Vector3.Scale(spineV3scale, new Vector3((float)isInverted, 1, 1));
-            skeletonGraphics.color = Color.white;
+        } else {
+            rR_DialogueTools_ExtraVisual.ChangeAnimPos(rR_Narration, rR_DialogueTools_AssetManager, rR_DialogueTools_Visualization);
         }
-        if (useExtra_Visual) {
-            rR_DialogueTools_Extra.ChangeAnimPos(rR_Narration, rR_Narration_AssetManagement, rR_Narration_Visualization);
-        }
-    }
-    void Beep() {
-        if (audioSource.clip == null) return;
-        StartCoroutine(PlayBeep(false, rR_Narration.dialogue, audioSource, 1 / beepPerSeconds));
     }
 
-    public IEnumerator PlayBeep(bool pause, RR_Dialogue dialogue, AudioSource audioSource, float seconds = 0.1f) {
+    private void TextSpeed() {
+        StartCoroutine(RunTextSpeed(false, rR_Narration.dialogue, beepAudioSource, 1 / textSpeed));
+    }
+
+    private void RunGeneralAudio() {
+        if (!useGeneralAudio) return;
+
+        RR_AudioPlayer.PlaySfx(rR_Narration.dialogue.voiceActID, false, voiceActAudioSource, rR_DialogueTools_AssetManager);
+        RR_AudioPlayer.PlaySfx(rR_Narration.dialogue.sfxID, false, sfxAudioSource, rR_DialogueTools_AssetManager);
+        RR_AudioPlayer.PlayBgm(rR_Narration.dialogue.bgmID, false, bgmAudioSource, rR_DialogueTools_AssetManager);
+    }
+
+    private IEnumerator RunTextSpeed(bool pause, RR_Dialogue dialogue, AudioSource audioSource, float seconds = 0.1f) {
         int index = 0;
         int skipIndex = -1;
         bool scanDone = false;
-        // Debug.Log("dialogue length: " + dialogue.dialogue.Length);
         for (int i = 0; i < dialogue.dialogue.Length; i++) {
-            if (stop) yield break;
+            if (stop) {
+                yield return null;
+            }
             if (index < skipIndex) {
                 index += 1;
                 continue;
@@ -168,7 +168,9 @@ public class RR_DialogueTools_Manager : MonoBehaviour
                 index += 1;
                 continue;
             }
-            RR_AudioPlayer.PlayBeep(audioSource, minPitch, maxPitch);
+            if (useBeepAudio && audioSource.clip != null) {
+                RR_AudioPlayer.PlayBeep(audioSource, minPitch, maxPitch);
+            }
             _dialogue.text = dialogue.dialogue.Substring(0, index + 1);
             yield return new WaitForSeconds(seconds);
             yield return new WaitUntil(() => !pause);
@@ -176,10 +178,61 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         }
         yield break;
     }
+
+    private void SetDialogueText() {
+        _name.text = rR_Narration.dialogue.displayName;
+        beepAudioSource.clip = null;
+        if (rR_DialogueTools_AssetManager.dictActorBeep.ContainsKey(rR_Narration.dialogue.actorName)) {
+            beepAudioSource.clip = rR_DialogueTools_AssetManager.GetActorBeep(rR_Narration.dialogue.actorName);
+        }
+        if (textSpeed > 0) {
+            TextSpeed();
+        } else {
+            _dialogue.text = rR_Narration.dialogue.dialogue;
+        }
+
+    }
+
+    private void ResetShakeObject() {
+        if (shakingObject == null) return;
+        if (!rR_Narration.dialogue.useShake) return;
+
+        shakingObject.localPosition = shakeDefaultPosition;
+        shakeProgressPosition = Vector3.zero;
+        shakeProgress = 0;
+    }
+
+    private void ShakeObject() {
+        if (shakeProgress < 360 * shakeTotal) {
+            shakeProgress += ((1 / shakeDuration) * (360 * shakeTotal)) * Time.deltaTime;
+            shakeProgressPosition.x = Mathf.Sin(shakeProgress * Mathf.Deg2Rad);
+            shakeProgressPosition.y = Mathf.Sin(shakeProgress * Mathf.Deg2Rad);
+            shakingObject.localPosition = shakeDefaultPosition + (shakeProgressPosition * shakeRange);
+        }
+    }
+
+    Image SetActorSprite(Image actorSprite, RR_Dialogue dialogue) {
+        return RR_DialogueTools_FunctionsVisual.SetActorSprite(
+            actorImage: actorSprite,
+            targetSprite: dialogue.sprite,
+            targetPosition: dialogue.actorPosition,
+            targetScale: dialogue.actorScale
+            );
+    }
+
+    SkeletonGraphic SetActorSpine(SkeletonGraphic targetSkeletonGraphic, RR_Dialogue dialogue) {
+        return RR_DialogueTools_FunctionsVisual.SetActorSkeletonGraphics(
+            targetSkeletonGraphic,
+            dialogue.skeletonDataAsset,
+            dialogue.expression,
+            dialogue.actorPosition,
+            dialogue.actorScale
+            );
+    }
+
     int getIndex(int index, string dialogue, ref bool scanDone) {
         for (int i = index; i < dialogue.Length; i++) {
             if (dialogue[i].ToString() == ">") {
-                // Debug.Log(dialogue.Substring(index, i - index + 1));
                 scanDone = true;
                 return i;
             }

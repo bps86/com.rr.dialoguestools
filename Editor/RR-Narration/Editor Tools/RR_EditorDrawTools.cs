@@ -4,7 +4,7 @@ using System.IO;
 using UnityEngine;
 using UnityEditor;
 
-public static class EditorDrawTools
+public static class RR_EditorDrawTools
 {
     public static void ResizeScrollView(ref Rect cursorChangeRect, Rect defaultRect, ref bool resize, ref float currentScrollViewWidth) {
         GUI.DrawTexture(cursorChangeRect, EditorGUIUtility.whiteTexture);

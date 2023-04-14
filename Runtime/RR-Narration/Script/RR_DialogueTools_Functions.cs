@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Localization;
 using Spine.Unity;
 
-public class RR_NarrationFunctions
+public class RR_DialogueTools_Functions
 {
     public static void NewFile(string fileName) {
         string newFile = null;
@@ -41,15 +41,22 @@ public class RR_NarrationFunctions
         }
         for (int i = 0; i < dialoguesList.Length; i++) {
             dialoguedata = dialoguesList[i].Split(new string[] { ";" }, System.StringSplitOptions.None);
-            tmpDialogues.Add(new RR_Dialogue());
-            tmpDialogues[i].name = dialoguedata[0];
-            tmpDialogues[i].expression = dialoguedata[1];
-            tmpDialogues[i].dialogue = dialoguedata[2];
-            tmpDialogues[i].tags = dialoguedata[3];
-            tmpDialogues[i].index = int.Parse(dialoguedata[4]);
-            tmpDialogues[i].nameMode = (NameMode)int.Parse(dialoguedata[5]);
-            tmpDialogues[i].nameShown = tmpDialogues[i].GetName(tmpDialogues[i].nameMode);
-            tmpDialogues[i].charPos = (CharPos)int.Parse(dialoguedata[6]);
+            tmpDialogues.Add(new RR_Dialogue(
+                _name: dialoguedata[0],
+                _expression: dialoguedata[1],
+                _dialogue: dialoguedata[2],
+                _tags: dialoguedata[3],
+                _index: int.Parse(dialoguedata[4]),
+                _nameMode: (NameMode)int.Parse(dialoguedata[5]),
+                _positionX: float.Parse(dialoguedata[6]),
+                _positionY: float.Parse(dialoguedata[7]),
+                _scale: float.Parse(dialoguedata[8]),
+                _isInverted: bool.Parse(dialoguedata[9]),
+                _useShake: bool.Parse(dialoguedata[10]),
+                _sfxID: dialoguedata[11],
+                _bgmID: dialoguedata[12],
+                _voiceActID: dialoguedata[13]
+            ));
         }
         return tmpDialogues;
     }

@@ -5,26 +5,43 @@ using Spine.Unity;
 
 public class RR_Dialogue
 {
-    public string name;
-    public string nameShown;
+    public string actorName;
+    public string displayName;
     public string expression;
-    [TextArea]
     public string dialogue;
     public string tags;
+    public string sfxID;
+    public string bgmID;
+    public string voiceActID;
     public int index;
+    public bool isInverted;
+    public bool useShake;
     public NameMode nameMode;
-    public CharPos charPos;
     public Sprite sprite;
     public SkeletonDataAsset skeletonDataAsset;
-    public RR_Dialogue(string _name = "name", string _expression = "expression", string _dialogue = "dialogue", string _tags = "tags", int _index = 0, NameMode _nameMode = NameMode.Normal, CharPos _charPos = CharPos.Center) {
-        this.name = _name;
+    public Vector3 actorPosition;
+    public Vector3 actorScale;
+    public float scale;
+    public RR_Dialogue(string _name = "name", string _expression = "expression", string _dialogue = "dialogue", string _tags = "tags", int _index = 0, NameMode _nameMode = NameMode.Normal, float _positionX = 0, float _positionY = 0, float _scale = 1, bool _isInverted = false, bool _useShake = false, string _sfxID = "", string _bgmID = "", string _voiceActID = "") {
+        this.actorName = _name;
         this.expression = _expression;
         this.dialogue = _dialogue;
         this.tags = _tags;
         this.index = _index;
         this.nameMode = _nameMode;
-        this.nameShown = GetName(_nameMode);
-        this.charPos = _charPos;
+        this.displayName = GetName(_nameMode);
+        this.actorPosition = new Vector3(_positionX, _positionY, 0);
+        this.isInverted = _isInverted;
+        this.scale = _scale;
+        if (!isInverted) {
+            this.actorScale = new Vector3(scale, scale, scale);
+        } else {
+            this.actorScale = new Vector3(-scale, scale, scale);
+        }
+        this.useShake = _useShake;
+        this.sfxID = _sfxID;
+        this.bgmID = _bgmID;
+        this.voiceActID = _voiceActID;
     }
     public string GetName(NameMode _nameMode) {
         switch (_nameMode) {
@@ -33,7 +50,7 @@ public class RR_Dialogue
             case NameMode.None:
                 return "";
             case NameMode.Normal:
-                return this.name;
+                return this.actorName;
         }
         return "Error";
     }
