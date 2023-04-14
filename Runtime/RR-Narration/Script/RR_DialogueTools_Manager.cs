@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -19,6 +20,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     [SerializeField] private RR_DialogueTools_ExtraVisual rR_DialogueTools_ExtraVisual;
     [SerializeField] private List<string> _dialogues = new List<string>();
     [SerializeField] private string currentDialogue;
+    [SerializeField] private string defaultAnimation;
     [SerializeField] private string tags;
     [SerializeField] private int index;
     [SerializeField] private int textSpeed;
@@ -127,6 +129,9 @@ public class RR_DialogueTools_Manager : MonoBehaviour
                 skeletonGraphics.gameObject.SetActive(true);
                 skeletonGraphics = SetActorSpine(skeletonGraphics, rR_Narration.dialogue);
                 skeletonGraphics.Initialize(true);
+                if (!String.IsNullOrEmpty(defaultAnimation) && !rR_Narration.dialogue.animationLoop) {
+                    RR_DialogueTools_FunctionsVisual.SetResetAnim(skeletonGraphics, defaultAnimation);
+                }
             } else {
                 skeletonGraphics.gameObject.SetActive(false);
                 return;
@@ -226,7 +231,8 @@ public class RR_DialogueTools_Manager : MonoBehaviour
             dialogue.skeletonDataAsset,
             dialogue.expression,
             dialogue.actorPosition,
-            dialogue.actorScale
+            dialogue.actorScale,
+            dialogue.animationLoop
             );
     }
 

@@ -15,18 +15,24 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
     // public static EditorWindow getWindow, thisWindow;
     public Object textAsset;
     public TextAsset config;
-    public List<string> clipboardActor;
-    public List<string> clipboardExpression;
-    public List<Vector3> clipboardPos = new List<Vector3>(),
-    clipboardScale = new List<Vector3>();
-    RR_DialogueTools_Visualization rR_DialogueTools_Visualization;
-    RR_Narration rR_Narration;
+    private List<string> clipboardActor;
+    private List<string> clipboardExpression;
+    private List<Vector3> clipboardStartPos;
+    private List<Vector3> clipboardStartScale;
+    private List<Vector3> clipboardEndPos;
+    private List<Vector3> clipboardEndScale;
+    private RR_DialogueTools_Visualization rR_DialogueTools_Visualization;
+    private RR_Narration rR_Narration;
 
     [MenuItem("Window/RR/Visual Editor")]
     public static void init() {
         Debug.Log("a");
         RR_EditorTools.Initialize_RR_Dir();
         RR_DialogueTools_VisualEditor thisWindow = (RR_DialogueTools_VisualEditor)EditorWindow.GetWindow(typeof(RR_DialogueTools_VisualEditor));
+        thisWindow.clipboardStartPos = new List<Vector3>();
+        thisWindow.clipboardStartScale = new List<Vector3>();
+        thisWindow.clipboardEndPos = new List<Vector3>();
+        thisWindow.clipboardEndScale = new List<Vector3>();
         thisWindow.position = new Rect(Screen.width / 2, Screen.height / 2, 1080, 600);
         thisWindow.Show();
     }
@@ -66,7 +72,6 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
         }
         if (rR_DialogueTools_Visualization.visual != null && GUILayout.Button("Save")) {
             string visualJson = JsonUtility.ToJson(rR_DialogueTools_Visualization.visual);
-            Debug.Log(visualJson);
             RR_DialogueTools_Functions.SaveFile("Assets/RR-Narration/Resources/RR-Visual/" + textAsset.name + ".json", visualJson);
             RR_EditorTools.Refresh_RR_DialogueTools();
         }
@@ -105,12 +110,10 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
                     string expression = rR_DialogueTools_Visualization.visual.visualDatas[i].expression[ii];
                     GUILayout.BeginVertical();
                     GUILayout.Label("Name: " + name, GUILayout.Width(100));
-                    // GUILayout.Label("Expr: " + rR_DialogueTools_Visualization.visual.visualDatas[i].expression[ii], GUILayout.Width(100));
                     GUILayout.Label("Expr: " + expression, GUILayout.Width(100));
                     if (GUILayout.Button(AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/RR-Thumbnail/Thumbnail-" + name + "," + expression + ".png"), GUILayout.Width(100), GUILayout.Height(100))) {
                         int index = i;
                         int index2 = ii;
-                        Debug.Log(rR_DialogueTools_Visualization.visual.visualDatas[i].expression.Count);
                         OpenActorManagerWindow(index, index2);
                         GUIUtility.ExitGUI();
                     }
@@ -129,6 +132,7 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
                 }
                 GUILayout.BeginHorizontal();
                 for (int ii = 0; ii < rR_DialogueTools_Visualization.visual.visualDatas[i].endPos.Count; ii++) {
+                    GUILayout.BeginVertical();
                     if (rR_DialogueTools_Visualization.visual.animMode == TransitionMode.Static) {
                         GUILayout.BeginVertical();
                         rR_DialogueTools_Visualization.visual.visualDatas[i].endPos[ii] = EditorGUILayout.Vector3Field("pos " + ii + ": ", rR_DialogueTools_Visualization.visual.visualDatas[i].endPos[ii]);
@@ -148,6 +152,11 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
                         GUILayout.EndVertical();
                         GUILayout.Space(20);
                     }
+                    GUILayout.BeginHorizontal(GUILayout.Width(200));
+                    GUILayout.Label("Loop Animation: ");
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].isLooping[ii] = EditorGUILayout.Toggle(rR_DialogueTools_Visualization.visual.visualDatas[i].isLooping[ii]);
+                    GUILayout.EndHorizontal();
+                    GUILayout.EndVertical();
                 }
                 GUILayout.EndHorizontal();
                 GUILayout.BeginHorizontal();
@@ -156,22 +165,24 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
                     clipboardExpression = rR_DialogueTools_Visualization.visual.visualDatas[i].expression;
                 }
                 if (GUILayout.Button("Paste Actor", GUILayout.Width(80))) {
-                    rR_DialogueTools_Visualization.visual.visualDatas[i].actorName = clipboardActor;
-                    rR_DialogueTools_Visualization.visual.visualDatas[i].expression = clipboardExpression;
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].actorName = new List<string>(clipboardActor);
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].expression = new List<string>(clipboardExpression);
                 }
                 if (GUILayout.Button("Copy Pos", GUILayout.Width(80))) {
-                    Debug.Log("isCopyPressed");
-                    clipboardPos = rR_DialogueTools_Visualization.visual.visualDatas[i].endPos;
+                    clipboardStartPos = rR_DialogueTools_Visualization.visual.visualDatas[i].startPos;
+                    clipboardEndPos = rR_DialogueTools_Visualization.visual.visualDatas[i].endPos;
                 }
                 if (GUILayout.Button("Paste Pos", GUILayout.Width(80))) {
-                    Debug.Log("isPastePressed");
-                    rR_DialogueTools_Visualization.visual.visualDatas[i].endPos = clipboardPos;
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].startPos = new List<Vector3>(clipboardStartPos);
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].endPos = new List<Vector3>(clipboardEndPos);
                 }
                 if (GUILayout.Button("Copy Scale", GUILayout.Width(80))) {
-                    clipboardScale = rR_DialogueTools_Visualization.visual.visualDatas[i].endScale;
+                    clipboardEndScale = rR_DialogueTools_Visualization.visual.visualDatas[i].endScale;
+                    clipboardStartScale = rR_DialogueTools_Visualization.visual.visualDatas[i].startScale;
                 }
                 if (GUILayout.Button("Paste Scale", GUILayout.Width(80))) {
-                    rR_DialogueTools_Visualization.visual.visualDatas[i].endScale = clipboardScale;
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].endScale = new List<Vector3>(clipboardEndScale);
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].startScale = new List<Vector3>(clipboardStartScale);
                 }
                 GUILayout.EndHorizontal();
                 GUILayout.EndVertical();
@@ -198,9 +209,19 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
                     rR_DialogueTools_Visualization.visual.visualDatas[i].expression.Add("");
                 }
             }
-            for (int ii = 0; ii < rR_DialogueTools_Visualization.visual.actorCount; ii++) {
+            for (int ii = rR_DialogueTools_Visualization.visual.visualDatas[i].expression.Count - 1; ii >= 0; ii--) {
                 if (rR_DialogueTools_Visualization.visual.visualDatas[i].expression.Count > rR_DialogueTools_Visualization.visual.actorCount) {
                     rR_DialogueTools_Visualization.visual.visualDatas[i].expression.RemoveAt(rR_DialogueTools_Visualization.visual.visualDatas[i].expression.Count - 1);
+                }
+            }
+            for (int ii = 0; ii < rR_DialogueTools_Visualization.visual.actorCount; ii++) {
+                if (rR_DialogueTools_Visualization.visual.visualDatas[i].isLooping.Count < rR_DialogueTools_Visualization.visual.actorCount) {
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].isLooping.Add(false);
+                }
+            }
+            for (int ii = rR_DialogueTools_Visualization.visual.visualDatas[i].isLooping.Count - 1; ii >= 0; ii--) {
+                if (rR_DialogueTools_Visualization.visual.visualDatas[i].isLooping.Count > rR_DialogueTools_Visualization.visual.actorCount) {
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].isLooping.RemoveAt(rR_DialogueTools_Visualization.visual.visualDatas[i].isLooping.Count - 1);
                 }
             }
             for (int ii = 0; ii < rR_DialogueTools_Visualization.visual.actorCount; ii++) {
@@ -223,7 +244,6 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
                     rR_DialogueTools_Visualization.visual.visualDatas[i].endScale.RemoveAt(rR_DialogueTools_Visualization.visual.visualDatas[i].endScale.Count - 1);
                 }
             }
-
             for (int ii = 0; ii < rR_DialogueTools_Visualization.visual.actorCount; ii++) {
                 if (rR_DialogueTools_Visualization.visual.visualDatas[i].startPos.Count < rR_DialogueTools_Visualization.visual.actorCount) {
                     rR_DialogueTools_Visualization.visual.visualDatas[i].startPos.Add(new Vector3());
@@ -246,18 +266,9 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
             }
         }
     }
-    // private void Saving() {
-    //     string data = JsonUtility.ToJson(rR_DialogueTools_Visualization.visual);
-    //     EditorUtility.SetDirty(textAsset);
-    //     rR_DialogueTools_FileManagerWindow.init_Window(FileMode.Save);
-    //     GUIUtility.ExitGUI();
-    //     ready = true;
-    // }
 
     private void OnOpen(RR_Narration selected_RR_Narration, RR_DialogueTools_Visualization selected_RR_DialogueTools_Visualization) {
         this.rR_Narration = selected_RR_Narration;
         this.rR_DialogueTools_Visualization = selected_RR_DialogueTools_Visualization;
-        Debug.Log(selected_RR_DialogueTools_Visualization.visual.visualDatas[0].expression[0]);
-        Debug.Log(rR_DialogueTools_Visualization.visual.visualDatas[0].expression[0]);
     }
 }

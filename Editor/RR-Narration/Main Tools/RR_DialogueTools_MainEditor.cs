@@ -160,8 +160,14 @@ public class RR_DialogueTools_MainEditor : EditorWindow
                 rR_Narration.dialogues[i].actorPosition.y = EditorGUILayout.FloatField(rR_Narration.dialogues[i].actorPosition.y, GUILayout.Width(60));
                 GUILayout.Label("Actor Scale: ", GUILayout.Width(80));
                 rR_Narration.dialogues[i].scale = EditorGUILayout.FloatField(rR_Narration.dialogues[i].scale, GUILayout.Width(60));
-                GUILayout.Label("Is Inverted: ", GUILayout.Width(80));
+                GUILayout.BeginHorizontal(GUILayout.Width(200));
+                GUILayout.Label("Is Inverted: ");
                 rR_Narration.dialogues[i].isInverted = EditorGUILayout.Toggle(rR_Narration.dialogues[i].isInverted, GUILayout.Width(60));
+                GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal(GUILayout.Width(200));
+                GUILayout.Label("Loop Animation: ");
+                rR_Narration.dialogues[i].animationLoop = EditorGUILayout.Toggle(rR_Narration.dialogues[i].animationLoop, GUILayout.Width(60));
+                GUILayout.EndHorizontal();
                 GUILayout.EndHorizontal();
                 GUILayout.EndVertical();
             }
@@ -182,12 +188,12 @@ public class RR_DialogueTools_MainEditor : EditorWindow
         dialoguedata += dialogue.tags + separator;
         dialoguedata += dialogue.index.ToString() + separator;
         dialoguedata += (int)dialogue.nameMode + separator;
-        // dialoguedata += (int)dialogue.charPos + separator;
         dialoguedata += dialogue.actorPosition.x + separator;
         dialoguedata += dialogue.actorPosition.y + separator;
         dialoguedata += dialogue.scale + separator;
         dialoguedata += dialogue.isInverted + separator;
         dialoguedata += dialogue.useShake + separator;
+        dialoguedata += dialogue.animationLoop + separator;
         dialoguedata += dialogue.sfxID + separator;
         dialoguedata += dialogue.bgmID + separator;
         dialoguedata += dialogue.voiceActID;

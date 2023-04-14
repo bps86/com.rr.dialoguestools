@@ -19,13 +19,23 @@ public class RR_DialogueTools_FunctionsVisual
         actorSprite.color = Color.clear;
         return actorSprite;
     }
-    public static SkeletonGraphic SetActorSkeletonGraphics(SkeletonGraphic actorSkeletonGraphics, SkeletonDataAsset targetSkeletonDataAsset, string animationName, Vector3 targetPosition, Vector3 targetScale) {
+    public static SkeletonGraphic SetActorSkeletonGraphics(SkeletonGraphic actorSkeletonGraphics, SkeletonDataAsset targetSkeletonDataAsset, string animationName, Vector3 targetPosition, Vector3 targetScale, bool isLoop) {
         actorSkeletonGraphics.skeletonDataAsset = targetSkeletonDataAsset;
         actorSkeletonGraphics.startingAnimation = animationName;
+        actorSkeletonGraphics.startingLoop = isLoop;
         actorSkeletonGraphics.rectTransform.localPosition = targetPosition;
         actorSkeletonGraphics.rectTransform.localScale = targetScale;
         actorSkeletonGraphics.color = Color.white;
         return actorSkeletonGraphics;
+    }
 
+    public static void SetResetAnim(SkeletonGraphic skeletonGraphic, string defaultAnimation) {
+        skeletonGraphic.AnimationState.Complete += delegate {
+            ResetAnim(skeletonGraphic, defaultAnimation);
+        };
+    }
+
+    private static void ResetAnim(SkeletonGraphic skeletonGraphic, string defaultAnimation) {
+        skeletonGraphic.AnimationState.SetAnimation(0, defaultAnimation, true);
     }
 }

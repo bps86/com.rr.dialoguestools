@@ -84,9 +84,9 @@ public class RR_DialogueTools_ExtraVisual : MonoBehaviour
             if (skeletonGraphics[i].skeletonDataAsset != null) {
                 skeletonGraphics[i].gameObject.SetActive(true);
                 skeletonGraphics[i].Initialize(true);
-
-                SetResetAnim(skeletonGraphics[i]);
-
+                if (!String.IsNullOrEmpty(defaultAnimation) && !visualData.isLooping[i]) {
+                    RR_DialogueTools_FunctionsVisual.SetResetAnim(skeletonGraphics[i], defaultAnimation);
+                }
                 if (isDim) {
                     if (visualData.actorName[i] != dialogue.actorName) {
                         skeletonGraphics[i].color = dimColor;
@@ -125,20 +125,20 @@ public class RR_DialogueTools_ExtraVisual : MonoBehaviour
         if (rR_DialogueTools_AssetManager.GetActorSpine(name) == null) {
             skeletonGraphic.skeletonDataAsset = null;
         } else if (transitionMode == TransitionMode.MovePosition) {
-            skeletonGraphic = RR_DialogueTools_FunctionsVisual.SetActorSkeletonGraphics(skeletonGraphic, rR_DialogueTools_AssetManager.GetActorSpine(name).skeletonDataAsset, expression, visualData.startPos[actorIndex], visualData.startScale[actorIndex]);
+            skeletonGraphic = RR_DialogueTools_FunctionsVisual.SetActorSkeletonGraphics(skeletonGraphic, rR_DialogueTools_AssetManager.GetActorSpine(name).skeletonDataAsset, expression, visualData.startPos[actorIndex], visualData.startScale[actorIndex], visualData.isLooping[actorIndex]);
         } else {
-            skeletonGraphic = RR_DialogueTools_FunctionsVisual.SetActorSkeletonGraphics(skeletonGraphic, rR_DialogueTools_AssetManager.GetActorSpine(name).skeletonDataAsset, expression, visualData.endPos[actorIndex], visualData.endScale[actorIndex]);
+            skeletonGraphic = RR_DialogueTools_FunctionsVisual.SetActorSkeletonGraphics(skeletonGraphic, rR_DialogueTools_AssetManager.GetActorSpine(name).skeletonDataAsset, expression, visualData.endPos[actorIndex], visualData.endScale[actorIndex], visualData.isLooping[actorIndex]);
         }
         return skeletonGraphic;
     }
 
-    private void SetResetAnim(SkeletonGraphic skeletonGraphic) {
-        skeletonGraphic.AnimationState.Complete += delegate {
-            ResetAnim(skeletonGraphic);
-        };
-    }
+    // private void SetResetAnim(SkeletonGraphic skeletonGraphic) {
+    //     skeletonGraphic.AnimationState.Complete += delegate {
+    //         ResetAnim(skeletonGraphic);
+    //     };
+    // }
 
-    private void ResetAnim(SkeletonGraphic skeletonGraphic) {
-        skeletonGraphic.AnimationState.SetAnimation(0, defaultAnimation, true);
-    }
+    // private void ResetAnim(SkeletonGraphic skeletonGraphic) {
+    //     skeletonGraphic.AnimationState.SetAnimation(0, defaultAnimation, true);
+    // }
 }

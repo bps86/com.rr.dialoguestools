@@ -53,9 +53,10 @@ public class RR_DialogueTools_Functions
                 _scale: float.Parse(dialoguedata[8]),
                 _isInverted: bool.Parse(dialoguedata[9]),
                 _useShake: bool.Parse(dialoguedata[10]),
-                _sfxID: dialoguedata[11],
-                _bgmID: dialoguedata[12],
-                _voiceActID: dialoguedata[13]
+                _animationLoop: bool.Parse(dialoguedata[11]),
+                _sfxID: dialoguedata[12],
+                _bgmID: dialoguedata[13],
+                _voiceActID: dialoguedata[14]
             ));
         }
         return tmpDialogues;
