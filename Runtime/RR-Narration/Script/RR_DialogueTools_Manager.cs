@@ -37,8 +37,10 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     private RR_Narration rR_Narration;
     private Vector3 shakeDefaultPosition;
     private Vector3 shakeProgressPosition;
+    private Coroutine textSpeedCoroutine;
     private float shakeProgress;
-    private bool stop = false;
+    private bool stop;
+    private bool stopCoroutine;
     private void Awake() {
         rR_Narration = new RR_Narration();
         rR_DialogueTools_AssetManager = new RR_DialogueTools_AssetManager();
@@ -142,7 +144,10 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     }
 
     private void TextSpeed() {
-        StartCoroutine(RunTextSpeed(false, rR_Narration.dialogue, beepAudioSource, 1 / textSpeed));
+        if (textSpeedCoroutine != null) {
+            StopCoroutine(textSpeedCoroutine);
+        }
+        textSpeedCoroutine = StartCoroutine(RunTextSpeed(false, rR_Narration.dialogue, beepAudioSource, 1 / textSpeed));
     }
 
     private void RunGeneralAudio() {
