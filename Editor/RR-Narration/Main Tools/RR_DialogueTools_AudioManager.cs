@@ -98,15 +98,12 @@ public class RR_DialogueTools_AudioManager : EditorWindow
         scrollPos = GUILayout.BeginScrollView(scrollPos, GUILayout.Width(currentScrollViewWidth));
         if (GUILayout.Button("Sfx")) {
             mode = SFX;
-            Debug.Log(mode);
         }
         if (GUILayout.Button("Bgm")) {
             mode = BGM;
-            Debug.Log(mode);
         }
         if (GUILayout.Button("Voice Act")) {
             mode = VOICE_ACT;
-            Debug.Log(mode);
         }
         if (GUILayout.Button("Apply")) {
             Apply(index, sfxID, bgmID, voiceActID);

@@ -27,7 +27,6 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
 
     [MenuItem("Window/RR/Visual Editor")]
     public static void init() {
-        Debug.Log("a");
         RR_EditorTools.Initialize_RR_Dir();
         RR_DialogueTools_VisualEditor thisWindow = (RR_DialogueTools_VisualEditor)EditorWindow.GetWindow(typeof(RR_DialogueTools_VisualEditor));
         thisWindow.clipboardStartPos = new List<Vector3>();
@@ -196,12 +195,28 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
                     rR_DialogueTools_Visualization.visual.visualDatas[i].endPos = new List<Vector3>(clipboardEndPos);
                 }
                 if (GUILayout.Button("Copy Scale", GUILayout.Width(80))) {
+                    clipboardStartScale = rR_DialogueTools_Visualization.visual.visualDatas[i].startScale;
+                    clipboardEndScale = rR_DialogueTools_Visualization.visual.visualDatas[i].endScale;
+                }
+                if (GUILayout.Button("Paste Scale", GUILayout.Width(80))) {
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].startScale = new List<Vector3>(clipboardStartScale);
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].endScale = new List<Vector3>(clipboardEndScale);
+                }
+                if (GUILayout.Button("Copy All(Actor,Pos,Scale)", GUILayout.Width(160))) {
+                    clipboardActor = rR_DialogueTools_Visualization.visual.visualDatas[i].actorName;
+                    clipboardExpression = rR_DialogueTools_Visualization.visual.visualDatas[i].expression;
+                    clipboardStartPos = rR_DialogueTools_Visualization.visual.visualDatas[i].startPos;
+                    clipboardEndPos = rR_DialogueTools_Visualization.visual.visualDatas[i].endPos;
                     clipboardEndScale = rR_DialogueTools_Visualization.visual.visualDatas[i].endScale;
                     clipboardStartScale = rR_DialogueTools_Visualization.visual.visualDatas[i].startScale;
                 }
-                if (GUILayout.Button("Paste Scale", GUILayout.Width(80))) {
-                    rR_DialogueTools_Visualization.visual.visualDatas[i].endScale = new List<Vector3>(clipboardEndScale);
+                if (GUILayout.Button("Paste All(Actor,Pos,Scale)", GUILayout.Width(160))) {
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].actorName = new List<string>(clipboardActor);
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].expression = new List<string>(clipboardExpression);
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].startPos = new List<Vector3>(clipboardStartPos);
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].endPos = new List<Vector3>(clipboardEndPos);
                     rR_DialogueTools_Visualization.visual.visualDatas[i].startScale = new List<Vector3>(clipboardStartScale);
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].endScale = new List<Vector3>(clipboardEndScale);
                 }
                 GUILayout.EndHorizontal();
                 GUILayout.Space(20);

@@ -172,7 +172,6 @@ public class RR_EditorTools
         for (int i = 0; i < tempSpriteActor.Count; i++) {
             expression[tempSpriteActor[i]] = dictSprite[tempSpriteActor[i]].ToArray();
         }
-        Debug.Log("scanning Actor Spine");
         for (int i = 0; i < tempSpine.Count; i++) {
             List<string> name = new List<string>();
             if (i > 0) spinePaths += ";";
@@ -205,7 +204,6 @@ public class RR_EditorTools
         if (tagMan == null) return;
         var so = new SerializedObject(tagMan);
         var m_SortingLayers = so.FindProperty("m_SortingLayers");
-        Debug.Log(m_SortingLayers.GetArrayElementAtIndex(0).FindPropertyRelative("name").stringValue);
         int uid1 = CheckIdDuplicates(m_SortingLayers);
         int uid2 = CheckIdDuplicates(m_SortingLayers);
         int uid3 = CheckIdDuplicates(m_SortingLayers);

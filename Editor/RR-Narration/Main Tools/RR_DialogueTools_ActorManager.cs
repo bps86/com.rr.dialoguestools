@@ -74,7 +74,6 @@ public class RR_DialogueTools_ActorManager : EditorWindow
         for (int i = 0; i < tempExpression.Count; i++)
             if (GUILayout.Button(AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/RR-Thumbnail/Thumbnail-" + tempName + "," + tempExpression[i] + ".png"), GUILayout.Width(100), GUILayout.Height(100))) {
                 if (mode == RR_DialogueTools_ActorManager.Mode.Dialogue) {
-                    Debug.Log(rR_Narration.dialogues[dynamicIndex].actorName);
                     rR_Narration.dialogues[dynamicIndex].actorName = tempName;
                     rR_Narration.dialogues[dynamicIndex].expression = tempExpression[i];
                 }

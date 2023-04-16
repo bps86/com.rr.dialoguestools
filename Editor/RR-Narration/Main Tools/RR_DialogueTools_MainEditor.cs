@@ -27,12 +27,12 @@ public class RR_DialogueTools_MainEditor : EditorWindow
     }
 
     void OnEnable() {
-        Debug.Log("Enabled");
         rR_Narration = new RR_Narration();
         rR_DialogueTools_Visualization = new RR_DialogueTools_Visualization();
         RR_EditorTools.locales = RR_EditorTools.GetLocales(new string[] { });
-        if (rR_Narration.dialogues == null) Debug.Log("is Null");
-        if (rR_Narration.dialogues == null) RR_EditorTools.currentLocaleIndex = RR_EditorTools.locales.Length - 1;
+        if (rR_Narration.dialogues == null) {
+            RR_EditorTools.currentLocaleIndex = RR_EditorTools.locales.Length - 1;
+        }
         currentScrollViewWidth = this.position.width / 2;
         cursorChangeRect = new Rect(currentScrollViewWidth, 0, 2f, this.position.height);
     }
@@ -95,7 +95,10 @@ public class RR_DialogueTools_MainEditor : EditorWindow
                 ready = false;
                 OpenFileManagerWindow(FileMode.Save);
             }
-            if (GUILayout.Button("New Dialogue")) rR_Narration.dialogues.Add(new RR_Dialogue());
+            if (GUILayout.Button("New Dialogue")) rR_Narration.dialogues.Add(new RR_Dialogue(
+                _tags: rR_Narration.dialogues[rR_Narration.dialogues.Count - 1].tags,
+                _index: rR_Narration.dialogues[rR_Narration.dialogues.Count - 1].index + 1)
+                );
         }
         GUILayout.EndScrollView();
         GUILayout.EndVertical();

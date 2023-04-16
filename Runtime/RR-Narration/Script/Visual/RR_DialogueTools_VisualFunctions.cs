@@ -8,8 +8,8 @@ public class RR_DialogueTools_FunctionsVisual
 {
     public static Image SetActorSprite(Image actorImage, Vector3 targetPosition, Vector3 targetScale, Color selectedColor) {
         actorImage.color = selectedColor;
-        actorImage.gameObject.transform.localPosition = targetPosition;
-        actorImage.gameObject.transform.localScale = targetScale;
+        actorImage.rectTransform.anchoredPosition = targetPosition;
+        actorImage.rectTransform.localScale = targetScale;
         return actorImage;
     }
 
@@ -21,7 +21,7 @@ public class RR_DialogueTools_FunctionsVisual
     public static SkeletonGraphic SetActorSkeletonGraphics(SkeletonGraphic actorSkeletonGraphics, string animationName, Vector3 targetPosition, Vector3 targetScale, Color selectedColor, bool isLoop) {
         actorSkeletonGraphics.startingAnimation = animationName;
         actorSkeletonGraphics.startingLoop = isLoop;
-        actorSkeletonGraphics.rectTransform.localPosition = targetPosition;
+        actorSkeletonGraphics.rectTransform.anchoredPosition = targetPosition;
         actorSkeletonGraphics.rectTransform.localScale = targetScale;
         actorSkeletonGraphics.color = selectedColor;
         return actorSkeletonGraphics;
