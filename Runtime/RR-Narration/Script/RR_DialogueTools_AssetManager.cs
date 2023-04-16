@@ -1,149 +1,94 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System;
+using UnityEngine;
+using Spine.Unity;
 
-public class RR_DialogueTools_AssetManager
+public class RR_DialogueTools_AssetManager : MonoBehaviour
 {
-    public Dictionary<string, TextAsset> dialoguesData;
-    public Dictionary<string, TextAsset> visualAssets;
-    public Dictionary<string, Sprite> dictActorSprite;
-    public Dictionary<string, RR_ActorSpine> dictActorSpine;
-    public Dictionary<string, AudioClip> dictActorBeep;
-    public Dictionary<string, AudioClip> dictSfx;
-    public Dictionary<string, AudioClip> dictBgm;
-    public bool isLoaded = false;
+    public Action LoadDialogueEvent;
 
-    public RR_DialogueTools_AssetManager() {
-        this.dialoguesData = new Dictionary<string, TextAsset>();
-        this.visualAssets = new Dictionary<string, TextAsset>();
-    }
+    public static RR_DialogueTools_AssetManager Instance;
+    [SerializeField] private List<string> _dialogues = new List<string>();
+    [SerializeField] private bool autoLoadDialogue;
+    [SerializeField] private bool useSingleton;
+    [SerializeField] private bool useGeneralAudio;
+    private RR_DialogueTools_AssetManagement assetManagement;
+    private bool assetLoaded;
 
-    public Sprite GetActorSprite(RR_Dialogue dialogue) {
-        return GetActorSprite(dialogue.actorName, dialogue.expression);
-    }
-
-    public Sprite GetActorSprite(string name, string expression) {
-        if (dictActorSprite.ContainsKey(name + ";;" + expression)) {
-            return dictActorSprite[name + ";;" + expression];
-        } else {
-            return null;
+    private void Awake() {
+        if (useSingleton) {
+            if (Instance == null) {
+                Instance = this;
+                DontDestroyOnLoad(this);
+                Init();
+            } else {
+                Destroy(this);
+            }
         }
     }
 
-    public RR_ActorSpine GetActorSpine(RR_Dialogue dialogue) {
-        return GetActorSpine(dialogue.actorName);
+    public void Init() {
+        if (assetLoaded) return;
+
+        assetManagement = new RR_DialogueTools_AssetManagement();
+        for (int i = 0; i < _dialogues.Count; i++) {
+            assetManagement.dialoguesData.Add(_dialogues[i], Resources.Load<TextAsset>("RR-Dialogues/" + _dialogues[i]));
+            assetManagement.visualAssets.Add(_dialogues[i], Resources.Load<TextAsset>("RR-Visual/" + _dialogues[i]));
+        }
+        StartCoroutine(Load());
     }
 
-    public RR_ActorSpine GetActorSpine(string actorName) {
-        if (dictActorSpine.ContainsKey(actorName)) {
-            return dictActorSpine[actorName];
-        } else {
-            return null;
+    private IEnumerator Load() {
+        StartCoroutine(assetManagement.LoadAssets(useGeneralAudio));
+        yield return new WaitUntil(() => assetManagement.isLoaded);
+        assetLoaded = true;
+        if (LoadDialogueEvent != null && autoLoadDialogue) {
+            LoadDialogueEvent();
         }
+    }
+
+    public RR_DialogueTools_AssetManagement GetAssetManagement() {
+        return assetManagement;
     }
 
     public AudioClip GetActorBeep(string actorName) {
-        if (dictActorBeep.ContainsKey(actorName)) {
-            return dictActorBeep[actorName];
-        } else {
-            return null;
-        }
+        return assetManagement.GetActorBeep(actorName);
     }
 
-    public AudioClip GetSfx(string sfxName) {
-        if (dictSfx.ContainsKey(sfxName)) {
-            return dictSfx[sfxName];
-        } else {
-            return null;
-        }
+    public Sprite GetActorSprite(string actorName, string actorExpression) {
+        return assetManagement.GetActorSprite(actorName, actorExpression);
     }
 
-    public AudioClip GetBgm(string bgmName) {
-        if (dictBgm.ContainsKey(bgmName)) {
-            return dictBgm[bgmName];
-        } else {
-            return null;
-        }
+    public SkeletonDataAsset GetActorSkeletonDataAsset(string actorName) {
+        return assetManagement.GetActorSkeletonDataAsset(actorName);
     }
 
-    public IEnumerator LoadAssets(bool useGeneralAudio) {
-        LoadActorData();
-        if (useGeneralAudio) {
-            LoadAudioGeneral();
-            yield return new WaitUntil(() => IsGeneralAudioAssetLoaded());
-        }
-        yield return new WaitUntil(() => IsActorAssetLoaded());
-        isLoaded = true;
+    public string GetDialogueData(string dialogueName) {
+        return assetManagement.dialoguesData[dialogueName].text;
     }
 
-    private bool IsActorAssetLoaded() {
-        return dictActorSprite != null && dictActorSpine != null && dictActorBeep != null;
+    public string GetVisualAsset(string visualAssetName) {
+        return assetManagement.visualAssets[visualAssetName].text;
     }
 
-    private bool IsGeneralAudioAssetLoaded() {
-        return dictSfx != null && dictBgm != null;
+    public bool CheckActorSpriteExist(string actorName, string actorExpression) {
+        return assetManagement.dictActorSprite.ContainsKey(actorName + ";;" + actorExpression);
     }
 
-    public void LoadActorData() {
-        dictActorSprite = LoadActorSpriteData("spritePaths");
-        dictActorSpine = LoadActorSpineData("spinePaths");
-        dictActorBeep = LoadAudioData("beepPaths");
+    public bool CheckActorSpineExist(string actorName) {
+        return assetManagement.dictActorSpine.ContainsKey(actorName);
     }
 
-    public void LoadAudioGeneral() {
-        dictSfx = LoadAudioData("sfxPaths");
-        dictBgm = LoadAudioData("bgmPaths");
+    public bool CheckActorBeepExist(string actorName) {
+        return assetManagement.dictActorBeep.ContainsKey(actorName);
     }
 
-    private Dictionary<string, Sprite> LoadActorSpriteData(string pathsName) {
-        Dictionary<string, Sprite> dictSprite = new Dictionary<string, Sprite>();
-        string name = "";
-        string expression = "";
-        string[] spritePath = GetDataPaths(pathsName, ';');
-        for (int i = 0; i < spritePath.Length; i++) {
-            if (System.String.IsNullOrEmpty(spritePath[i])) {
-                continue;
-            }
-            name = spritePath[i].Substring(spritePath[i].LastIndexOf('/') + 1, spritePath[i].LastIndexOf(',') - spritePath[i].LastIndexOf('/') - 1);
-            expression = spritePath[i].Substring(spritePath[i].LastIndexOf(',') + 1, spritePath[i].Length - spritePath[i].LastIndexOf(',') - 1);
-            dictSprite.Add(name + ";;" + expression, Resources.Load<Sprite>(spritePath[i]));
-        }
-
-        return dictSprite;
+    public bool IsAssetLoaded() {
+        return assetLoaded;
     }
 
-    private Dictionary<string, RR_ActorSpine> LoadActorSpineData(string pathsName) {
-        Dictionary<string, RR_ActorSpine> dictRRSpine = new Dictionary<string, RR_ActorSpine>();
-        string name = "";
-        string[] spinePath = GetDataPaths(pathsName, ';');
-        for (int i = 0; i < spinePath.Length; i++) {
-            if (System.String.IsNullOrEmpty(spinePath[i])) {
-                continue;
-            }
-            name = spinePath[i].Substring(spinePath[i].LastIndexOf('/') + 1);
-            dictRRSpine.Add(name, new RR_ActorSpine(name, "RR-Actors-Spine/" + name + "/skeleton_SkeletonData"));
-        }
-
-        return dictRRSpine;
-    }
-
-    private Dictionary<string, AudioClip> LoadAudioData(string pathsName) {
-        Dictionary<string, AudioClip> dictAudio = new Dictionary<string, AudioClip>();
-        string name = "";
-        string[] audioDataPath = GetDataPaths(pathsName, ';');
-        for (int i = 0; i < audioDataPath.Length; i++) {
-            if (System.String.IsNullOrEmpty(audioDataPath[i])) {
-                continue;
-            }
-            name = audioDataPath[i].Substring(audioDataPath[i].LastIndexOf('/') + 1);
-            dictAudio.Add(name, Resources.Load<AudioClip>(audioDataPath[i]));
-        }
-        return dictAudio;
-    }
-
-    private string[] GetDataPaths(string pathsName, Char separator) {
-        TextAsset textDataPath = Resources.Load<TextAsset>(pathsName);
-        return textDataPath.text.Split(separator);
+    public bool IsUsingAudio() {
+        return useGeneralAudio;
     }
 }

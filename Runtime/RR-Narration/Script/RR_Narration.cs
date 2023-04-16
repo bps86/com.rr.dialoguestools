@@ -31,11 +31,7 @@ public class RR_Narration
         }
         LoadDialogueData(dialogues[0].tags, dialogues[0].index);
     }
-    public void LoadDialogueData(string tags, int index, RR_DialogueTools_AssetManager rR_DialogueTools_AssetManager = null) {
+    public void LoadDialogueData(string tags, int index) {
         dialogue = dictDialogues[tags + ";" + index];
-        if (rR_DialogueTools_AssetManager != null) {
-            dialogue.sprite = rR_DialogueTools_AssetManager.GetActorSprite(dialogue);
-            dialogue.skeletonDataAsset = rR_DialogueTools_AssetManager.GetActorSpine(dialogue).skeletonDataAsset;
-        }
     }
 }

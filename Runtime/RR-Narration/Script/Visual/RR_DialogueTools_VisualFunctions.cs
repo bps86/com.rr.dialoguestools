@@ -6,9 +6,8 @@ using Spine.Unity;
 
 public class RR_DialogueTools_FunctionsVisual
 {
-    public static Image SetActorSprite(Image actorImage, Sprite targetSprite, Vector3 targetPosition, Vector3 targetScale) {
-        actorImage.sprite = targetSprite;
-        actorImage.color = Color.white;
+    public static Image SetActorSprite(Image actorImage, Vector3 targetPosition, Vector3 targetScale, Color selectedColor) {
+        actorImage.color = selectedColor;
         actorImage.gameObject.transform.localPosition = targetPosition;
         actorImage.gameObject.transform.localScale = targetScale;
         return actorImage;
@@ -19,13 +18,12 @@ public class RR_DialogueTools_FunctionsVisual
         actorSprite.color = Color.clear;
         return actorSprite;
     }
-    public static SkeletonGraphic SetActorSkeletonGraphics(SkeletonGraphic actorSkeletonGraphics, SkeletonDataAsset targetSkeletonDataAsset, string animationName, Vector3 targetPosition, Vector3 targetScale, bool isLoop) {
-        actorSkeletonGraphics.skeletonDataAsset = targetSkeletonDataAsset;
+    public static SkeletonGraphic SetActorSkeletonGraphics(SkeletonGraphic actorSkeletonGraphics, string animationName, Vector3 targetPosition, Vector3 targetScale, Color selectedColor, bool isLoop) {
         actorSkeletonGraphics.startingAnimation = animationName;
         actorSkeletonGraphics.startingLoop = isLoop;
         actorSkeletonGraphics.rectTransform.localPosition = targetPosition;
         actorSkeletonGraphics.rectTransform.localScale = targetScale;
-        actorSkeletonGraphics.color = Color.white;
+        actorSkeletonGraphics.color = selectedColor;
         return actorSkeletonGraphics;
     }
 

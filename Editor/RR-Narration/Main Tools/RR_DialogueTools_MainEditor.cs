@@ -12,12 +12,10 @@ public class RR_DialogueTools_MainEditor : EditorWindow
     public static bool ready = false;
     private Vector2 scrollPos = Vector2.zero, scrollPos2 = Vector2.zero;
     Rect cursorChangeRect;
-    // public static EditorWindow getWindow, thisWindow;
     RR_Narration rR_Narration;
     RR_DialogueTools_Visualization rR_DialogueTools_Visualization;
     string fileName;
     string fileData;
-    // RR_DialogueTools_FileManagerWindow rR_DialogueTools_FileManagerWindow;
 
 
     [MenuItem("Window/RR/Narration")]
@@ -53,7 +51,6 @@ public class RR_DialogueTools_MainEditor : EditorWindow
     }
 
     private void OpenFileManagerWindow(FileMode fileMode) {
-        // RR_DialogueTools_FileManagerWindow rR_DialogueTools_FileManagerWindow = new RR_DialogueTools_FileManagerWindow(fileName, fileData);
         RR_DialogueTools_FileManagerWindow rR_DialogueTools_FileManagerWindow = (RR_DialogueTools_FileManagerWindow)ScriptableObject.CreateInstance(typeof(RR_DialogueTools_FileManagerWindow));
         rR_DialogueTools_FileManagerWindow.init(rR_Narration, rR_DialogueTools_Visualization);
         rR_DialogueTools_FileManagerWindow.SetData(fileName, fileData);
@@ -74,7 +71,6 @@ public class RR_DialogueTools_MainEditor : EditorWindow
     private void OpenAudioManagerWindow(int index, string sfxID, string bgmID, string voiceActID) {
         RR_DialogueTools_AudioManager rR_DialogueTools_AudioManager = (RR_DialogueTools_AudioManager)ScriptableObject.CreateInstance(typeof(RR_DialogueTools_AudioManager));
         rR_DialogueTools_AudioManager.init(index, sfxID, bgmID, voiceActID);
-        // rR_DialogueTools_AudioManager.SetRRVar(rR_Narration, rR_DialogueTools_Visualization);
         rR_DialogueTools_AudioManager.Apply += OnAudioApply;
         rR_DialogueTools_AudioManager.init_Window();
         GUIUtility.ExitGUI();
@@ -119,12 +115,10 @@ public class RR_DialogueTools_MainEditor : EditorWindow
                 if (GUILayout.Button(AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/RR-Thumbnail/Thumbnail-" + nameThumb + "," + expressionThumb + ".png"), GUILayout.Width(100), GUILayout.Height(100))) {
                     int index = i;
                     OpenActorManagerWindow(i);
-                    // rR_DialogueTools_ActorManager.init(RR_DialogueTools_ActorManager.Mode.Dialogue, index);
-                    // GUIUtility.ExitGUI();
                 }
                 GUILayout.EndVertical();
                 Vector2 scrollPos3 = Vector2.zero;
-                scrollPos3 = GUILayout.BeginScrollView(scrollPos3, GUILayout.Height(117));
+                scrollPos3 = GUILayout.BeginScrollView(scrollPos3, GUILayout.Width(320), GUILayout.Height(117));
                 rR_Narration.dialogues[i].dialogue = GUILayout.TextArea(rR_Narration.dialogues[i].dialogue, GUILayout.Width(300), GUILayout.ExpandHeight(true));
                 GUILayout.EndScrollView();
                 GUILayout.BeginVertical(GUILayout.Width(60));
@@ -147,10 +141,6 @@ public class RR_DialogueTools_MainEditor : EditorWindow
                     OpenAudioManagerWindow(i, rR_Narration.dialogues[i].sfxID, rR_Narration.dialogues[i].bgmID, rR_Narration.dialogues[i].voiceActID);
                 }
                 if (GUILayout.Button("Remove", GUILayout.Width(80))) rR_Narration.dialogues.RemoveAt(i);
-                GUILayout.BeginHorizontal(GUILayout.Width(80));
-                GUILayout.Label("Use Shake: ");
-                rR_Narration.dialogues[i].useShake = EditorGUILayout.Toggle(rR_Narration.dialogues[i].useShake);
-                GUILayout.EndHorizontal();
                 GUILayout.EndVertical();
                 GUILayout.EndHorizontal();
                 GUILayout.BeginHorizontal();
@@ -160,13 +150,21 @@ public class RR_DialogueTools_MainEditor : EditorWindow
                 rR_Narration.dialogues[i].actorPosition.y = EditorGUILayout.FloatField(rR_Narration.dialogues[i].actorPosition.y, GUILayout.Width(60));
                 GUILayout.Label("Actor Scale: ", GUILayout.Width(80));
                 rR_Narration.dialogues[i].scale = EditorGUILayout.FloatField(rR_Narration.dialogues[i].scale, GUILayout.Width(60));
-                GUILayout.BeginHorizontal(GUILayout.Width(200));
+                GUILayout.BeginHorizontal(GUILayout.Width(100));
                 GUILayout.Label("Is Inverted: ");
-                rR_Narration.dialogues[i].isInverted = EditorGUILayout.Toggle(rR_Narration.dialogues[i].isInverted, GUILayout.Width(60));
+                rR_Narration.dialogues[i].isInverted = EditorGUILayout.Toggle(rR_Narration.dialogues[i].isInverted);
                 GUILayout.EndHorizontal();
-                GUILayout.BeginHorizontal(GUILayout.Width(200));
+                GUILayout.BeginHorizontal(GUILayout.Width(120));
                 GUILayout.Label("Loop Animation: ");
-                rR_Narration.dialogues[i].animationLoop = EditorGUILayout.Toggle(rR_Narration.dialogues[i].animationLoop, GUILayout.Width(60));
+                rR_Narration.dialogues[i].animationLoop = EditorGUILayout.Toggle(rR_Narration.dialogues[i].animationLoop);
+                GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal(GUILayout.Width(80));
+                GUILayout.Label("Use Shake: ");
+                rR_Narration.dialogues[i].useShake = EditorGUILayout.Toggle(rR_Narration.dialogues[i].useShake);
+                GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal(GUILayout.Width(120));
+                GUILayout.Label("Use Silhouette: ");
+                rR_Narration.dialogues[i].useSilhouette = EditorGUILayout.Toggle(rR_Narration.dialogues[i].useSilhouette);
                 GUILayout.EndHorizontal();
                 GUILayout.EndHorizontal();
                 GUILayout.EndVertical();
@@ -192,8 +190,9 @@ public class RR_DialogueTools_MainEditor : EditorWindow
         dialoguedata += dialogue.actorPosition.y + separator;
         dialoguedata += dialogue.scale + separator;
         dialoguedata += dialogue.isInverted + separator;
-        dialoguedata += dialogue.useShake + separator;
         dialoguedata += dialogue.animationLoop + separator;
+        dialoguedata += dialogue.useShake + separator;
+        dialoguedata += dialogue.useSilhouette + separator;
         dialoguedata += dialogue.sfxID + separator;
         dialoguedata += dialogue.bgmID + separator;
         dialoguedata += dialogue.voiceActID;

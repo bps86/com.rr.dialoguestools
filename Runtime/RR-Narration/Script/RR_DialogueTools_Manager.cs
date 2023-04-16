@@ -8,8 +8,12 @@ using Spine.Unity;
 
 public class RR_DialogueTools_Manager : MonoBehaviour
 {
-    [SerializeField] private SkeletonGraphic skeletonGraphics;
-    [SerializeField] private Image sprite;
+    public Action EndDialogueEvent;
+
+    [SerializeField] private SkeletonGraphic skeletonGraphicsForActor;
+    [SerializeField] private Image spriteForActor;
+    [SerializeField] private Color dimColor;
+    [SerializeField] private Color silhouetteColor;
     [SerializeField] private AudioSource beepAudioSource;
     [SerializeField] private AudioSource voiceActAudioSource;
     [SerializeField] private AudioSource sfxAudioSource;
@@ -17,22 +21,24 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     [SerializeField] private TMP_Text _name;
     [SerializeField] private TMP_Text _dialogue;
     [SerializeField] private RectTransform shakingObject;
+    [SerializeField] private RR_DialogueTools_AssetManager rR_DialogueTools_AssetManager;
     [SerializeField] private RR_DialogueTools_ExtraVisual rR_DialogueTools_ExtraVisual;
-    [SerializeField] private List<string> _dialogues = new List<string>();
     [SerializeField] private string currentDialogue;
     [SerializeField] private string defaultAnimation;
     [SerializeField] private string tags;
     [SerializeField] private int index;
+    [SerializeField] private int maxIndex;
     [SerializeField] private int textSpeed;
     [SerializeField] private int shakeTotal;
     [SerializeField] private float minPitch = -0.2f;
     [SerializeField] private float maxPitch = 0.2f;
     [SerializeField] private float shakeDuration;
     [SerializeField] private float shakeRange;
+    [SerializeField] private bool disableAutoInit;
+    [SerializeField] private bool useDim;
     [SerializeField] private bool useBeepAudio;
     [SerializeField] private bool useGeneralAudio;
     [SerializeField] private bool useLocalization;
-    private RR_DialogueTools_AssetManager rR_DialogueTools_AssetManager;
     private RR_DialogueTools_Visualization rR_DialogueTools_Visualization;
     private RR_Narration rR_Narration;
     private Vector3 shakeDefaultPosition;
@@ -41,71 +47,79 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     private float shakeProgress;
     private bool stop;
     private bool stopCoroutine;
+
     private void Awake() {
+        if (!disableAutoInit) {
+            Init();
+        }
+    }
+
+    public void Init() {
         rR_Narration = new RR_Narration();
-        rR_DialogueTools_AssetManager = new RR_DialogueTools_AssetManager();
         rR_DialogueTools_Visualization = new RR_DialogueTools_Visualization();
-        sprite.color = Color.clear;
+        if (rR_DialogueTools_AssetManager == null) {
+            rR_DialogueTools_AssetManager = RR_DialogueTools_AssetManager.Instance;
+            rR_DialogueTools_AssetManager.LoadDialogueEvent = null;
+        }
+        rR_DialogueTools_ExtraVisual.SetActorSpriteEvent += SetActorSprite;
+        rR_DialogueTools_ExtraVisual.SetActorSpineEvent += SetActorSpine;
+        rR_DialogueTools_AssetManager.LoadDialogueEvent += LoadCurrentDialogue;
+        rR_DialogueTools_ExtraVisual.Init();
+        if (spriteForActor != null) {
+            spriteForActor.color = Color.clear;
+        }
         if (shakingObject != null) {
             shakeProgress = shakeTotal * 360;
             shakeDefaultPosition = shakingObject.localPosition;
         }
-        for (int i = 0; i < _dialogues.Count; i++) {
-            rR_DialogueTools_AssetManager.dialoguesData.Add(_dialogues[i], Resources.Load<TextAsset>("RR-Dialogues/" + _dialogues[i]));
-            if (rR_DialogueTools_ExtraVisual != null) {
-                rR_DialogueTools_AssetManager.visualAssets.Add(_dialogues[i], Resources.Load<TextAsset>("RR-Visual/" + _dialogues[i]));
-            }
+        if (rR_DialogueTools_AssetManager != null) {
+            rR_DialogueTools_AssetManager.Init();
         }
-        StartCoroutine(Load());
     }
 
+    public void SetIndex(int index) {
+        this.index = index;
+    }
 
-
-    IEnumerator Load() {
-        StartCoroutine(rR_DialogueTools_AssetManager.LoadAssets(useGeneralAudio));
-        yield return new WaitUntil(() => rR_DialogueTools_AssetManager.isLoaded);
-        LoadDialogue(currentDialogue);
+    public void SetMaxIndex(int index) {
+        this.maxIndex = index;
     }
 
     private void Update() {
-        if (Input.GetKeyDown(KeyCode.Return)) {
-            NextDialogue();
-        }
-        if (Input.GetKeyDown(KeyCode.R)) {
-            SetDialogue(currentDialogue);
-            stop = true;
-            rR_Narration.LoadDialogueData(tags, index, rR_DialogueTools_AssetManager);
-            stop = false;
-            Refresh();
-        }
         ShakeObject();
     }
 
+    public void LoadCurrentDialogue() {
+        LoadDialogue(currentDialogue);
+    }
+
+    public void LoadDialogue(string dialogueTitle) {
+        SetDialogue(dialogueTitle);
+        SetVisualAsset(dialogueTitle);
+        rR_Narration.LoadDialogueData(tags, index);
+        Refresh();
+    }
+
     public void NextDialogue() {
-        if (index < rR_Narration.dialogues.Count - 1) {
+        if (index < maxIndex) {
             index += 1;
+        } else if (EndDialogueEvent != null) {
+            EndDialogueEvent();
         }
-        if (index < rR_Narration.dialogues.Count) {
+        if (index <= maxIndex) {
             stop = true;
-            rR_Narration.LoadDialogueData(tags, index, rR_DialogueTools_AssetManager);
+            rR_Narration.LoadDialogueData(tags, index);
             if (rR_DialogueTools_ExtraVisual != null) {
                 rR_DialogueTools_Visualization.LoadVisualData(tags, index);
             }
             stop = false;
+            Refresh();
         }
-        Refresh();
-    }
-
-    private void LoadDialogue(string dialogueTitle) {
-        SetDialogue(dialogueTitle);
-        SetVisualAsset(dialogueTitle);
-        rR_Narration.LoadDialogueData(tags, index, rR_DialogueTools_AssetManager);
-        Refresh();
     }
 
     private void SetDialogue(string dialogueTitle) {
         if (!useLocalization) {
-            rR_Narration.LoadDialogueFile(rR_DialogueTools_AssetManager.dialoguesData[dialogueTitle].text);
+            rR_Narration.LoadDialogueFile(rR_DialogueTools_AssetManager.GetDialogueData(dialogueTitle));
         } else {
             rR_Narration.LoadDialogueTable(dialogueTitle);
         }
@@ -114,7 +128,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     private void SetVisualAsset(string dialogueTitle) {
         if (rR_DialogueTools_ExtraVisual == null) return;
 
-        rR_DialogueTools_Visualization.LoadVisualAsset(rR_DialogueTools_AssetManager.visualAssets[dialogueTitle].text);
+        rR_DialogueTools_Visualization.LoadVisualAsset(rR_DialogueTools_AssetManager.GetVisualAsset(dialogueTitle));
     }
 
     private void Refresh() {
@@ -122,24 +136,9 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         ResetShakeObject();
         RunGeneralAudio();
         if (rR_DialogueTools_ExtraVisual == null) {
-            if (rR_DialogueTools_AssetManager.dictActorSprite.ContainsKey(rR_Narration.dialogue.actorName + ";;" + rR_Narration.dialogue.expression)) {
-                sprite = SetActorSprite(sprite, rR_Narration.dialogue);
-            } else {
-                sprite = RR_DialogueTools_FunctionsVisual.ResetActorSprite(sprite);
-            }
-            if (rR_Narration.dialogue.skeletonDataAsset != null) {
-                skeletonGraphics.gameObject.SetActive(true);
-                skeletonGraphics = SetActorSpine(skeletonGraphics, rR_Narration.dialogue);
-                skeletonGraphics.Initialize(true);
-                if (!String.IsNullOrEmpty(defaultAnimation) && !rR_Narration.dialogue.animationLoop) {
-                    RR_DialogueTools_FunctionsVisual.SetResetAnim(skeletonGraphics, defaultAnimation);
-                }
-            } else {
-                skeletonGraphics.gameObject.SetActive(false);
-                return;
-            }
+            SetActor(rR_Narration.dialogue);
         } else {
-            rR_DialogueTools_ExtraVisual.ChangeAnimPos(rR_Narration, rR_DialogueTools_AssetManager, rR_DialogueTools_Visualization);
+            rR_DialogueTools_ExtraVisual.ChangeAnimPos(rR_Narration, rR_DialogueTools_AssetManager.GetAssetManagement(), rR_DialogueTools_Visualization);
         }
     }
 
@@ -153,9 +152,9 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     private void RunGeneralAudio() {
         if (!useGeneralAudio) return;
 
-        RR_AudioPlayer.PlaySfx(rR_Narration.dialogue.voiceActID, false, voiceActAudioSource, rR_DialogueTools_AssetManager);
-        RR_AudioPlayer.PlaySfx(rR_Narration.dialogue.sfxID, false, sfxAudioSource, rR_DialogueTools_AssetManager);
-        RR_AudioPlayer.PlayBgm(rR_Narration.dialogue.bgmID, false, bgmAudioSource, rR_DialogueTools_AssetManager);
+        RR_AudioPlayer.PlaySfx(rR_Narration.dialogue.voiceActID, false, voiceActAudioSource, rR_DialogueTools_AssetManager.GetAssetManagement());
+        RR_AudioPlayer.PlaySfx(rR_Narration.dialogue.sfxID, false, sfxAudioSource, rR_DialogueTools_AssetManager.GetAssetManagement());
+        RR_AudioPlayer.PlayBgm(rR_Narration.dialogue.bgmID, false, bgmAudioSource, rR_DialogueTools_AssetManager.GetAssetManagement());
     }
 
     private IEnumerator RunTextSpeed(bool pause, RR_Dialogue dialogue, AudioSource audioSource, float seconds = 0.1f) {
@@ -192,7 +191,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     private void SetDialogueText() {
         _name.text = rR_Narration.dialogue.displayName;
         beepAudioSource.clip = null;
-        if (rR_DialogueTools_AssetManager.dictActorBeep.ContainsKey(rR_Narration.dialogue.actorName)) {
+        if (rR_DialogueTools_AssetManager.CheckActorBeepExist(rR_Narration.dialogue.actorName)) {
             beepAudioSource.clip = rR_DialogueTools_AssetManager.GetActorBeep(rR_Narration.dialogue.actorName);
         }
         if (textSpeed > 0) {
@@ -213,6 +212,8 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     }
 
     private void ShakeObject() {
+        if (shakingObject == null) return;
+
         if (shakeProgress < 360 * shakeTotal) {
             shakeProgress += ((1 / shakeDuration) * (360 * shakeTotal)) * Time.deltaTime;
             shakeProgressPosition.x = Mathf.Sin(shakeProgress * Mathf.Deg2Rad);
@@ -221,24 +222,58 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         }
     }
 
-    Image SetActorSprite(Image actorSprite, RR_Dialogue dialogue) {
-        return RR_DialogueTools_FunctionsVisual.SetActorSprite(
-            actorImage: actorSprite,
-            targetSprite: dialogue.sprite,
-            targetPosition: dialogue.actorPosition,
-            targetScale: dialogue.actorScale
-            );
+    private void SetActor(RR_Dialogue dialogue) {
+        SetActorSprite(dialogue.actorName, dialogue.expression, spriteForActor, dialogue.actorPosition, dialogue.actorScale, dialogue.useSilhouette);
+        SetActorSpine(dialogue.actorName, dialogue.expression, skeletonGraphicsForActor, dialogue.actorPosition, dialogue.actorScale, dialogue.useSilhouette, dialogue.animationLoop);
+    }
+    private void SetActorSprite(string actorName, string animationName, Image actorSprite, Vector3 targetPos, Vector3 targetScale, bool usingSilhouette) {
+        actorSprite.sprite = rR_DialogueTools_AssetManager.GetActorSprite(actorName, animationName);
+        actorSprite.transform.SetAsLastSibling();
+        if (usingSilhouette) {
+            actorSprite = RR_DialogueTools_FunctionsVisual.SetActorSprite(actorSprite, targetPos, targetScale, silhouetteColor);
+        } else {
+            actorSprite = RR_DialogueTools_FunctionsVisual.SetActorSprite(actorSprite, targetPos, targetScale, Color.white);
+        }
+        if (actorSprite.sprite != null) {
+            if (useDim) {
+                if (actorName != rR_Narration.dialogue.actorName) {
+                    actorSprite.transform.SetAsFirstSibling();
+                    if (!usingSilhouette) {
+                        actorSprite.color = dimColor;
+                    }
+                }
+            }
+        } else {
+            actorSprite = RR_DialogueTools_FunctionsVisual.ResetActorSprite(actorSprite);
+        }
     }
 
-    SkeletonGraphic SetActorSpine(SkeletonGraphic targetSkeletonGraphic, RR_Dialogue dialogue) {
-        return RR_DialogueTools_FunctionsVisual.SetActorSkeletonGraphics(
-            targetSkeletonGraphic,
-            dialogue.skeletonDataAsset,
-            dialogue.expression,
-            dialogue.actorPosition,
-            dialogue.actorScale,
-            dialogue.animationLoop
-            );
+    private void SetActorSpine(string actorName, string animationName, SkeletonGraphic skeletonGraphic, Vector3 targetPos, Vector3 targetScale, bool usingSilhouette, bool isLoop) {
+        skeletonGraphic.skeletonDataAsset = rR_DialogueTools_AssetManager.GetActorSkeletonDataAsset(actorName);
+        skeletonGraphic.allowMultipleCanvasRenderers = true;
+        skeletonGraphic.transform.SetAsLastSibling();
+        if (usingSilhouette) {
+            skeletonGraphic = RR_DialogueTools_FunctionsVisual.SetActorSkeletonGraphics(skeletonGraphic, animationName, targetPos, targetScale, silhouetteColor, isLoop);
+        } else {
+            skeletonGraphic = RR_DialogueTools_FunctionsVisual.SetActorSkeletonGraphics(skeletonGraphic, animationName, targetPos, targetScale, Color.white, isLoop);
+        }
+        if (skeletonGraphic.skeletonDataAsset != null) {
+            skeletonGraphic.gameObject.SetActive(true);
+            skeletonGraphic.Initialize(true);
+            if (!String.IsNullOrEmpty(defaultAnimation) && !isLoop) {
+                RR_DialogueTools_FunctionsVisual.SetResetAnim(skeletonGraphic, defaultAnimation);
+            }
+            if (useDim) {
+                if (actorName != rR_Narration.dialogue.actorName) {
+                    skeletonGraphic.transform.SetAsFirstSibling();
+                    if (!usingSilhouette) {
+                        skeletonGraphic.color = dimColor;
+                    }
+                }
+            }
+        } else {
+            skeletonGraphic.gameObject.SetActive(false);
+        }
     }
 
     int getIndex(int index, string dialogue, ref bool scanDone) {

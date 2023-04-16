@@ -52,11 +52,12 @@ public class RR_DialogueTools_Functions
                 _positionY: float.Parse(dialoguedata[7]),
                 _scale: float.Parse(dialoguedata[8]),
                 _isInverted: bool.Parse(dialoguedata[9]),
-                _useShake: bool.Parse(dialoguedata[10]),
-                _animationLoop: bool.Parse(dialoguedata[11]),
-                _sfxID: dialoguedata[12],
-                _bgmID: dialoguedata[13],
-                _voiceActID: dialoguedata[14]
+                _animationLoop: bool.Parse(dialoguedata[10]),
+                _useShake: bool.Parse(dialoguedata[11]),
+                _useSilhouette: bool.Parse(dialoguedata[12]),
+                _sfxID: dialoguedata[13],
+                _bgmID: dialoguedata[14],
+                _voiceActID: dialoguedata[15]
             ));
         }
         return tmpDialogues;

@@ -22,9 +22,6 @@ public class RR_DialogueTools_ActorManager : EditorWindow
     RR_Narration rR_Narration;
     RR_DialogueTools_Visualization rR_DialogueTools_Visualization;
 
-
-    // [MenuItem("Window/RR/ActorManager")]
-
     public void init(RR_DialogueTools_ActorManager.Mode selectedMode, int currentIndex, int secondIndex = 0) {
         rR_Narration = new RR_Narration();
         rR_DialogueTools_Visualization = new RR_DialogueTools_Visualization();
@@ -84,8 +81,6 @@ public class RR_DialogueTools_ActorManager : EditorWindow
                 if (mode == RR_DialogueTools_ActorManager.Mode.Visual) {
                     rR_DialogueTools_Visualization.visual.visualDatas[dynamicIndex].actorName[optionalIndex] = tempName;
                     rR_DialogueTools_Visualization.visual.visualDatas[dynamicIndex].expression[optionalIndex] = tempExpression[i];
-                    // Debug.Log(tempExpression[i]);
-                    // Debug.Log(rR_DialogueTools_Visualization.visual.visualDatas[dynamicIndex].expression[optionalIndex]);
                 }
                 SetRRVarEvent(rR_Narration, rR_DialogueTools_Visualization);
                 Close();

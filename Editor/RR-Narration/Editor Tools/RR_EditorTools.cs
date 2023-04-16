@@ -11,7 +11,6 @@ using Spine.Unity;
 
 public class RR_EditorTools
 {
-    // public static string fileName, fileData;
     static string[] spritePath = new string[] { };
     static string[] spinePath = new string[] { };
     static string[] beepPath = new string[] { };
@@ -200,7 +199,7 @@ public class RR_EditorTools
         RR_DialogueTools_Functions.SaveFile(Application.dataPath + Path.AltDirectorySeparatorChar + "RR-Narration/Resources/voiceActPaths.txt", voiceActPaths);
         AssetDatabase.Refresh();
     }
-    // [MenuItem("Testing/AddSortLayer")]
+
     public static void CheckSortingLayers() {
         var tagMan = AssetDatabase.LoadMainAssetAtPath("ProjectSettings/TagManager.asset");
         if (tagMan == null) return;

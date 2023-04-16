@@ -12,20 +12,20 @@ public class RR_AudioPlayer
         audioSource.Play();
     }
 
-    public static void PlaySfx(string sfxName, bool isLoop, AudioSource audioSource, RR_DialogueTools_AssetManager rR_DialogueTools_AssetManager) {
+    public static void PlaySfx(string sfxName, bool isLoop, AudioSource audioSource, RR_DialogueTools_AssetManagement rR_DialogueTools_AssetManagement) {
         if (System.String.IsNullOrEmpty(sfxName)) return;
 
         audioSource.Stop();
-        audioSource.clip = rR_DialogueTools_AssetManager.GetSfx(sfxName);
+        audioSource.clip = rR_DialogueTools_AssetManagement.GetSfx(sfxName);
         audioSource.loop = isLoop;
         audioSource.Play();
     }
 
-    public static void PlayBgm(string bgmName, bool isLoop, AudioSource audioSource, RR_DialogueTools_AssetManager rR_DialogueTools_AssetManager) {
+    public static void PlayBgm(string bgmName, bool isLoop, AudioSource audioSource, RR_DialogueTools_AssetManagement rR_DialogueTools_AssetManagement) {
         if (System.String.IsNullOrEmpty(bgmName)) return;
 
         if (audioSource.clip == null || bgmName != audioSource.clip.name) {
-            audioSource.clip = rR_DialogueTools_AssetManager.GetBgm(bgmName);
+            audioSource.clip = rR_DialogueTools_AssetManagement.GetBgm(bgmName);
             audioSource.loop = isLoop;
             audioSource.Play();
         }
