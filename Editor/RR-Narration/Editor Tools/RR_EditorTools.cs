@@ -86,6 +86,7 @@ public class RR_EditorTools
         List<string> tempSpriteActor = new List<string>();
         Dictionary<string, List<string>> dictSprite = new Dictionary<string, List<string>>();
         List<string> tempSpine = new List<string>();
+        TextureImporter textureImporter = null;
         string spritePaths = "";
         string spinePaths = "";
         string beepPaths = "";
@@ -102,6 +103,9 @@ public class RR_EditorTools
             tempSprite.Add(spritePath[i].Substring(spritePath[i].LastIndexOf('/') + 1, spritePath[i].LastIndexOf('.') - spritePath[i].LastIndexOf('/') - 1));
             if (nameIndex > 0) spritePaths += ";";
             spritePaths += "RR-Actors/" + tempSprite[nameIndex];
+            textureImporter = AssetImporter.GetAtPath("Assets/RR-Narration/Resources/RR-Actors/" + tempSprite[nameIndex] + ".png") as TextureImporter;
+            textureImporter.textureType = TextureImporterType.Sprite;
+            AssetDatabase.WriteImportSettingsIfDirty("Assets/RR-Narration/Resources/RR-Actors/" + tempSprite[nameIndex] + ".png");
             File.Copy(spritePath[i], "Assets/Editor/RR-Thumbnail/Thumbnail-" + tempSprite[nameIndex] + ".png", true);
             nameIndex += 1;
             string name = spritePath[i].Substring(spritePath[i].LastIndexOf('/') + 1, spritePath[i].LastIndexOf(',') - spritePath[i].LastIndexOf('/') - 1);

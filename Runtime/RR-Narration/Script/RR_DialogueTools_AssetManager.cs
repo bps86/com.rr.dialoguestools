@@ -11,17 +11,20 @@ public class RR_DialogueTools_AssetManager : MonoBehaviour
     public static RR_DialogueTools_AssetManager Instance;
     [SerializeField] private List<string> _dialogues = new List<string>();
     [SerializeField] private bool autoLoadDialogue;
-    [SerializeField] private bool useSingleton;
+    [SerializeField] private bool autoInitialize;
+    [SerializeField] private bool useAsSingleton;
     [SerializeField] private bool useGeneralAudio;
     private RR_DialogueTools_AssetManagement assetManagement;
     private bool assetLoaded;
 
     private void Awake() {
-        if (useSingleton) {
+        if (useAsSingleton) {
             if (Instance == null) {
                 Instance = this;
                 DontDestroyOnLoad(this);
-                Init();
+                if (autoInitialize) {
+                    Init();
+                }
             } else {
                 Destroy(this);
             }

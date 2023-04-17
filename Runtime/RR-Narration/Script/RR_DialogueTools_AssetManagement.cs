@@ -116,7 +116,6 @@ public class RR_DialogueTools_AssetManagement
             }
             name = spinePath[i].Substring(spinePath[i].LastIndexOf('/') + 1);
             dictRRSpine.Add(name, Resources.Load<SkeletonDataAsset>("RR-Actors-Spine/" + name + "/skeleton_SkeletonData"));
-
         }
 
         return dictRRSpine;

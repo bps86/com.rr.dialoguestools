@@ -34,7 +34,8 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     [SerializeField] private float maxPitch = 0.2f;
     [SerializeField] private float shakeDuration;
     [SerializeField] private float shakeRange;
-    [SerializeField] private bool disableAutoInit;
+    [SerializeField] private bool autoInitialize;
+    [SerializeField] private bool refreshAfterLoad;
     [SerializeField] private bool useDim;
     [SerializeField] private bool useBeepAudio;
     [SerializeField] private bool useGeneralAudio;
@@ -45,11 +46,11 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     private Vector3 shakeProgressPosition;
     private Coroutine textSpeedCoroutine;
     private float shakeProgress;
-    private bool stop;
+    private bool pauseTextSpeed;
     private bool stopCoroutine;
 
     private void Awake() {
-        if (!disableAutoInit) {
+        if (autoInitialize) {
             Init();
         }
     }
@@ -77,6 +78,10 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         }
     }
 
+    public void SetTag(string tag) {
+        this.tags = tag;
+    }
+
     public void SetIndex(int index) {
         this.index = index;
     }
@@ -97,7 +102,9 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         SetDialogue(dialogueTitle);
         SetVisualAsset(dialogueTitle);
         rR_Narration.LoadDialogueData(tags, index);
-        Refresh();
+        if (refreshAfterLoad) {
+            Refresh();
+        }
     }
 
     public void NextDialogue() {
@@ -107,13 +114,15 @@ public class RR_DialogueTools_Manager : MonoBehaviour
             EndDialogueEvent();
         }
         if (index <= maxIndex) {
-            stop = true;
+            pauseTextSpeed = true;
             rR_Narration.LoadDialogueData(tags, index);
             if (rR_DialogueTools_ExtraVisual != null) {
                 rR_DialogueTools_Visualization.LoadVisualData(tags, index);
             }
-            stop = false;
-            Refresh();
+            pauseTextSpeed = false;
+            if (refreshAfterLoad) {
+                Refresh();
+            }
         }
     }
 
@@ -131,7 +140,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         rR_DialogueTools_Visualization.LoadVisualAsset(rR_DialogueTools_AssetManager.GetVisualAsset(dialogueTitle));
     }
 
-    private void Refresh() {
+    public void Refresh() {
         SetDialogueText();
         ResetShakeObject();
         RunGeneralAudio();
@@ -162,8 +171,8 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         int skipIndex = -1;
         bool scanDone = false;
         for (int i = 0; i < dialogue.dialogue.Length; i++) {
-            if (stop) {
-                yield return null;
+            if (pauseTextSpeed) {
+                yield return new WaitUntil(() => !pauseTextSpeed);
             }
             if (index < skipIndex) {
                 index += 1;
@@ -235,6 +244,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
             actorSprite = RR_DialogueTools_FunctionsVisual.SetActorSprite(actorSprite, targetPos, targetScale, Color.white);
         }
         if (actorSprite.sprite != null) {
+            actorSprite.gameObject.SetActive(true);
             if (useDim) {
                 if (actorName != rR_Narration.dialogue.actorName) {
                     actorSprite.transform.SetAsFirstSibling();
@@ -244,7 +254,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
                 }
             }
         } else {
-            actorSprite = RR_DialogueTools_FunctionsVisual.ResetActorSprite(actorSprite);
+            actorSprite.gameObject.SetActive(false);
         }
     }
 

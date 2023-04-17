@@ -13,11 +13,6 @@ public class RR_DialogueTools_FunctionsVisual
         return actorImage;
     }
 
-    public static Image ResetActorSprite(Image actorSprite) {
-        actorSprite.sprite = null;
-        actorSprite.color = Color.clear;
-        return actorSprite;
-    }
     public static SkeletonGraphic SetActorSkeletonGraphics(SkeletonGraphic actorSkeletonGraphics, string animationName, Vector3 targetPosition, Vector3 targetScale, Color selectedColor, bool isLoop) {
         actorSkeletonGraphics.startingAnimation = animationName;
         actorSkeletonGraphics.startingLoop = isLoop;

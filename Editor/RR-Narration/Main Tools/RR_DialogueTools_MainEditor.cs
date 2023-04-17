@@ -185,7 +185,7 @@ public class RR_DialogueTools_MainEditor : EditorWindow
     static string DialogueToString(RR_Dialogue dialogue, string separator, string dialoguedata = "") {
         dialoguedata += dialogue.actorName + separator;
         dialoguedata += dialogue.expression + separator;
-        dialoguedata += dialogue.dialogue + separator;
+        dialoguedata += dialogue.dialogue.Replace(System.Environment.NewLine, "</n>") + separator;
         dialoguedata += dialogue.tags + separator;
         dialoguedata += dialogue.index.ToString() + separator;
         dialoguedata += (int)dialogue.nameMode + separator;

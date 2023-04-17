@@ -44,7 +44,7 @@ public class RR_DialogueTools_Functions
             tmpDialogues.Add(new RR_Dialogue(
                 _name: dialoguedata[0],
                 _expression: dialoguedata[1],
-                _dialogue: dialoguedata[2],
+                _dialogue: dialoguedata[2].Replace("</n>", System.Environment.NewLine),
                 _tags: dialoguedata[3],
                 _index: int.Parse(dialoguedata[4]),
                 _nameMode: (NameMode)int.Parse(dialoguedata[5]),

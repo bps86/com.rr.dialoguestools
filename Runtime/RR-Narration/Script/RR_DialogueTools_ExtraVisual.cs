@@ -80,6 +80,20 @@ public class RR_DialogueTools_ExtraVisual : MonoBehaviour
     private void SetActorVisualPosition(RR_Dialogue dialogue, RR_DialogueTools_Visual visual, RR_DialogueTools_VisualData visualData, RR_DialogueTools_AssetManagement rR_DialogueTools_AssetManagement) {
         string name = "";
         string expression = "";
+        for (int i = 0; i < images.Count; i++) {
+            if (images[i] != null) {
+                if (i >= visual.actorCount) {
+                    images[i].gameObject.SetActive(false);
+                }
+            }
+        }
+        for (int i = 0; i < skeletonGraphics.Count; i++) {
+            if (skeletonGraphics[i] != null) {
+                if (i >= visual.actorCount) {
+                    skeletonGraphics[i].gameObject.SetActive(false);
+                }
+            }
+        }
         for (int i = 0; i < visual.actorCount; i++) {
             name = visualData.actorName[i];
             expression = visualData.expression[i];
