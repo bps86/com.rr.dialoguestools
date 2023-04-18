@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -25,6 +24,7 @@ public class RR_EditorTools
     public static int currentLocaleIndex;
     public static string getFileName;
     public static StringTableCollection rrDialoguesTable;
+    public static SharedTableData rrDialoguesSharedData;
     public RR_DialogueTools_Visualization rR_DialogueTools_Visualization;
     public static void GetDialogueIndex(RR_Narration rR_Narration) {
         for (int i = 0; i < rR_Narration.dialogues.Count; i++) {
@@ -55,6 +55,7 @@ public class RR_EditorTools
             if (LocalizationEditorSettings.GetLocales().Count > 0)
                 if (!File.Exists("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue.asset") || !File.Exists("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue Shared Data.asset")) {
                     LocalizationEditorSettings.CreateStringTableCollection("RR-Dialogue", "Assets/RR-Narration/Resources/RR-DialoguesTable", LocalizationEditorSettings.GetLocales());
+                    rrDialoguesSharedData = GetSharedTableData(rrDialoguesSharedData);
                 }
         }
         if (File.Exists("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue.asset")) {
@@ -66,8 +67,6 @@ public class RR_EditorTools
             for (int i = 0; i < missingLocale.Count; i++)
                 rrDialoguesTable.AddNewTable(missingLocale[i].Identifier);
         }
-
-        RR_EditorTools.CheckSortingLayers();
 
         RR_EditorTools.Refresh_RR_DialogueTools();
     }
@@ -203,22 +202,6 @@ public class RR_EditorTools
         AssetDatabase.Refresh();
     }
 
-    public static void CheckSortingLayers() {
-        var tagMan = AssetDatabase.LoadMainAssetAtPath("ProjectSettings/TagManager.asset");
-        if (tagMan == null) return;
-        var so = new SerializedObject(tagMan);
-        var m_SortingLayers = so.FindProperty("m_SortingLayers");
-        int uid1 = CheckIdDuplicates(m_SortingLayers);
-        int uid2 = CheckIdDuplicates(m_SortingLayers);
-        int uid3 = CheckIdDuplicates(m_SortingLayers);
-        CreateRRLayers("RR-Layers1", uid1, so, m_SortingLayers);
-        CreateRRLayers("RR-Layers2", uid2, so, m_SortingLayers);
-        CreateRRLayers("RR-Layers3", uid3, so, m_SortingLayers);
-        EditorUtility.SetDirty(tagMan);
-        AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
-    }
-
     public static int CheckIdDuplicates(SerializedProperty sp) {
         int uniqueID = GenerateUID();
         for (int i = 0; i < sp.arraySize; i++) {
@@ -256,11 +239,20 @@ public class RR_EditorTools
         }
     }
     public static void SetStringTable(string _filename, string _fileData, StringTable stringTable) {
-        StringTableEntry entry = GetStringTableEntry(stringTable, _filename);
-        entry.Value = _fileData;
+        stringTable.AddEntry(_filename, _fileData);
+        rrDialoguesSharedData = GetSharedTableData(rrDialoguesSharedData);
         EditorUtility.SetDirty(stringTable);
+        EditorUtility.SetDirty(rrDialoguesSharedData);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
+    }
+
+    public static SharedTableData GetSharedTableData(SharedTableData sharedTableData) {
+        if (sharedTableData != null) {
+            return sharedTableData;
+        } else {
+            return AssetDatabase.LoadAssetAtPath<SharedTableData>("Assets/RR-Narration/Resources/RR-DialoguesTable/RR-Dialogue Shared Data.asset");
+        }
     }
 
     public static StringTableEntry GetStringTableEntry(StringTable stringTable, string entry) {

@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 
 public class RR_DialogueTools_Visualization
@@ -22,7 +20,6 @@ public class RR_DialogueTools_Visualization
         for (int i = 0; i < visual.visualDatas.Count; i++) {
             dictVisualDatas[visual.visualDatas[i].tags + ";" + visual.visualDatas[i].index] = visual.visualDatas[i];
         }
-        LoadVisualData(visual.visualDatas[0].tags, visual.visualDatas[0].index);
     }
     public void LoadVisualData(string tags, int index) {
         visualData = dictVisualDatas[tags + ";" + index];

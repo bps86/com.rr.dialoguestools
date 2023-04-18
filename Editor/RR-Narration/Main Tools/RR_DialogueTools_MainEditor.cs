@@ -1,9 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 using UnityEditor;
-using UnityEngine.Localization.Tables;
 
 public class RR_DialogueTools_MainEditor : EditorWindow
 {

@@ -1,8 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Localization;
-using UnityEngine;
-using Spine.Unity;
 
 public class RR_Narration
 {

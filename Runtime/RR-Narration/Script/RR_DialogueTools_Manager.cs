@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -101,9 +100,16 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     public void LoadDialogue(string dialogueTitle) {
         SetDialogue(dialogueTitle);
         SetVisualAsset(dialogueTitle);
-        rR_Narration.LoadDialogueData(tags, index);
+        LoadData(tags, index);
         if (refreshAfterLoad) {
             Refresh();
+        }
+    }
+
+    public void LoadData(string tag, int index) {
+        rR_Narration.LoadDialogueData(tag, index);
+        if (rR_DialogueTools_ExtraVisual != null) {
+            rR_DialogueTools_Visualization.LoadVisualData(tag, index);
         }
     }
 
@@ -115,10 +121,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         }
         if (index <= maxIndex) {
             pauseTextSpeed = true;
-            rR_Narration.LoadDialogueData(tags, index);
-            if (rR_DialogueTools_ExtraVisual != null) {
-                rR_DialogueTools_Visualization.LoadVisualData(tags, index);
-            }
+            LoadData(tags, index);
             pauseTextSpeed = false;
             if (refreshAfterLoad) {
                 Refresh();
@@ -147,7 +150,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         if (rR_DialogueTools_ExtraVisual == null) {
             SetActor(rR_Narration.dialogue);
         } else {
-            rR_DialogueTools_ExtraVisual.ChangeAnimPos(rR_Narration, rR_DialogueTools_AssetManager.GetAssetManagement(), rR_DialogueTools_Visualization);
+            rR_DialogueTools_ExtraVisual.ChangeAnimPos(rR_Narration, rR_DialogueTools_Visualization);
         }
     }
 

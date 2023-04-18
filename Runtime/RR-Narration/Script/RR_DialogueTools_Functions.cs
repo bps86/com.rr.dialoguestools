@@ -1,9 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using UnityEngine.Localization;
-using Spine.Unity;
 
 public class RR_DialogueTools_Functions
 {

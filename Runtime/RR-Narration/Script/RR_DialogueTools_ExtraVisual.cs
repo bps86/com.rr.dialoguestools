@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
@@ -53,19 +52,19 @@ public class RR_DialogueTools_ExtraVisual : MonoBehaviour
         MoveActorTransition();
     }
 
-    public void ChangeAnimPos(RR_Narration rR_Narration, RR_DialogueTools_AssetManagement rR_DialogueTools_AssetManagement, RR_DialogueTools_Visualization rR_DialogueTools_Visualization) {
+    public void ChangeAnimPos(RR_Narration rR_Narration, RR_DialogueTools_Visualization rR_DialogueTools_Visualization) {
         transitionMode = rR_DialogueTools_Visualization.visual.animMode;
-        ChangeAnimPos_MovePosition(rR_Narration.dialogue, rR_DialogueTools_Visualization.visual, rR_DialogueTools_Visualization.visualData, rR_DialogueTools_AssetManagement);
+        ChangeAnimPos_MovePosition(rR_Narration.dialogue, rR_DialogueTools_Visualization.visual, rR_DialogueTools_Visualization.visualData);
     }
 
-    private void ChangeAnimPos_MovePosition(RR_Dialogue dialogue, RR_DialogueTools_Visual visual, RR_DialogueTools_VisualData visualData, RR_DialogueTools_AssetManagement rR_DialogueTools_AssetManagement) {
+    private void ChangeAnimPos_MovePosition(RR_Dialogue dialogue, RR_DialogueTools_Visual visual, RR_DialogueTools_VisualData visualData) {
         if (visualData.actorName.Count <= 0) return;
 
         if (transitionMode == TransitionMode.MovePosition) {
             isTransitioning = false;
             currentTransition = 0;
             actorCount = visual.actorCount;
-            SetActorVisualPosition(dialogue, visual, visualData, rR_DialogueTools_AssetManagement);
+            SetActorVisualPosition(dialogue, visual, visualData);
             startPos = visualData.startPos;
             startScale = visualData.startScale;
             endPos = visualData.endPos;
@@ -73,11 +72,11 @@ public class RR_DialogueTools_ExtraVisual : MonoBehaviour
             transitionDuration = visualData.transitionDuration;
             isTransitioning = true;
         } else {
-            SetActorVisualPosition(dialogue, visual, visualData, rR_DialogueTools_AssetManagement);
+            SetActorVisualPosition(dialogue, visual, visualData);
         }
     }
 
-    private void SetActorVisualPosition(RR_Dialogue dialogue, RR_DialogueTools_Visual visual, RR_DialogueTools_VisualData visualData, RR_DialogueTools_AssetManagement rR_DialogueTools_AssetManagement) {
+    private void SetActorVisualPosition(RR_Dialogue dialogue, RR_DialogueTools_Visual visual, RR_DialogueTools_VisualData visualData) {
         string name = "";
         string expression = "";
         for (int i = 0; i < images.Count; i++) {
