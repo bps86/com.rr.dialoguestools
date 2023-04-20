@@ -15,11 +15,11 @@ public class RR_Dialogue
     public bool animationLoop;
     public bool useShake;
     public bool useSilhouette;
-    public NameMode nameMode;
+    public RR_DialogueTools_NameMode nameMode;
     public Vector3 actorPosition;
     public Vector3 actorScale;
     public float scale;
-    public RR_Dialogue(string _name = "name", string _expression = "expression", string _dialogue = "dialogue", string _tags = "tags", int _index = 0, NameMode _nameMode = NameMode.Normal, float _positionX = 0, float _positionY = 0, float _scale = 1, bool _isInverted = false, bool _animationLoop = false, bool _useShake = false, bool _useSilhouette = false, string _sfxID = "", string _bgmID = "", string _voiceActID = "") {
+    public RR_Dialogue(string _name = "name", string _expression = "expression", string _dialogue = "dialogue", string _tags = "tags", int _index = 0, RR_DialogueTools_NameMode _nameMode = RR_DialogueTools_NameMode.Normal, float _positionX = 0, float _positionY = 0, float _scale = 1, bool _isInverted = false, bool _animationLoop = false, bool _useShake = false, bool _useSilhouette = false, string _sfxID = "", string _bgmID = "", string _voiceActID = "") {
         this.actorName = _name;
         this.expression = _expression;
         this.dialogue = _dialogue;
@@ -42,13 +42,13 @@ public class RR_Dialogue
         this.bgmID = _bgmID;
         this.voiceActID = _voiceActID;
     }
-    public string GetName(NameMode _nameMode) {
+    public string GetName(RR_DialogueTools_NameMode _nameMode) {
         switch (_nameMode) {
-            case NameMode.Hidden:
+            case RR_DialogueTools_NameMode.Hidden:
                 return "?";
-            case NameMode.None:
+            case RR_DialogueTools_NameMode.None:
                 return "";
-            case NameMode.Normal:
+            case RR_DialogueTools_NameMode.Normal:
                 if (this.actorName.Contains("_")) {
                     return this.actorName.Substring(0, this.actorName.IndexOf('_'));
                 } else {

@@ -26,6 +26,14 @@ public class RR_DialogueTools_FunctionsVisual
         };
     }
 
+    public static Vector3 GetAdjustedActorPos(Vector3 targetPos, Vector3 actorPivot) {
+        return targetPos + actorPivot;
+    }
+
+    public static Vector3 GetAdjustedActorScale(Vector3 targetPos, Vector3 actorScale) {
+        return Vector3.Scale(targetPos, actorScale);
+    }
+
     private static void ResetAnim(SkeletonGraphic skeletonGraphic, string defaultAnimation) {
         skeletonGraphic.AnimationState.SetAnimation(0, defaultAnimation, true);
     }

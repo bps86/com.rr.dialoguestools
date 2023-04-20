@@ -12,6 +12,7 @@ public class RR_EditorTools
 {
     static string[] spritePath = new string[] { };
     static string[] spinePath = new string[] { };
+    static string[] rectDataPath = new string[] { };
     static string[] beepPath = new string[] { };
     static string[] sfxPath = new string[] { };
     static string[] bgmPath = new string[] { };
@@ -22,10 +23,8 @@ public class RR_EditorTools
     public static List<bool> hidename;
     public static string currentLocale;
     public static int currentLocaleIndex;
-    public static string getFileName;
     public static StringTableCollection rrDialoguesTable;
     public static SharedTableData rrDialoguesSharedData;
-    public RR_DialogueTools_Visualization rR_DialogueTools_Visualization;
     public static void GetDialogueIndex(RR_Narration rR_Narration) {
         for (int i = 0; i < rR_Narration.dialogues.Count; i++) {
             actorDataIndex["Actor" + i] = 0;
@@ -42,6 +41,7 @@ public class RR_EditorTools
         if (!Directory.Exists("Assets/RR-Narration/Resources/RR-DialoguesTable")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-DialoguesTable");
         if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Actors")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Actors");
         if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Actors-Spine")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Actors-Spine");
+        if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Actors-RectData")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Actors-RectData");
         if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Sound")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Sound");
         if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Sound/Beep")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Sound/Beep");
         if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Sound/Voice-Act")) Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Sound/Voice-Act");
@@ -74,6 +74,7 @@ public class RR_EditorTools
     public static void Refresh_RR_DialogueTools() {
         spritePath = Directory.GetFiles("Assets/RR-Narration/Resources/RR-Actors/");
         spinePath = Directory.GetDirectories("Assets/RR-Narration/Resources/RR-Actors-Spine/");
+        rectDataPath = Directory.GetDirectories("Assets/RR-Narration/Resources/RR-Actors-RectData/");
         beepPath = Directory.GetFiles("Assets/RR-Narration/Resources/RR-Sound/Beep/");
         sfxPath = Directory.GetFiles("Assets/RR-Narration/Resources/RR-Sound/Sfx/");
         bgmPath = Directory.GetFiles("Assets/RR-Narration/Resources/RR-Sound/Bgm/");
@@ -88,19 +89,26 @@ public class RR_EditorTools
         TextureImporter textureImporter = null;
         string spritePaths = "";
         string spinePaths = "";
+        string rectDataPaths = "";
         string beepPaths = "";
         string sfxPaths = "";
         string bgmPaths = "";
         string voiceActPaths = "";
-        if (!Directory.Exists("Assets/Editor")) Directory.CreateDirectory("Assets/Editor");
-        if (!Directory.Exists("Assets/Editor/RR-Thumbnail")) Directory.CreateDirectory("Assets/Editor/RR-Thumbnail");
+        if (!Directory.Exists("Assets/Editor")) {
+            Directory.CreateDirectory("Assets/Editor");
+        }
+        if (!Directory.Exists("Assets/Editor/RR-Thumbnail")) {
+            Directory.CreateDirectory("Assets/Editor/RR-Thumbnail");
+        }
 
         for (int i = 0; i < spritePath.Length; i++) {
             if (spritePath[i].Contains(".meta")) {
                 continue;
             }
             tempSprite.Add(spritePath[i].Substring(spritePath[i].LastIndexOf('/') + 1, spritePath[i].LastIndexOf('.') - spritePath[i].LastIndexOf('/') - 1));
-            if (nameIndex > 0) spritePaths += ";";
+            if (nameIndex > 0) {
+                spritePaths += ";";
+            }
             spritePaths += "RR-Actors/" + tempSprite[nameIndex];
             textureImporter = AssetImporter.GetAtPath("Assets/RR-Narration/Resources/RR-Actors/" + tempSprite[nameIndex] + ".png") as TextureImporter;
             textureImporter.textureType = TextureImporterType.Sprite;
@@ -114,7 +122,13 @@ public class RR_EditorTools
             temp.Add(name);
             tempSpriteActor.Add(name);
             dictSprite[name] = new List<string>();
-            index += 1;
+            if (!File.Exists(Application.dataPath + Path.AltDirectorySeparatorChar + "RR-Narration/Resources/RR-Actors-RectData/" + name + ".txt")) {
+                RR_DialogueTools_Functions.SaveFile(Application.dataPath + Path.AltDirectorySeparatorChar + "RR-Narration/Resources/RR-Actors-RectData/" + name + ".txt", "0;0;0;1;1;1");
+            }
+            if (!System.String.IsNullOrEmpty(rectDataPaths)) {
+                rectDataPaths += ";";
+            }
+            rectDataPaths += "RR-Actors-RectData/" + name;
         }
         for (int i = 0; i < spinePath.Length; i++) {
             string name = spinePath[i].Substring(spinePath[i].LastIndexOf('/') + 1);
@@ -123,6 +137,13 @@ public class RR_EditorTools
             }
             temp.Add(name);
             tempSpine.Add(name);
+            if (!File.Exists(Application.dataPath + Path.AltDirectorySeparatorChar + "RR-Narration/Resources/RR-Actors-RectData/" + name + ".txt")) {
+                RR_DialogueTools_Functions.SaveFile(Application.dataPath + Path.AltDirectorySeparatorChar + "RR-Narration/Resources/RR-Actors-RectData/" + name + ".txt", "0;0;0;1;1;1");
+            }
+            if (!System.String.IsNullOrEmpty(rectDataPaths)) {
+                rectDataPaths += ";";
+            }
+            rectDataPaths += "RR-Actors-RectData/" + name;
         }
         index = 0;
         for (int i = 0; i < beepPath.Length; i++) {
@@ -130,7 +151,9 @@ public class RR_EditorTools
                 continue;
             }
             string beepName = beepPath[i].Substring(beepPath[i].LastIndexOf('/') + 1, beepPath[i].LastIndexOf('.') - beepPath[i].LastIndexOf('/') - 1);
-            if (index > 0) beepPaths += ";";
+            if (index > 0) {
+                beepPaths += ";";
+            }
             beepPaths += "RR-Sound/Beep/" + beepName;
             index += 1;
         }
@@ -140,7 +163,9 @@ public class RR_EditorTools
                 continue;
             }
             string sfxName = sfxPath[i].Substring(sfxPath[i].LastIndexOf('/') + 1, sfxPath[i].LastIndexOf('.') - sfxPath[i].LastIndexOf('/') - 1);
-            if (index > 0) sfxPaths += ";";
+            if (index > 0) {
+                sfxPaths += ";";
+            }
             sfxPaths += "RR-Sound/Sfx/" + sfxName;
             index += 1;
         }
@@ -150,7 +175,9 @@ public class RR_EditorTools
                 continue;
             }
             string bgmName = bgmPath[i].Substring(bgmPath[i].LastIndexOf('/') + 1, bgmPath[i].LastIndexOf('.') - bgmPath[i].LastIndexOf('/') - 1);
-            if (index > 0) bgmPaths += ";";
+            if (index > 0) {
+                bgmPaths += ";";
+            }
             bgmPaths += "RR-Sound/Bgm/" + bgmName;
             index += 1;
         }
@@ -160,7 +187,9 @@ public class RR_EditorTools
                 continue;
             }
             string voiceActName = voiceActPath[i].Substring(voiceActPath[i].LastIndexOf('/') + 1, voiceActPath[i].LastIndexOf('.') - voiceActPath[i].LastIndexOf('/') - 1);
-            if (index > 0) voiceActPaths += ";";
+            if (index > 0) {
+                voiceActPaths += ";";
+            }
             voiceActPaths += "RR-Sound/Bgm/" + voiceActName;
             index += 1;
         }
@@ -177,7 +206,9 @@ public class RR_EditorTools
         }
         for (int i = 0; i < tempSpine.Count; i++) {
             List<string> name = new List<string>();
-            if (i > 0) spinePaths += ";";
+            if (i > 0) {
+                spinePaths += ";";
+            }
             spinePaths += "RR-Narration/Resources/RR-Actors-Spine/" + tempSpine[i];
             SkeletonDataAsset skeletonDataAsset = AssetDatabase.LoadAssetAtPath<SkeletonDataAsset>("Assets/RR-Narration/Resources/RR-Actors-Spine/" + tempSpine[i] + "/skeleton_SkeletonData.asset");
             Spine.SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
@@ -195,39 +226,12 @@ public class RR_EditorTools
         }
         RR_DialogueTools_Functions.SaveFile(Application.dataPath + Path.AltDirectorySeparatorChar + "RR-Narration/Resources/spritePaths.txt", spritePaths);
         RR_DialogueTools_Functions.SaveFile(Application.dataPath + Path.AltDirectorySeparatorChar + "RR-Narration/Resources/spinePaths.txt", spinePaths);
+        RR_DialogueTools_Functions.SaveFile(Application.dataPath + Path.AltDirectorySeparatorChar + "RR-Narration/Resources/rectDataPaths.txt", rectDataPaths);
         RR_DialogueTools_Functions.SaveFile(Application.dataPath + Path.AltDirectorySeparatorChar + "RR-Narration/Resources/beepPaths.txt", beepPaths);
         RR_DialogueTools_Functions.SaveFile(Application.dataPath + Path.AltDirectorySeparatorChar + "RR-Narration/Resources/bgmPaths.txt", bgmPaths);
         RR_DialogueTools_Functions.SaveFile(Application.dataPath + Path.AltDirectorySeparatorChar + "RR-Narration/Resources/sfxPaths.txt", sfxPaths);
         RR_DialogueTools_Functions.SaveFile(Application.dataPath + Path.AltDirectorySeparatorChar + "RR-Narration/Resources/voiceActPaths.txt", voiceActPaths);
         AssetDatabase.Refresh();
-    }
-
-    public static int CheckIdDuplicates(SerializedProperty sp) {
-        int uniqueID = GenerateUID();
-        for (int i = 0; i < sp.arraySize; i++) {
-            if (sp.GetArrayElementAtIndex(i).FindPropertyRelative("uniqueId") == null)
-                continue;
-            if (uniqueID == 0 || uniqueID == sp.GetArrayElementAtIndex(i).FindPropertyRelative("uniqueId").intValue) {
-                uniqueID = GenerateUID();
-                i = -1;
-                continue;
-            }
-            continue;
-        }
-        return uniqueID;
-    }
-
-    public static void CreateRRLayers(string name, int uid, SerializedObject so, SerializedProperty m_SortingLayers) {
-        var num_SortingLayers = m_SortingLayers.arraySize;
-        for (int i = 0; i < num_SortingLayers; i++) {
-            if (name == m_SortingLayers.GetArrayElementAtIndex(i).FindPropertyRelative("name").stringValue) return;
-        }
-        m_SortingLayers.InsertArrayElementAtIndex(num_SortingLayers);
-        m_SortingLayers.GetArrayElementAtIndex(num_SortingLayers).FindPropertyRelative("name").stringValue = name;
-        m_SortingLayers.GetArrayElementAtIndex(num_SortingLayers).FindPropertyRelative("uniqueID").intValue = uid;
-        m_SortingLayers.GetArrayElementAtIndex(num_SortingLayers).FindPropertyRelative("locked").boolValue = false;
-        so.ApplyModifiedProperties();
-        so.Update();
     }
 
     public static void ToStringTable(string _filename, string _fileData, StringTableCollection stringTableCollection) {
@@ -272,11 +276,5 @@ public class RR_EditorTools
         RR_DialogueTools_Visual visual = new RR_DialogueTools_Visual();
         string visualJson = JsonUtility.ToJson(visual);
         RR_DialogueTools_Functions.SaveFile("Assets/RR-Narration/Resources/RR-Visual/" + fileName + ".json", visualJson);
-    }
-
-    static int GenerateUID() {
-        int newGuid = System.Guid.NewGuid().GetHashCode();
-        if (newGuid < 0) newGuid *= -1;
-        return newGuid;
     }
 }

@@ -17,9 +17,9 @@ public class RR_Narration
         LoadDialogueFile(localizedDialogueTable.GetTable()[tableKey].LocalizedValue);
 
     }
-    public void LoadDialogueFile(string _dialoguedata) {
+    public void LoadDialogueFile(string dialoguedata) {
         dictDialogues.Clear();
-        dialogues = RR_DialogueTools_Functions.GetDialogues(_dialoguedata.Split(new string[] { "||" }, System.StringSplitOptions.None));
+        dialogues = RR_DialogueTools_Functions.GetDialogues(dialoguedata.Split(new string[] { "||" }, System.StringSplitOptions.None));
         if (dialogues.Count < 1) {
             dialogues.Add(new RR_Dialogue());
         }

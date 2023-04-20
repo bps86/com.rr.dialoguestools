@@ -4,23 +4,23 @@ using UnityEditor;
 
 public class RR_DialogueTools_VisualEditor : EditorWindow
 {
-    float currentScrollViewWidth;
-    bool resize = false;
-    public static bool ready = false;
-    private Vector2 scrollPos = Vector2.zero, scrollPos2 = Vector2.zero;
-    Rect cursorChangeRect;
-    public Object textAsset;
-    public TextAsset config;
+    private RR_DialogueTools_Visualization rR_DialogueTools_Visualization;
+    private RR_Narration rR_Narration;
+    private TextAsset config;
+    private Object textAsset;
     private List<string> clipboardActor;
     private List<string> clipboardExpression;
     private List<Vector3> clipboardStartPos;
     private List<Vector3> clipboardStartScale;
     private List<Vector3> clipboardEndPos;
     private List<Vector3> clipboardEndScale;
-    private RR_DialogueTools_Visualization rR_DialogueTools_Visualization;
-    private RR_Narration rR_Narration;
+    private Rect cursorChangeRect;
+    private Vector2 scrollPos;
+    private Vector2 scrollPos2;
     private bool sameTransitionDuration;
+    private bool resize = false;
     private float allDurationTransition;
+    private float currentScrollViewWidth;
 
     [MenuItem("Window/RR/Visual Editor")]
     public static void init() {
@@ -78,7 +78,7 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
 
     private void OpenActorManagerWindow(int index, int index2) {
         RR_DialogueTools_ActorManager rR_DialogueTools_ActorManager = (RR_DialogueTools_ActorManager)ScriptableObject.CreateInstance(typeof(RR_DialogueTools_ActorManager));
-        rR_DialogueTools_ActorManager.init(RR_DialogueTools_ActorManager.Mode.Visual, index, index2);
+        rR_DialogueTools_ActorManager.init(RR_ActorManagerMode.Visual, index, index2);
         rR_DialogueTools_ActorManager.SetRRVar(rR_Narration, rR_DialogueTools_Visualization);
         rR_DialogueTools_ActorManager.SetRRVarEvent += OnOpen;
         rR_DialogueTools_ActorManager.init_Window();
@@ -93,9 +93,9 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Actors: ", GUILayout.Width(60));
                 rR_DialogueTools_Visualization.visual.actorCount = EditorGUILayout.IntSlider(rR_DialogueTools_Visualization.visual.actorCount, 1, 4);
-                rR_DialogueTools_Visualization.visual.animMode = (TransitionMode)EditorGUILayout.EnumPopup("Transition Mode", rR_DialogueTools_Visualization.visual.animMode);
+                rR_DialogueTools_Visualization.visual.animMode = (RR_DialogueTools_TransitionMode)EditorGUILayout.EnumPopup("Transition Mode", rR_DialogueTools_Visualization.visual.animMode);
                 GUILayout.EndHorizontal();
-                if (rR_DialogueTools_Visualization.visual.animMode == TransitionMode.MovePosition) {
+                if (rR_DialogueTools_Visualization.visual.animMode == RR_DialogueTools_TransitionMode.MovePosition) {
                     GUILayout.BeginHorizontal(GUILayout.Width(150));
                     GUILayout.Label("Single Transition Duration: ");
                     sameTransitionDuration = EditorGUILayout.Toggle(sameTransitionDuration);
@@ -135,7 +135,7 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
                     GUILayout.EndVertical();
                 }
                 GUILayout.EndHorizontal();
-                if (rR_DialogueTools_Visualization.visual.animMode == TransitionMode.MovePosition) {
+                if (rR_DialogueTools_Visualization.visual.animMode == RR_DialogueTools_TransitionMode.MovePosition) {
                     if (!sameTransitionDuration) {
                         GUILayout.BeginHorizontal(GUILayout.Width(150));
                         GUILayout.Label("Transition Duration: ");
@@ -148,13 +148,13 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
                 GUILayout.BeginHorizontal();
                 for (int ii = 0; ii < rR_DialogueTools_Visualization.visual.visualDatas[i].endPos.Count; ii++) {
                     GUILayout.BeginVertical();
-                    if (rR_DialogueTools_Visualization.visual.animMode == TransitionMode.Static) {
+                    if (rR_DialogueTools_Visualization.visual.animMode == RR_DialogueTools_TransitionMode.Static) {
                         GUILayout.BeginVertical();
                         rR_DialogueTools_Visualization.visual.visualDatas[i].endPos[ii] = EditorGUILayout.Vector3Field("pos " + ii + ": ", rR_DialogueTools_Visualization.visual.visualDatas[i].endPos[ii]);
                         rR_DialogueTools_Visualization.visual.visualDatas[i].endScale[ii] = EditorGUILayout.Vector3Field("scale " + ii + ": ", rR_DialogueTools_Visualization.visual.visualDatas[i].endScale[ii]);
                         GUILayout.EndVertical();
                         GUILayout.Space(10);
-                    } else if (rR_DialogueTools_Visualization.visual.animMode == TransitionMode.MovePosition) {
+                    } else if (rR_DialogueTools_Visualization.visual.animMode == RR_DialogueTools_TransitionMode.MovePosition) {
                         GUILayout.BeginVertical();
                         rR_DialogueTools_Visualization.visual.visualDatas[i].startPos[ii] = EditorGUILayout.Vector3Field("Start pos " + ii + ": ", rR_DialogueTools_Visualization.visual.visualDatas[i].startPos[ii]);
                         rR_DialogueTools_Visualization.visual.visualDatas[i].endPos[ii] = EditorGUILayout.Vector3Field("End pos " + ii + ": ", rR_DialogueTools_Visualization.visual.visualDatas[i].endPos[ii]);
@@ -163,14 +163,8 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
                         GUILayout.EndVertical();
                         GUILayout.Space(20);
                     }
-                    GUILayout.BeginHorizontal(GUILayout.Width(200));
-                    GUILayout.Label("Loop Animation: ");
-                    rR_DialogueTools_Visualization.visual.visualDatas[i].isLooping[ii] = EditorGUILayout.Toggle(rR_DialogueTools_Visualization.visual.visualDatas[i].isLooping[ii]);
-                    GUILayout.EndHorizontal();
-                    GUILayout.BeginHorizontal(GUILayout.Width(200));
-                    GUILayout.Label("Use Silhouette: ");
-                    rR_DialogueTools_Visualization.visual.visualDatas[i].useSilhouette[ii] = EditorGUILayout.Toggle(rR_DialogueTools_Visualization.visual.visualDatas[i].useSilhouette[ii]);
-                    GUILayout.EndHorizontal();
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].isLooping[ii] = EditorGUILayout.Toggle("Loop Animation: ", rR_DialogueTools_Visualization.visual.visualDatas[i].isLooping[ii]);
+                    rR_DialogueTools_Visualization.visual.visualDatas[i].useSilhouette[ii] = EditorGUILayout.Toggle("Use Silhouette: ", rR_DialogueTools_Visualization.visual.visualDatas[i].useSilhouette[ii]);
                     GUILayout.EndVertical();
                 }
                 GUILayout.EndHorizontal();

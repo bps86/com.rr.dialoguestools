@@ -1,4 +1,4 @@
-public enum FileMode
+public enum RR_DialogueTools_FileMode
 {
     New = 0,
     Save = 1,

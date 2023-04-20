@@ -44,7 +44,7 @@ public class RR_DialogueTools_Functions
                 _dialogue: dialoguedata[2].Replace("</n>", System.Environment.NewLine),
                 _tags: dialoguedata[3],
                 _index: int.Parse(dialoguedata[4]),
-                _nameMode: (NameMode)int.Parse(dialoguedata[5]),
+                _nameMode: (RR_DialogueTools_NameMode)int.Parse(dialoguedata[5]),
                 _positionX: float.Parse(dialoguedata[6]),
                 _positionY: float.Parse(dialoguedata[7]),
                 _scale: float.Parse(dialoguedata[8]),

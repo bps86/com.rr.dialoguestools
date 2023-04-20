@@ -3,15 +3,16 @@ using UnityEditor;
 
 public class RR_DialogueTools_MainEditor : EditorWindow
 {
-    float currentScrollViewWidth;
-    bool resize = false;
-    public static bool ready = false;
-    private Vector2 scrollPos = Vector2.zero, scrollPos2 = Vector2.zero;
-    Rect cursorChangeRect;
-    RR_Narration rR_Narration;
-    RR_DialogueTools_Visualization rR_DialogueTools_Visualization;
-    string fileName;
-    string fileData;
+    private Rect cursorChangeRect;
+    private RR_Narration rR_Narration;
+    private RR_DialogueTools_Visualization rR_DialogueTools_Visualization;
+    private Vector2 scrollPos;
+    private Vector2 scrollPos2;
+    private string fileName;
+    private string fileData;
+    private float currentScrollViewWidth;
+    private bool resize;
+    private bool ready;
 
 
     [MenuItem("Window/RR/Narration")]
@@ -46,18 +47,19 @@ public class RR_DialogueTools_MainEditor : EditorWindow
         Repaint();
     }
 
-    private void OpenFileManagerWindow(FileMode fileMode) {
+    private void OpenFileManagerWindow(RR_DialogueTools_FileMode fileMode) {
         RR_DialogueTools_FileManagerWindow rR_DialogueTools_FileManagerWindow = (RR_DialogueTools_FileManagerWindow)ScriptableObject.CreateInstance(typeof(RR_DialogueTools_FileManagerWindow));
         rR_DialogueTools_FileManagerWindow.init(rR_Narration, rR_DialogueTools_Visualization);
         rR_DialogueTools_FileManagerWindow.SetData(fileName, fileData);
-        rR_DialogueTools_FileManagerWindow.Open += OnOpen;
+        rR_DialogueTools_FileManagerWindow.OpenEvent += OnOpen;
+        rR_DialogueTools_FileManagerWindow.CloseEvent += OnClose;
         rR_DialogueTools_FileManagerWindow.init_Window(fileMode);
         GUIUtility.ExitGUI();
     }
 
     private void OpenActorManagerWindow(int index) {
         RR_DialogueTools_ActorManager rR_DialogueTools_ActorManager = (RR_DialogueTools_ActorManager)ScriptableObject.CreateInstance(typeof(RR_DialogueTools_ActorManager));
-        rR_DialogueTools_ActorManager.init(RR_DialogueTools_ActorManager.Mode.Dialogue, index);
+        rR_DialogueTools_ActorManager.init(RR_ActorManagerMode.Dialogue, index);
         rR_DialogueTools_ActorManager.SetRRVar(rR_Narration, rR_DialogueTools_Visualization);
         rR_DialogueTools_ActorManager.SetRRVarEvent += OnActorApply;
         rR_DialogueTools_ActorManager.init_Window();
@@ -67,7 +69,7 @@ public class RR_DialogueTools_MainEditor : EditorWindow
     private void OpenAudioManagerWindow(int index, string sfxID, string bgmID, string voiceActID) {
         RR_DialogueTools_AudioManager rR_DialogueTools_AudioManager = (RR_DialogueTools_AudioManager)ScriptableObject.CreateInstance(typeof(RR_DialogueTools_AudioManager));
         rR_DialogueTools_AudioManager.init(index, sfxID, bgmID, voiceActID);
-        rR_DialogueTools_AudioManager.Apply += OnAudioApply;
+        rR_DialogueTools_AudioManager.ApplyEvent += OnAudioApply;
         rR_DialogueTools_AudioManager.init_Window();
         GUIUtility.ExitGUI();
     }
@@ -77,11 +79,11 @@ public class RR_DialogueTools_MainEditor : EditorWindow
         scrollPos = GUILayout.BeginScrollView(scrollPos, GUILayout.Width(currentScrollViewWidth));
         if (GUILayout.Button("New")) {
             ready = false;
-            OpenFileManagerWindow(FileMode.New);
+            OpenFileManagerWindow(RR_DialogueTools_FileMode.New);
         }
         if (GUILayout.Button("Open")) {
             ready = false;
-            OpenFileManagerWindow(FileMode.Open);
+            OpenFileManagerWindow(RR_DialogueTools_FileMode.Open);
         }
         if (GUILayout.Button("Refresh")) {
             RR_EditorTools.Refresh_RR_DialogueTools();
@@ -89,7 +91,7 @@ public class RR_DialogueTools_MainEditor : EditorWindow
         if (rR_Narration.dialogues != null) {
             if (GUILayout.Button("Save")) {
                 ready = false;
-                OpenFileManagerWindow(FileMode.Save);
+                OpenFileManagerWindow(RR_DialogueTools_FileMode.Save);
             }
             if (GUILayout.Button("New Dialogue")) rR_Narration.dialogues.Add(new RR_Dialogue(
                 _tags: rR_Narration.dialogues[rR_Narration.dialogues.Count - 1].tags,
@@ -102,6 +104,7 @@ public class RR_DialogueTools_MainEditor : EditorWindow
 
     private void DrawDialogue() {
         if (!ready) return;
+
         scrollPos2 = GUILayout.BeginScrollView(scrollPos2, GUILayout.Width(this.position.width - currentScrollViewWidth));
         if (rR_Narration.dialogues != null)
             for (int i = 0; i < rR_Narration.dialogues.Count; i++) {
@@ -127,7 +130,7 @@ public class RR_DialogueTools_MainEditor : EditorWindow
                 GUILayout.BeginVertical(GUILayout.Width(60));
                 rR_Narration.dialogues[i].tags = GUILayout.TextField(rR_Narration.dialogues[i].tags, GUILayout.Width(60));
                 rR_Narration.dialogues[i].index = EditorGUILayout.IntField(rR_Narration.dialogues[i].index, GUILayout.Width(60));
-                rR_Narration.dialogues[i].nameMode = (NameMode)EditorGUILayout.EnumPopup(rR_Narration.dialogues[i].nameMode);
+                rR_Narration.dialogues[i].nameMode = (RR_DialogueTools_NameMode)EditorGUILayout.EnumPopup(rR_Narration.dialogues[i].nameMode);
                 GUILayout.EndVertical();
                 GUILayout.BeginVertical();
                 GUILayout.Label($"Selected SFX: {rR_Narration.dialogues[i].sfxID}", GUILayout.Width(180));
@@ -149,22 +152,12 @@ public class RR_DialogueTools_MainEditor : EditorWindow
                 rR_Narration.dialogues[i].actorPosition.y = EditorGUILayout.FloatField(rR_Narration.dialogues[i].actorPosition.y, GUILayout.Width(60));
                 GUILayout.Label("Actor Scale: ", GUILayout.Width(80));
                 rR_Narration.dialogues[i].scale = EditorGUILayout.FloatField(rR_Narration.dialogues[i].scale, GUILayout.Width(60));
+                GUILayout.EndHorizontal();
                 GUILayout.BeginHorizontal(GUILayout.Width(100));
-                GUILayout.Label("Is Inverted: ");
-                rR_Narration.dialogues[i].isInverted = EditorGUILayout.Toggle(rR_Narration.dialogues[i].isInverted);
-                GUILayout.EndHorizontal();
-                GUILayout.BeginHorizontal(GUILayout.Width(120));
-                GUILayout.Label("Loop Animation: ");
-                rR_Narration.dialogues[i].animationLoop = EditorGUILayout.Toggle(rR_Narration.dialogues[i].animationLoop);
-                GUILayout.EndHorizontal();
-                GUILayout.BeginHorizontal(GUILayout.Width(80));
-                GUILayout.Label("Use Shake: ");
-                rR_Narration.dialogues[i].useShake = EditorGUILayout.Toggle(rR_Narration.dialogues[i].useShake);
-                GUILayout.EndHorizontal();
-                GUILayout.BeginHorizontal(GUILayout.Width(120));
-                GUILayout.Label("Use Silhouette: ");
-                rR_Narration.dialogues[i].useSilhouette = EditorGUILayout.Toggle(rR_Narration.dialogues[i].useSilhouette);
-                GUILayout.EndHorizontal();
+                rR_Narration.dialogues[i].isInverted = EditorGUILayout.Toggle("Is Inverted: ", rR_Narration.dialogues[i].isInverted);
+                rR_Narration.dialogues[i].animationLoop = EditorGUILayout.Toggle("Loop Animation: ", rR_Narration.dialogues[i].animationLoop);
+                rR_Narration.dialogues[i].useShake = EditorGUILayout.Toggle("Use Shake: ", rR_Narration.dialogues[i].useShake);
+                rR_Narration.dialogues[i].useSilhouette = EditorGUILayout.Toggle("Use Silhouette: ", rR_Narration.dialogues[i].useSilhouette);
                 GUILayout.EndHorizontal();
                 GUILayout.EndVertical();
             }
@@ -213,6 +206,7 @@ public class RR_DialogueTools_MainEditor : EditorWindow
         this.fileData = fileData;
         this.rR_Narration = selected_RR_Narration;
         this.rR_DialogueTools_Visualization = selected_RR_DialogueTools_Visualization;
+        this.ready = true;
     }
 
     private void OnAudioApply(int index, string sfxID, string bgmID, string voiceActID) {
@@ -225,7 +219,12 @@ public class RR_DialogueTools_MainEditor : EditorWindow
         this.rR_Narration = selected_RR_Narration;
         this.rR_DialogueTools_Visualization = selected_RR_DialogueTools_Visualization;
     }
-    void OnDestroy() {
+
+    private void OnClose() {
+        this.ready = true;
+    }
+
+    private void OnDestroy() {
         RR_EditorTools.Refresh_RR_DialogueTools();
     }
 }

@@ -5,23 +5,21 @@ using UnityEditor;
 
 public class RR_DialogueTools_AudioManager : EditorWindow
 {
-    public Action<int, string, string, string> Apply;
-    float currentScrollViewWidth;
-    bool resize = false;
-    private Vector2 scrollPos = Vector2.zero, scrollPos2 = Vector2.zero;
-    Rect cursorChangeRect;
+    public Action<int, string, string, string> ApplyEvent;
 
-    int index;
-    int sfxIndex;
-    int bgmIndex;
-    int voiceActIndex;
-    int mode;
-    private string sfxID;
-    private string bgmID;
-    private string voiceActID;
+    private Rect cursorChangeRect;
+    private Vector2 scrollPos;
+    private Vector2 scrollPos2;
     private List<string> sfxList;
     private List<string> bgmList;
     private List<string> voiceActList;
+    private float currentScrollViewWidth;
+    private int index;
+    private int mode;
+    private bool resize;
+    private string sfxID;
+    private string bgmID;
+    private string voiceActID;
     private const int SFX = 0;
     private const int BGM = 1;
     private const int VOICE_ACT = 2;
@@ -103,7 +101,7 @@ public class RR_DialogueTools_AudioManager : EditorWindow
             mode = VOICE_ACT;
         }
         if (GUILayout.Button("Apply")) {
-            Apply(index, sfxID, bgmID, voiceActID);
+            ApplyEvent(index, sfxID, bgmID, voiceActID);
             Close();
         }
         GUILayout.EndScrollView();

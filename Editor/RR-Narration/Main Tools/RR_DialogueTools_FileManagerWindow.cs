@@ -6,10 +6,11 @@ using UnityEngine.Localization.Tables;
 
 public class RR_DialogueTools_FileManagerWindow : EditorWindow
 {
-    public Action<RR_Narration, RR_DialogueTools_Visualization> OpenRR;
-    public Action<string, string, RR_Narration, RR_DialogueTools_Visualization> Open;
+    public Action<RR_Narration, RR_DialogueTools_Visualization> OpenRREvent;
+    public Action<string, string, RR_Narration, RR_DialogueTools_Visualization> OpenEvent;
+    public Action CloseEvent;
 
-    private FileMode fileMode;
+    private RR_DialogueTools_FileMode fileMode;
     private RR_Narration rR_Narration;
     private RR_DialogueTools_Visualization rR_DialogueTools_Visualization;
     private string fileName;
@@ -20,16 +21,12 @@ public class RR_DialogueTools_FileManagerWindow : EditorWindow
         this.fileData = fileData;
     }
 
-    public void SetFileData(string currentFileData) {
-        fileData = currentFileData;
-    }
-
     public void init(RR_Narration selected_RR_Narration, RR_DialogueTools_Visualization selected_RR_DialogueTools_Visualization) {
         rR_Narration = selected_RR_Narration;
         rR_DialogueTools_Visualization = selected_RR_DialogueTools_Visualization;
     }
 
-    public void init_Window(FileMode selectedFileMode) {
+    public void init_Window(RR_DialogueTools_FileMode selectedFileMode) {
         fileMode = selectedFileMode;
         position = new Rect(Screen.width / 2, Screen.height / 2, 100, 100);
         Show();
@@ -44,13 +41,13 @@ public class RR_DialogueTools_FileManagerWindow : EditorWindow
         RR_EditorTools.currentLocale = RR_EditorTools.locales[RR_EditorTools.currentLocaleIndex];
         if (GUILayout.Button("OK")) {
             switch (fileMode) {
-                case FileMode.New:
+                case RR_DialogueTools_FileMode.New:
                     NewFile();
                     break;
-                case FileMode.Save:
+                case RR_DialogueTools_FileMode.Save:
                     SaveFile();
                     break;
-                case FileMode.Open:
+                case RR_DialogueTools_FileMode.Open:
                     OpenFile();
                     Close();
                     break;
@@ -60,11 +57,15 @@ public class RR_DialogueTools_FileManagerWindow : EditorWindow
     }
 
     public void NewFile() {
-        if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Dialogues/" + RR_EditorTools.currentLocale) && RR_EditorTools.currentLocale != "<None>") Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Dialogues/" + RR_EditorTools.currentLocale);
-        if (RR_EditorTools.currentLocaleIndex < RR_EditorTools.locales.Length - 1)
+        if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Dialogues/" + RR_EditorTools.currentLocale) && RR_EditorTools.currentLocale != "<None>") {
+            Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Dialogues/" + RR_EditorTools.currentLocale);
+        }
+        if (RR_EditorTools.currentLocaleIndex < RR_EditorTools.locales.Length - 1) {
             RR_DialogueTools_Functions.NewFile("RR-Narration/Resources/RR-Dialogues/" + RR_EditorTools.currentLocale + "/" + fileName + ".txt");
-        if (RR_EditorTools.currentLocaleIndex == RR_EditorTools.locales.Length - 1)
+        }
+        if (RR_EditorTools.currentLocaleIndex == RR_EditorTools.locales.Length - 1) {
             RR_DialogueTools_Functions.NewFile("RR-Narration/Resources/RR-Dialogues/" + fileName + ".txt");
+        }
         RR_EditorTools.CreateNewVisualAsset(fileName);
         RR_EditorTools.ToStringTable(fileName, "", RR_EditorTools.rrDialoguesTable);
         OpenFile();
@@ -72,19 +73,19 @@ public class RR_DialogueTools_FileManagerWindow : EditorWindow
     }
 
     public void SaveFile() {
-        Debug.Log("Saving");
-        if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Dialogues/" + RR_EditorTools.currentLocale) && RR_EditorTools.currentLocale != "<None>") Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Dialogues/" + RR_EditorTools.currentLocale);
-        if (RR_EditorTools.currentLocaleIndex < RR_EditorTools.locales.Length - 1)
+        if (!Directory.Exists("Assets/RR-Narration/Resources/RR-Dialogues/" + RR_EditorTools.currentLocale) && RR_EditorTools.currentLocale != "<None>") {
+            Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Dialogues/" + RR_EditorTools.currentLocale);
+        }
+        if (RR_EditorTools.currentLocaleIndex < RR_EditorTools.locales.Length - 1) {
             RR_DialogueTools_Functions.SaveFile("Assets/RR-Narration/Resources/RR-Dialogues/" + RR_EditorTools.currentLocale + "/" + fileName + ".txt", fileData);
-        Debug.Log("Checked Save on Locale");
+        }
         RR_EditorTools.ToStringTable(fileName, fileData, RR_EditorTools.rrDialoguesTable);
-        if (RR_EditorTools.currentLocaleIndex == RR_EditorTools.locales.Length - 1)
+        if (RR_EditorTools.currentLocaleIndex == RR_EditorTools.locales.Length - 1) {
             RR_DialogueTools_Functions.SaveFile("Assets/RR-Narration/Resources/RR-Dialogues/" + fileName + ".txt", fileData);
+        }
         string visualJson = JsonUtility.ToJson(rR_DialogueTools_Visualization.visual);
         RR_DialogueTools_Functions.SaveFile("Assets/RR-Narration/Resources/RR-Visual/" + fileName + ".json", visualJson);
-        Debug.Log("Checked Save on Non Locale");
         OpenFile();
-        Debug.Log("FileRefreshed");
         Close();
     }
 
@@ -95,14 +96,20 @@ public class RR_DialogueTools_FileManagerWindow : EditorWindow
             string[] dialogueList = stringTableEntry.Value.Split(new string[] { "||" }, System.StringSplitOptions.None);
             rR_Narration.dialogues = RR_DialogueTools_Functions.GetDialogues(dialogueList);
         }
-        if (RR_EditorTools.currentLocaleIndex == RR_EditorTools.locales.Length - 1)
+        if (RR_EditorTools.currentLocaleIndex == RR_EditorTools.locales.Length - 1) {
             rR_Narration.dialogues = RR_DialogueTools_Functions.OpenDialogueFile("Assets/RR-Narration/Resources/RR-Dialogues/" + fileName + ".txt");
-        if (!File.Exists("Assets/RR-Narration/Resources/RR-Visual/" + fileName + ".json"))
+        }
+        if (!File.Exists("Assets/RR-Narration/Resources/RR-Visual/" + fileName + ".json")) {
             RR_EditorTools.CreateNewVisualAsset(fileName);
+        }
         JsonUtility.FromJsonOverwrite(RR_DialogueTools_Functions.OpenFile("Assets/RR-Narration/Resources/RR-Visual/" + fileName + ".json"), rR_DialogueTools_Visualization.visual);
-        Open(fileName, fileData, rR_Narration, rR_DialogueTools_Visualization);
+        OpenEvent(fileName, fileData, rR_Narration, rR_DialogueTools_Visualization);
         RR_EditorTools.GetDialogueIndex(rR_Narration);
         RR_EditorTools.Refresh_RR_DialogueTools();
-        RR_DialogueTools_MainEditor.ready = true;
+    }
+
+    private void OnDestroy() {
+        CloseEvent();
+        RR_EditorTools.Refresh_RR_DialogueTools();
     }
 }

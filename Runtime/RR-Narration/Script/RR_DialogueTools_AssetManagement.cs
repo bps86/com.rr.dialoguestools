@@ -9,11 +9,12 @@ public class RR_DialogueTools_AssetManagement
     public Dictionary<string, TextAsset> dialoguesData;
     public Dictionary<string, TextAsset> visualAssets;
     public Dictionary<string, Sprite> dictActorSprite;
-    public Dictionary<string, SkeletonDataAsset> dictActorSpine;
+    public Dictionary<string, SkeletonDataAsset> dictActorSkeletonDataAsset;
+    public Dictionary<string, RR_DialogueTools_RectData> dictActorRectData;
     public Dictionary<string, AudioClip> dictActorBeep;
     public Dictionary<string, AudioClip> dictSfx;
     public Dictionary<string, AudioClip> dictBgm;
-    public bool isLoaded = false;
+    public bool assetLoaded;
 
     public RR_DialogueTools_AssetManagement() {
         this.dialoguesData = new Dictionary<string, TextAsset>();
@@ -29,10 +30,26 @@ public class RR_DialogueTools_AssetManagement
     }
 
     public SkeletonDataAsset GetActorSkeletonDataAsset(string actorName) {
-        if (dictActorSpine.ContainsKey(actorName)) {
-            return dictActorSpine[actorName];
+        if (dictActorSkeletonDataAsset.ContainsKey(actorName)) {
+            return dictActorSkeletonDataAsset[actorName];
         } else {
             return null;
+        }
+    }
+
+    public Vector3 GetActorRectDataPos(string actorName) {
+        if (dictActorSkeletonDataAsset.ContainsKey(actorName)) {
+            return dictActorRectData[actorName].ActorPivot;
+        } else {
+            return Vector3.zero;
+        }
+    }
+
+    public Vector3 GetActorRectDataScale(string actorName) {
+        if (dictActorSkeletonDataAsset.ContainsKey(actorName)) {
+            return dictActorRectData[actorName].ActorScale;
+        } else {
+            return Vector3.one;
         }
     }
 
@@ -61,17 +78,18 @@ public class RR_DialogueTools_AssetManagement
     }
 
     public IEnumerator LoadAssets(bool useGeneralAudio) {
+        assetLoaded = false;
         LoadActorData();
         if (useGeneralAudio) {
             LoadAudioGeneral();
             yield return new WaitUntil(() => IsGeneralAudioAssetLoaded());
         }
         yield return new WaitUntil(() => IsActorAssetLoaded());
-        isLoaded = true;
+        assetLoaded = true;
     }
 
     private bool IsActorAssetLoaded() {
-        return dictActorSprite != null && dictActorSpine != null && dictActorBeep != null;
+        return dictActorSprite != null && dictActorSkeletonDataAsset != null && dictActorBeep != null && dictActorRectData != null;
     }
 
     private bool IsGeneralAudioAssetLoaded() {
@@ -80,8 +98,9 @@ public class RR_DialogueTools_AssetManagement
 
     public void LoadActorData() {
         dictActorSprite = LoadActorSpriteData("spritePaths");
-        dictActorSpine = LoadActorSkeletonDataAsset("spinePaths");
+        dictActorSkeletonDataAsset = LoadActorSkeletonDataAsset("spinePaths");
         dictActorBeep = LoadAudioData("beepPaths");
+        LoadActorRectData("rectDataPaths");
     }
 
     public void LoadAudioGeneral() {
@@ -107,7 +126,7 @@ public class RR_DialogueTools_AssetManagement
     }
 
     private Dictionary<string, SkeletonDataAsset> LoadActorSkeletonDataAsset(string pathsName) {
-        Dictionary<string, SkeletonDataAsset> dictRRSpine = new Dictionary<string, SkeletonDataAsset>();
+        Dictionary<string, SkeletonDataAsset> dictSkeletonAsset = new Dictionary<string, SkeletonDataAsset>();
         string name = "";
         string[] spinePath = GetDataPaths(pathsName, ';');
         for (int i = 0; i < spinePath.Length; i++) {
@@ -115,10 +134,32 @@ public class RR_DialogueTools_AssetManagement
                 continue;
             }
             name = spinePath[i].Substring(spinePath[i].LastIndexOf('/') + 1);
-            dictRRSpine.Add(name, Resources.Load<SkeletonDataAsset>("RR-Actors-Spine/" + name + "/skeleton_SkeletonData"));
+            dictSkeletonAsset.Add(name, Resources.Load<SkeletonDataAsset>("RR-Actors-Spine/" + name + "/skeleton_SkeletonData"));
         }
 
-        return dictRRSpine;
+        return dictSkeletonAsset;
+    }
+
+    private void LoadActorRectData(string pathsName) {
+        List<TextAsset> textAssets = new List<TextAsset>();
+        string[] rectDataPath = GetDataPaths(pathsName, ';');
+        for (int i = 0; i < rectDataPath.Length; i++) {
+            if (System.String.IsNullOrEmpty(rectDataPath[i])) {
+                continue;
+            }
+            textAssets.Add(Resources.Load<TextAsset>(rectDataPath[i]));
+        }
+        dictActorRectData = LoadDictRectData(textAssets);
+    }
+
+    private Dictionary<string, RR_DialogueTools_RectData> LoadDictRectData(List<TextAsset> rectDatas) {
+        Dictionary<string, RR_DialogueTools_RectData> dictRectData = new Dictionary<string, RR_DialogueTools_RectData>();
+        string[] rectData = null;
+        for (int i = 0; i < rectDatas.Count; i++) {
+            rectData = rectDatas[i].text.Split(';');
+            dictRectData.Add(rectDatas[i].name, new RR_DialogueTools_RectData(rectData));
+        }
+        return dictRectData;
     }
 
     private Dictionary<string, AudioClip> LoadAudioData(string pathsName) {

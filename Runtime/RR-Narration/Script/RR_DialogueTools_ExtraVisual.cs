@@ -13,7 +13,8 @@ public class RR_DialogueTools_ExtraVisual : MonoBehaviour
     [SerializeField] private List<SkeletonGraphic> skeletonGraphics;
     [SerializeField] private bool disableAutoSetAnchor;
     [SerializeField] private bool useColorTransition;
-    private TransitionMode transitionMode;
+    private RR_DialogueTools_Visualization rR_DialogueTools_Visualization;
+    private RR_DialogueTools_TransitionMode transitionMode;
     private List<Color> startColor;
     private List<Color> endColor;
     private List<Vector3> startPos;
@@ -26,6 +27,7 @@ public class RR_DialogueTools_ExtraVisual : MonoBehaviour
     private bool isTransitioning;
 
     public void Init() {
+        rR_DialogueTools_Visualization = new RR_DialogueTools_Visualization();
         if (!disableAutoSetAnchor) {
             for (int i = 0; i < images.Count; i++) {
                 images[i].rectTransform.anchorMin = new Vector2(0.5f, 0);
@@ -48,30 +50,39 @@ public class RR_DialogueTools_ExtraVisual : MonoBehaviour
         }
     }
 
+    public void LoadVisualAsset(RR_DialogueTools_Visual visualAsset) {
+        rR_DialogueTools_Visualization.LoadVisualAsset(visualAsset);
+    }
+
+    public void LoadVisualData(string tag, int index) {
+        rR_DialogueTools_Visualization.LoadVisualData(tag, index);
+    }
+
     private void Update() {
         MoveActorTransition();
     }
 
-    public void ChangeAnimPos(RR_Narration rR_Narration, RR_DialogueTools_Visualization rR_DialogueTools_Visualization) {
+    public void ChangeAnimPos(RR_Dialogue dialogue) {
         transitionMode = rR_DialogueTools_Visualization.visual.animMode;
-        ChangeAnimPos_MovePosition(rR_Narration.dialogue, rR_DialogueTools_Visualization.visual, rR_DialogueTools_Visualization.visualData);
+        ChangeAnimPos_MovePosition(dialogue, rR_DialogueTools_Visualization.visual, rR_DialogueTools_Visualization.currentVisualData);
     }
 
     private void ChangeAnimPos_MovePosition(RR_Dialogue dialogue, RR_DialogueTools_Visual visual, RR_DialogueTools_VisualData visualData) {
         if (visualData.actorName.Count <= 0) return;
 
-        if (transitionMode == TransitionMode.MovePosition) {
+        if (transitionMode == RR_DialogueTools_TransitionMode.MovePosition) {
             isTransitioning = false;
             currentTransition = 0;
             actorCount = visual.actorCount;
-            SetActorVisualPosition(dialogue, visual, visualData);
             startPos = visualData.startPos;
             startScale = visualData.startScale;
             endPos = visualData.endPos;
             endScale = visualData.endScale;
+            SetActorVisualPosition(dialogue, visual, visualData);
             transitionDuration = visualData.transitionDuration;
             isTransitioning = true;
         } else {
+            isTransitioning = false;
             SetActorVisualPosition(dialogue, visual, visualData);
         }
     }
@@ -97,7 +108,7 @@ public class RR_DialogueTools_ExtraVisual : MonoBehaviour
             name = visualData.actorName[i];
             expression = visualData.expression[i];
             startColor[i] = endColor[i];
-            if (transitionMode == TransitionMode.MovePosition) {
+            if (transitionMode == RR_DialogueTools_TransitionMode.MovePosition) {
                 SetActorSpriteEvent(name, expression, images[i], visualData.startPos[i], visualData.startScale[i], visualData.useSilhouette[i]);
                 SetActorSpineEvent(name, expression, skeletonGraphics[i], visualData.startPos[i], visualData.startScale[i], visualData.useSilhouette[i], visualData.isLooping[i]);
             } else {
@@ -109,7 +120,7 @@ public class RR_DialogueTools_ExtraVisual : MonoBehaviour
     }
 
     private void MoveActorTransition() {
-        if (transitionMode != TransitionMode.MovePosition) return;
+        if (transitionMode != RR_DialogueTools_TransitionMode.MovePosition) return;
         if (!isTransitioning) return;
         if (currentTransition >= 1) return;
 
