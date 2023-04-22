@@ -256,9 +256,9 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         actorSprite.sprite = rR_DialogueTools_AssetManager.GetActorSprite(actorName, animationName);
         actorSprite.transform.SetAsLastSibling();
         if (usingSilhouette) {
-            actorSprite = RR_DialogueTools_FunctionsVisual.SetActorSprite(actorSprite, GetActorPos(targetPos, actorName), GetActorScale(targetScale, actorName), silhouetteColor);
+            actorSprite = RR_DialogueTools_FunctionsVisual.SetActorSprite(actorSprite, GetActorPos(targetPos, targetScale, actorName), GetActorScale(targetScale, actorName), silhouetteColor);
         } else {
-            actorSprite = RR_DialogueTools_FunctionsVisual.SetActorSprite(actorSprite, GetActorPos(targetPos, actorName), GetActorScale(targetScale, actorName), Color.white);
+            actorSprite = RR_DialogueTools_FunctionsVisual.SetActorSprite(actorSprite, GetActorPos(targetPos, targetScale, actorName), GetActorScale(targetScale, actorName), Color.white);
         }
         if (actorSprite.sprite != null) {
             actorSprite.gameObject.SetActive(true);
@@ -280,9 +280,9 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         skeletonGraphic.allowMultipleCanvasRenderers = true;
         skeletonGraphic.transform.SetAsLastSibling();
         if (usingSilhouette) {
-            skeletonGraphic = RR_DialogueTools_FunctionsVisual.SetActorSkeletonGraphics(skeletonGraphic, animationName, GetActorPos(targetPos, actorName), GetActorScale(targetScale, actorName), silhouetteColor, isLoop);
+            skeletonGraphic = RR_DialogueTools_FunctionsVisual.SetActorSkeletonGraphics(skeletonGraphic, animationName, GetActorPos(targetPos, targetScale, actorName), GetActorScale(targetScale, actorName), silhouetteColor, isLoop);
         } else {
-            skeletonGraphic = RR_DialogueTools_FunctionsVisual.SetActorSkeletonGraphics(skeletonGraphic, animationName, GetActorPos(targetPos, actorName), GetActorScale(targetScale, actorName), Color.white, isLoop);
+            skeletonGraphic = RR_DialogueTools_FunctionsVisual.SetActorSkeletonGraphics(skeletonGraphic, animationName, GetActorPos(targetPos, targetScale, actorName), GetActorScale(targetScale, actorName), Color.white, isLoop);
         }
         if (skeletonGraphic.skeletonDataAsset != null) {
             skeletonGraphic.gameObject.SetActive(true);
@@ -303,8 +303,8 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         }
     }
 
-    private Vector3 GetActorPos(Vector3 targetPos, string actorName) {
-        return RR_DialogueTools_FunctionsVisual.GetAdjustedActorPos(targetPos, rR_DialogueTools_AssetManager.GetAGetActorRectDataPos(actorName));
+    private Vector3 GetActorPos(Vector3 targetPos, Vector3 targetScale, string actorName) {
+        return RR_DialogueTools_FunctionsVisual.GetAdjustedActorPos(targetPos, targetScale, rR_DialogueTools_AssetManager.GetAGetActorRectDataPos(actorName));
     }
 
     private Vector3 GetActorScale(Vector3 targetScale, string actorName) {

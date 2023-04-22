@@ -91,8 +91,8 @@ public class RR_DialogueTools_AssetManager : MonoBehaviour
 
     public RR_DialogueTools_VisualData GetAdjustedVisualData(RR_DialogueTools_VisualData visualData, int actorCount) {
         for (int i = 0; i < actorCount; i++) {
-            visualData.startPos[i] = RR_DialogueTools_FunctionsVisual.GetAdjustedActorPos(visualData.startPos[i], GetAGetActorRectDataPos(visualData.actorName[i]));
-            visualData.endPos[i] = RR_DialogueTools_FunctionsVisual.GetAdjustedActorPos(visualData.endPos[i], GetAGetActorRectDataPos(visualData.actorName[i]));
+            visualData.startPos[i] = RR_DialogueTools_FunctionsVisual.GetAdjustedActorPos(visualData.startPos[i], visualData.startScale[i], GetAGetActorRectDataPos(visualData.actorName[i]));
+            visualData.endPos[i] = RR_DialogueTools_FunctionsVisual.GetAdjustedActorPos(visualData.endPos[i], visualData.endScale[i], GetAGetActorRectDataPos(visualData.actorName[i]));
             visualData.startScale[i] = RR_DialogueTools_FunctionsVisual.GetAdjustedActorScale(visualData.startScale[i], GetAGetActorRectDataScale(visualData.actorName[i]));
             visualData.endScale[i] = RR_DialogueTools_FunctionsVisual.GetAdjustedActorScale(visualData.endScale[i], GetAGetActorRectDataScale(visualData.actorName[i]));
         }
