@@ -122,7 +122,7 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
                     GUILayout.BeginVertical();
                     GUILayout.Label("Name: " + name, GUILayout.Width(100));
                     GUILayout.Label("Expr: " + expression, GUILayout.Width(100));
-                    if (GUILayout.Button(AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/RR-Thumbnail/Thumbnail-" + name + "," + expression + ".png"), GUILayout.Width(100), GUILayout.Height(100))) {
+                    if (GUILayout.Button(AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/RR-Thumbnail/Thumbnail-" + name + "," + expression + ".png"), GUILayout.Width(150), GUILayout.Height(150))) {
                         int index = i;
                         int index2 = ii;
                         OpenActorManagerWindow(index, index2);

@@ -25,6 +25,8 @@ public class RR_DialogueTools_ActorManager : EditorWindow
     private int optionalIndex;
     private bool resize = false;
 
+    private const int MAX_ROW = 4;
+
     [MenuItem("Window/RR/Actor Manager")]
     static void initPreview() {
         RR_EditorTools.Initialize_RR_Dir();
@@ -88,9 +90,9 @@ public class RR_DialogueTools_ActorManager : EditorWindow
         scrollPos2 = GUILayout.BeginScrollView(scrollPos2, GUILayout.Width(this.position.width - currentScrollViewWidth));
         GUILayout.Space(10);
         GUILayout.Label(tempName);
+        GUILayout.BeginHorizontal();
         for (int i = 0; i < tempExpression.Count; i++) {
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button(AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/RR-Thumbnail/Thumbnail-" + tempName + "," + tempExpression[i] + ".png"), GUILayout.Width(100), GUILayout.Height(100))) {
+            if (GUILayout.Button(AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/RR-Thumbnail/Thumbnail-" + tempName + "," + tempExpression[i] + ".png"), GUILayout.Width(150), GUILayout.Height(150))) {
                 if (mode != RR_ActorManagerMode.Preview) {
                     if (mode == RR_ActorManagerMode.Dialogue) {
                         rR_Narration.dialogues[dynamicIndex].actorName = tempName;
@@ -104,9 +106,12 @@ public class RR_DialogueTools_ActorManager : EditorWindow
                     Close();
                 }
             }
-            GUILayout.Label(tempExpression[i]);
-            GUILayout.EndHorizontal();
+            if ((i + 1f) / MAX_ROW == Math.Round((i + 1f) / MAX_ROW)) {
+                GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+            }
         }
+        GUILayout.EndHorizontal();
         GUILayout.EndScrollView();
         GUILayout.BeginHorizontal();
         if (tempActorRectData != null) {

@@ -113,14 +113,13 @@ public class RR_DialogueTools_MainEditor : EditorWindow
                 GUILayout.BeginVertical();
                 GUILayout.BeginHorizontal();
                 GUILayout.BeginVertical(GUILayout.Width(100));
-                GUILayout.Label(nameThumb);
-                if (GUILayout.Button(AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/RR-Thumbnail/Thumbnail-" + nameThumb + "," + expressionThumb + ".png"), GUILayout.Width(100), GUILayout.Height(100))) {
+                if (GUILayout.Button(AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/RR-Thumbnail/Thumbnail-" + nameThumb + "," + expressionThumb + ".png"), GUILayout.Width(150), GUILayout.Height(150))) {
                     int index = i;
                     OpenActorManagerWindow(i);
                 }
                 GUILayout.EndVertical();
                 Vector2 scrollPos3 = Vector2.zero;
-                scrollPos3 = GUILayout.BeginScrollView(scrollPos3, GUILayout.Width(320), GUILayout.Height(117));
+                scrollPos3 = GUILayout.BeginScrollView(scrollPos3, GUILayout.Width(320), GUILayout.Height(150));
                 rR_Narration.dialogues[i].dialogue = GUILayout.TextArea(rR_Narration.dialogues[i].dialogue, GUILayout.Width(300), GUILayout.ExpandHeight(true));
                 GUILayout.EndScrollView();
                 GUILayout.BeginVertical(GUILayout.Width(60));
@@ -145,6 +144,12 @@ public class RR_DialogueTools_MainEditor : EditorWindow
                 if (GUILayout.Button("Remove", GUILayout.Width(80))) rR_Narration.dialogues.RemoveAt(i);
                 GUILayout.EndVertical();
                 GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal(GUILayout.Width(100));
+                rR_Narration.dialogues[i].isInverted = EditorGUILayout.Toggle("Is Inverted: ", rR_Narration.dialogues[i].isInverted);
+                rR_Narration.dialogues[i].animationLoop = EditorGUILayout.Toggle("Loop Animation: ", rR_Narration.dialogues[i].animationLoop);
+                rR_Narration.dialogues[i].useShake = EditorGUILayout.Toggle("Use Shake: ", rR_Narration.dialogues[i].useShake);
+                rR_Narration.dialogues[i].useSilhouette = EditorGUILayout.Toggle("Use Silhouette: ", rR_Narration.dialogues[i].useSilhouette);
+                GUILayout.EndHorizontal();
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Position X: ", GUILayout.Width(60));
                 rR_Narration.dialogues[i].actorPosition.x = EditorGUILayout.FloatField(rR_Narration.dialogues[i].actorPosition.x, GUILayout.Width(60));
@@ -153,12 +158,7 @@ public class RR_DialogueTools_MainEditor : EditorWindow
                 GUILayout.Label("Actor Scale: ", GUILayout.Width(80));
                 rR_Narration.dialogues[i].scale = EditorGUILayout.FloatField(rR_Narration.dialogues[i].scale, GUILayout.Width(60));
                 GUILayout.EndHorizontal();
-                GUILayout.BeginHorizontal(GUILayout.Width(100));
-                rR_Narration.dialogues[i].isInverted = EditorGUILayout.Toggle("Is Inverted: ", rR_Narration.dialogues[i].isInverted);
-                rR_Narration.dialogues[i].animationLoop = EditorGUILayout.Toggle("Loop Animation: ", rR_Narration.dialogues[i].animationLoop);
-                rR_Narration.dialogues[i].useShake = EditorGUILayout.Toggle("Use Shake: ", rR_Narration.dialogues[i].useShake);
-                rR_Narration.dialogues[i].useSilhouette = EditorGUILayout.Toggle("Use Silhouette: ", rR_Narration.dialogues[i].useSilhouette);
-                GUILayout.EndHorizontal();
+                GUILayout.Space(20);
                 GUILayout.EndVertical();
             }
         GUILayout.EndScrollView();
