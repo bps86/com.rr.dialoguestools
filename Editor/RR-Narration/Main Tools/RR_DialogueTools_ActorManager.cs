@@ -125,6 +125,7 @@ public class RR_DialogueTools_ActorManager : EditorWindow
                 tempRectDataString += ";" + tempActorRectData.ActorScale.y.ToString();
                 tempRectDataString += ";" + tempActorRectData.ActorScale.z.ToString();
                 RR_DialogueTools_Functions.SaveFile(Application.dataPath + Path.AltDirectorySeparatorChar + "RR-Narration/Resources/RR-Actors-RectData/" + tempName + ".txt", tempRectDataString);
+                RR_EditorTools.Refresh_RR_DialogueTools();
             }
         }
         GUILayout.EndHorizontal();
