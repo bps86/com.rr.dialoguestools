@@ -18,6 +18,7 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
     private Vector2 scrollPos;
     private Vector2 scrollPos2;
     private bool sameTransitionDuration;
+    private bool loopAll;
     private bool resize = false;
     private float allDurationTransition;
     private float currentScrollViewWidth;
@@ -59,6 +60,7 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
         GUILayout.Label("Load your config here:");
         textAsset = EditorGUILayout.ObjectField(textAsset, typeof(TextAsset), true);
         if (textAsset != null && GUILayout.Button("Load")) {
+            loopAll = false;
             sameTransitionDuration = false;
             config = (TextAsset)textAsset;
             if (!System.String.IsNullOrEmpty(config.text)) {
@@ -108,6 +110,19 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
                     GUILayout.Label("Transition Duration: ");
                     allDurationTransition = EditorGUILayout.FloatField(allDurationTransition);
                     GUILayout.EndHorizontal();
+                }
+                GUILayout.BeginHorizontal(GUILayout.Width(150));
+                GUILayout.Label("Loop All Animation: ");
+                loopAll = EditorGUILayout.Toggle(loopAll);
+                GUILayout.EndHorizontal();
+                if (!loopAll) {
+                    if (GUILayout.Button("Clear Loop", GUILayout.Width(100))) {
+                        for (int i = 0; i < rR_DialogueTools_Visualization.visual.visualDatas.Count; i++) {
+                            for (int ii = 0; ii < rR_DialogueTools_Visualization.visual.visualDatas[i].actorName.Count; ii++) {
+                                rR_DialogueTools_Visualization.visual.visualDatas[i].isLooping[ii] = false;
+                            }
+                        }
+                    }
                 }
             }
             scrollPos2 = GUILayout.BeginScrollView(scrollPos2, GUILayout.Width(this.position.width - currentScrollViewWidth));
@@ -163,7 +178,11 @@ public class RR_DialogueTools_VisualEditor : EditorWindow
                         GUILayout.EndVertical();
                         GUILayout.Space(20);
                     }
-                    rR_DialogueTools_Visualization.visual.visualDatas[i].isLooping[ii] = EditorGUILayout.Toggle("Loop Animation: ", rR_DialogueTools_Visualization.visual.visualDatas[i].isLooping[ii]);
+                    if (loopAll) {
+                        rR_DialogueTools_Visualization.visual.visualDatas[i].isLooping[ii] = true;
+                    } else {
+                        rR_DialogueTools_Visualization.visual.visualDatas[i].isLooping[ii] = EditorGUILayout.Toggle("Loop Animation: ", rR_DialogueTools_Visualization.visual.visualDatas[i].isLooping[ii]);
+                    }
                     rR_DialogueTools_Visualization.visual.visualDatas[i].useSilhouette[ii] = EditorGUILayout.Toggle("Use Silhouette: ", rR_DialogueTools_Visualization.visual.visualDatas[i].useSilhouette[ii]);
                     GUILayout.EndVertical();
                 }

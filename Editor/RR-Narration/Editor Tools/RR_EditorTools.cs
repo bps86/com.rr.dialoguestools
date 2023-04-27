@@ -243,7 +243,15 @@ public class RR_EditorTools
         }
     }
     public static void SetStringTable(string _filename, string _fileData, StringTable stringTable) {
-        stringTable.AddEntry(_filename, _fileData);
+        if (System.String.IsNullOrEmpty(_fileData)) {
+            if (stringTable[_filename] == null) {
+                stringTable.AddEntry(_filename, _fileData);
+            } else {
+                Debug.Log("String Table Is Not Empty");
+            }
+        } else {
+            stringTable.AddEntry(_filename, _fileData);
+        }
         rrDialoguesSharedData = GetSharedTableData(rrDialoguesSharedData);
         EditorUtility.SetDirty(stringTable);
         EditorUtility.SetDirty(rrDialoguesSharedData);

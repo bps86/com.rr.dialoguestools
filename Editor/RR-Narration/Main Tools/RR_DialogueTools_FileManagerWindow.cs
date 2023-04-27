@@ -35,6 +35,17 @@ public class RR_DialogueTools_FileManagerWindow : EditorWindow
 
     void OnGUI() {
         GUILayout.BeginVertical();
+        switch (fileMode) {
+            case RR_DialogueTools_FileMode.New:
+                GUILayout.Label("New File");
+                break;
+            case RR_DialogueTools_FileMode.Open:
+                GUILayout.Label("Open File");
+                break;
+            case RR_DialogueTools_FileMode.Save:
+                GUILayout.Label("Save File");
+                break;
+        }
         GUILayout.Label("File Name");
         fileName = EditorGUILayout.TextField(fileName);
         RR_EditorTools.currentLocaleIndex = EditorGUILayout.Popup(RR_EditorTools.currentLocaleIndex, RR_EditorTools.locales);
@@ -61,12 +72,22 @@ public class RR_DialogueTools_FileManagerWindow : EditorWindow
             Directory.CreateDirectory("Assets/RR-Narration/Resources/RR-Dialogues/" + RR_EditorTools.currentLocale);
         }
         if (RR_EditorTools.currentLocaleIndex < RR_EditorTools.locales.Length - 1) {
-            RR_DialogueTools_Functions.NewFile("RR-Narration/Resources/RR-Dialogues/" + RR_EditorTools.currentLocale + "/" + fileName + ".txt");
+            if (!File.Exists("Assets/RR-Narration/Resources/RR-Dialogues/" + RR_EditorTools.currentLocale + "/" + fileName + ".txt")) {
+                RR_DialogueTools_Functions.NewFile("RR-Narration/Resources/RR-Dialogues/" + RR_EditorTools.currentLocale + "/" + fileName + ".txt");
+            } else {
+                Debug.Log("Local Dialogue with the same name already exist");
+            }
         }
         if (RR_EditorTools.currentLocaleIndex == RR_EditorTools.locales.Length - 1) {
-            RR_DialogueTools_Functions.NewFile("RR-Narration/Resources/RR-Dialogues/" + fileName + ".txt");
+            if (!File.Exists("Assets/RR-Narration/Resources/RR-Dialogues/" + fileName + ".txt")) {
+                RR_DialogueTools_Functions.NewFile("RR-Narration/Resources/RR-Dialogues/" + fileName + ".txt");
+            } else {
+                Debug.Log("Dialogue with the same name already exist");
+            }
         }
-        RR_EditorTools.CreateNewVisualAsset(fileName);
+        if (!File.Exists("Assets/RR-Narration/Resources/RR-Visual/" + fileName + ".json")) {
+            RR_EditorTools.CreateNewVisualAsset(fileName);
+        }
         RR_EditorTools.ToStringTable(fileName, "", RR_EditorTools.rrDialoguesTable);
         OpenFile();
         Close();
