@@ -23,8 +23,8 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     [SerializeField] private RectTransform shakingObject;
     [SerializeField] private RR_DialogueTools_AssetManager rR_DialogueTools_AssetManager;
     [SerializeField] private RR_DialogueTools_ExtraVisual rR_DialogueTools_ExtraVisual;
-    [SerializeField] private string currentDialogue;
     [SerializeField] private string defaultAnimation;
+    [SerializeField] private string currentDialogue;
     [SerializeField] private string tags;
     [SerializeField] private int index;
     [SerializeField] private int maxIndex;
@@ -82,6 +82,22 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         LoadNarration();
     }
 
+    public string GetCurrentDialogue() {
+        return currentDialogue;
+    }
+
+    public string GetTag() {
+        return tags;
+    }
+
+    public int GetIndex() {
+        return index;
+    }
+
+    public int GetMaxIndex() {
+        return maxIndex;
+    }
+
     public void SetTag(string tag) {
         this.tags = tag;
     }
@@ -107,6 +123,12 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         LoadDialogue(currentDialogue);
         if (refreshAfterLoad) {
             Refresh();
+        }
+    }
+
+    public void SkipNarration() {
+        if (EndDialogueEvent != null) {
+            EndDialogueEvent(currentDialogue, tags, maxIndex);
         }
     }
 
