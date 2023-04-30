@@ -60,6 +60,9 @@ public class RR_DialogueTools_Manager : MonoBehaviour
             rR_DialogueTools_AssetManager = RR_DialogueTools_AssetManager.Instance;
             rR_DialogueTools_AssetManager.LoadDialogueEvent = null;
         }
+        if (shakingObject != null) {
+            shakeDefaultPosition = shakingObject.anchoredPosition;
+        }
         if (rR_DialogueTools_ExtraVisual != null) {
             rR_DialogueTools_ExtraVisual.SetActorSpriteEvent += SetActorSprite;
             rR_DialogueTools_ExtraVisual.SetActorSpineEvent += SetActorSpine;
@@ -250,7 +253,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     private void ResetShakeObject() {
         if (shakingObject == null) return;
 
-        shakingObject.localPosition = shakeDefaultPosition;
+        shakingObject.anchoredPosition = shakeDefaultPosition;
         shakeProgressPosition = Vector3.zero;
         if (rR_Narration.dialogue.useShake) {
             shakeProgress = 0;
@@ -266,7 +269,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
             shakeProgress += ((1 / shakeDuration) * (360 * shakeTotal)) * Time.deltaTime;
             shakeProgressPosition.x = Mathf.Sin(shakeProgress * Mathf.Deg2Rad);
             shakeProgressPosition.y = Mathf.Sin(shakeProgress * Mathf.Deg2Rad);
-            shakingObject.localPosition = shakeDefaultPosition + (shakeProgressPosition * shakeRange);
+            shakingObject.anchoredPosition = shakeDefaultPosition + (shakeProgressPosition * shakeRange);
         }
     }
 
