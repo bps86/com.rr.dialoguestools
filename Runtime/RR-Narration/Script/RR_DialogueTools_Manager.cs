@@ -264,12 +264,15 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         if (shakingObject == null) return;
         if (rR_Narration.dialogue == null) return;
         if (!rR_Narration.dialogue.useShake) return;
+        if (shakeProgress >= 360 * shakeTotal) return;
 
+        shakeProgress += ((1 / shakeDuration) * (360 * shakeTotal)) * Time.deltaTime;
         if (shakeProgress < 360 * shakeTotal) {
-            shakeProgress += ((1 / shakeDuration) * (360 * shakeTotal)) * Time.deltaTime;
             shakeProgressPosition.x = Mathf.Sin(shakeProgress * Mathf.Deg2Rad);
             shakeProgressPosition.y = Mathf.Sin(shakeProgress * Mathf.Deg2Rad);
             shakingObject.anchoredPosition = shakeDefaultPosition + (shakeProgressPosition * shakeRange);
+        } else {
+            shakingObject.anchoredPosition = shakeDefaultPosition;
         }
     }
 
