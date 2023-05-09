@@ -36,6 +36,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     [SerializeField] private float shakeRange;
     [SerializeField] private bool autoInitialize;
     [SerializeField] private bool refreshAfterLoad;
+    [SerializeField] private bool disableOverrideTransform;
     [SerializeField] private bool useDim;
     [SerializeField] private bool useBeepAudio;
     [SerializeField] private bool useGeneralAudio;
@@ -277,8 +278,13 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     }
 
     private void SetActor(RR_Dialogue dialogue) {
-        SetActorSprite(dialogue.actorName, dialogue.expression, spriteForActor, dialogue.actorPosition, dialogue.actorScale, dialogue.useSilhouette);
-        SetActorSpine(dialogue.actorName, dialogue.expression, skeletonGraphicsForActor, dialogue.actorPosition, dialogue.actorScale, dialogue.useSilhouette, dialogue.animationLoop);
+        if (!disableOverrideTransform) {
+            SetActorSprite(dialogue.actorName, dialogue.expression, spriteForActor, dialogue.actorPosition, dialogue.actorScale, dialogue.useSilhouette);
+            SetActorSpine(dialogue.actorName, dialogue.expression, skeletonGraphicsForActor, dialogue.actorPosition, dialogue.actorScale, dialogue.useSilhouette, dialogue.animationLoop);
+        } else {
+            SetActorSprite(dialogue.actorName, dialogue.expression, spriteForActor, spriteForActor.rectTransform.anchoredPosition, spriteForActor.rectTransform.localScale, dialogue.useSilhouette);
+            SetActorSpine(dialogue.actorName, dialogue.expression, skeletonGraphicsForActor, skeletonGraphicsForActor.rectTransform.anchoredPosition, skeletonGraphicsForActor.rectTransform.localScale, dialogue.useSilhouette, dialogue.animationLoop);
+        }
     }
     private void SetActorSprite(string actorName, string animationName, Image actorSprite, Vector3 targetPos, Vector3 targetScale, bool usingSilhouette) {
         actorSprite.sprite = rR_DialogueTools_AssetManager.GetActorSprite(actorName, animationName);
