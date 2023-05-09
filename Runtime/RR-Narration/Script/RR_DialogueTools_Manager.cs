@@ -102,6 +102,10 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         return maxIndex;
     }
 
+    public bool OverrideTransform() {
+        return !disableOverrideTransform;
+    }
+
     public void SetTag(string tag) {
         this.tags = tag;
     }
@@ -112,6 +116,10 @@ public class RR_DialogueTools_Manager : MonoBehaviour
 
     public void SetMaxIndex(int maxIndex) {
         this.maxIndex = maxIndex;
+    }
+
+    public void SetOverrideTransform(bool toggle) {
+        disableOverrideTransform = !toggle;
     }
 
     private void Update() {
