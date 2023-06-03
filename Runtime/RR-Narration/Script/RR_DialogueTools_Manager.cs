@@ -86,6 +86,9 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         LoadNarration();
     }
 
+    public SkeletonGraphic GetSkeletonGraphicForActor() {
+        return skeletonGraphicsForActor;
+    }
     public string GetCurrentDialogue() {
         return currentDialogue;
     }
@@ -104,6 +107,10 @@ public class RR_DialogueTools_Manager : MonoBehaviour
 
     public bool OverrideTransform() {
         return !disableOverrideTransform;
+    }
+
+    public void SetActorSkeletonGraphics(SkeletonGraphic skeletonGraphic) {
+        skeletonGraphicsForActor = skeletonGraphic;
     }
 
     public void SetTag(string tag) {
