@@ -41,6 +41,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     [SerializeField] private bool useBeepAudio;
     [SerializeField] private bool useGeneralAudio;
     [SerializeField] private bool useLocalization;
+    [SerializeField] private bool useExtraVisual;
     private RR_Narration rR_Narration;
     private Vector3 shakeDefaultPosition;
     private Vector3 shakeProgressPosition;
@@ -64,7 +65,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         if (shakingObject != null) {
             shakeDefaultPosition = shakingObject.anchoredPosition;
         }
-        if (rR_DialogueTools_ExtraVisual != null) {
+        if (rR_DialogueTools_ExtraVisual != null && useExtraVisual) {
             rR_DialogueTools_ExtraVisual.SetActorSpriteEvent += SetActorSprite;
             rR_DialogueTools_ExtraVisual.SetActorSpineEvent += SetActorSpine;
             rR_DialogueTools_ExtraVisual.Init();
@@ -109,6 +110,10 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         return !disableOverrideTransform;
     }
 
+    public bool GetUseExtraVisual() {
+        return useExtraVisual;
+    }
+
     public void SetActorSkeletonGraphics(SkeletonGraphic skeletonGraphic) {
         skeletonGraphicsForActor = skeletonGraphic;
     }
@@ -127,6 +132,10 @@ public class RR_DialogueTools_Manager : MonoBehaviour
 
     public void SetOverrideTransform(bool toggle) {
         disableOverrideTransform = !toggle;
+    }
+
+    public void SetUseExtraVisual(bool toggle) {
+        useExtraVisual = toggle;
     }
 
     private void Update() {
@@ -159,7 +168,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
 
     public void LoadData(string tag, int index) {
         rR_Narration.LoadDialogueData(tag, index);
-        if (rR_DialogueTools_ExtraVisual != null) {
+        if (rR_DialogueTools_ExtraVisual != null && useExtraVisual) {
             rR_DialogueTools_ExtraVisual.LoadVisualData(tags, index);
         }
     }
@@ -189,6 +198,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     }
 
     private void SetVisualAsset(string dialogueTitle) {
+        if (useExtraVisual) return;
         if (rR_DialogueTools_ExtraVisual == null) return;
 
         rR_DialogueTools_ExtraVisual.LoadVisualAsset(rR_DialogueTools_AssetManager.GetVisualAsset(dialogueTitle));
