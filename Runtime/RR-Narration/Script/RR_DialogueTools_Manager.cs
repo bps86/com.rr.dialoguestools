@@ -198,7 +198,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     }
 
     private void SetVisualAsset(string dialogueTitle) {
-        if (useExtraVisual) return;
+        if (!useExtraVisual) return;
         if (rR_DialogueTools_ExtraVisual == null) return;
 
         rR_DialogueTools_ExtraVisual.LoadVisualAsset(rR_DialogueTools_AssetManager.GetVisualAsset(dialogueTitle));
