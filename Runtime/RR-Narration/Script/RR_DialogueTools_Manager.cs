@@ -266,8 +266,10 @@ public class RR_DialogueTools_Manager : MonoBehaviour
 
     private void SetDialogueText() {
         _name.text = rR_Narration.dialogue.displayName;
-        beepAudioSource.clip = null;
-        beepAudioSource.clip = rR_DialogueTools_AssetManager.GetActorBeep(rR_Narration.dialogue.actorName);
+        if (useBeepAudio && beepAudioSource != null) {
+            beepAudioSource.clip = null;
+            beepAudioSource.clip = rR_DialogueTools_AssetManager.GetActorBeep(rR_Narration.dialogue.actorName);
+        }
         if (textSpeed > 0) {
             TextSpeed();
         } else {
