@@ -116,4 +116,8 @@ public class RR_DialogueTools_AssetManager : MonoBehaviour
     public bool IsUsingAudio() {
         return useGeneralAudio;
     }
+
+    public bool IsSingleton() {
+        return useAsSingleton;
+    }
 }
