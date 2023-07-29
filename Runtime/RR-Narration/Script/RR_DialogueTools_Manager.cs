@@ -75,7 +75,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         }
         if (rR_DialogueTools_AssetManager != null) {
             rR_DialogueTools_AssetManager.LoadDialogueEvent += LoadNarration;
-            rR_DialogueTools_AssetManager.Init();
+            rR_DialogueTools_AssetManager.Initialize();
         }
     }
 

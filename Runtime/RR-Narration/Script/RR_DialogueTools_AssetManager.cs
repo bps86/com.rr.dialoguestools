@@ -6,6 +6,7 @@ using Spine.Unity;
 
 public class RR_DialogueTools_AssetManager : MonoBehaviour
 {
+    public Action AssetLoadedEvent;
     public Action LoadDialogueEvent;
 
     public static RR_DialogueTools_AssetManager Instance;
@@ -16,21 +17,21 @@ public class RR_DialogueTools_AssetManager : MonoBehaviour
     [SerializeField] private bool useGeneralAudio;
     private RR_DialogueTools_AssetManagement assetManagement;
 
-    private void Awake() {
+    public void Init() {
         if (useAsSingleton) {
             if (Instance == null) {
                 Instance = this;
                 DontDestroyOnLoad(this);
-                if (autoInitialize) {
-                    Init();
-                }
+                Initialize();
             } else {
                 Destroy(this);
             }
+        } else {
+            Initialize();
         }
     }
 
-    public void Init() {
+    public void Initialize() {
         if (assetManagement == null) {
             assetManagement = new RR_DialogueTools_AssetManagement();
         }
@@ -46,8 +47,9 @@ public class RR_DialogueTools_AssetManager : MonoBehaviour
     private IEnumerator Load() {
         StartCoroutine(assetManagement.LoadAssets(useGeneralAudio));
         yield return new WaitUntil(() => assetManagement.assetLoaded);
-        if (LoadDialogueEvent != null && autoLoadDialogue) {
-            LoadDialogueEvent();
+        AssetLoadedEvent?.Invoke();
+        if (autoLoadDialogue) {
+            LoadDialogueEvent?.Invoke();
         }
     }
 
