@@ -90,6 +90,11 @@ public class RR_DialogueTools_Manager : MonoBehaviour
     public SkeletonGraphic GetSkeletonGraphicForActor() {
         return skeletonGraphicsForActor;
     }
+
+    public RR_Dialogue GetCurrentNarrationDialogue() {
+        return rR_Narration.dialogue;
+    }
+
     public string GetCurrentDialogue() {
         return currentDialogue;
     }
