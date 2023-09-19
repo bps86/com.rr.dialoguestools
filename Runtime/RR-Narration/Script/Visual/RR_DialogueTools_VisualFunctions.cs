@@ -14,6 +14,7 @@ public class RR_DialogueTools_FunctionsVisual
     public static SkeletonGraphic SetActorSkeletonGraphics(SkeletonGraphic actorSkeletonGraphics, string animationName, Vector3 targetPosition, Vector3 targetScale, Color selectedColor, bool isLoop) {
         actorSkeletonGraphics.startingAnimation = animationName;
         actorSkeletonGraphics.startingLoop = isLoop;
+        actorSkeletonGraphics.layoutScaleMode = SkeletonGraphic.LayoutMode.FitInParent;
         actorSkeletonGraphics.rectTransform.anchoredPosition = targetPosition;
         actorSkeletonGraphics.rectTransform.localScale = targetScale;
         actorSkeletonGraphics.color = selectedColor;
