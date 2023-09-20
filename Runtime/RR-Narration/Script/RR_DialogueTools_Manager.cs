@@ -311,11 +311,19 @@ public class RR_DialogueTools_Manager : MonoBehaviour
 
     private void SetActor(RR_Dialogue dialogue) {
         if (!disableOverrideTransform) {
-            SetActorSprite(dialogue.actorName, dialogue.expression, spriteForActor, dialogue.actorPosition, dialogue.actorScale, dialogue.useSilhouette);
-            SetActorSpine(dialogue.actorName, dialogue.expression, skeletonGraphicsForActor, dialogue.actorPosition, dialogue.actorScale, dialogue.useSilhouette, dialogue.animationLoop);
+            if (spriteForActor != null) {
+                SetActorSprite(dialogue.actorName, dialogue.expression, spriteForActor, dialogue.actorPosition, dialogue.actorScale, dialogue.useSilhouette);
+            }
+            if (skeletonGraphicsForActor != null) {
+                SetActorSpine(dialogue.actorName, dialogue.expression, skeletonGraphicsForActor, dialogue.actorPosition, dialogue.actorScale, dialogue.useSilhouette, dialogue.animationLoop);
+            }
         } else {
-            SetActorSprite(dialogue.actorName, dialogue.expression, spriteForActor, spriteForActor.rectTransform.anchoredPosition, spriteForActor.rectTransform.localScale, dialogue.useSilhouette);
-            SetActorSpine(dialogue.actorName, dialogue.expression, skeletonGraphicsForActor, skeletonGraphicsForActor.rectTransform.anchoredPosition, skeletonGraphicsForActor.rectTransform.localScale, dialogue.useSilhouette, dialogue.animationLoop);
+            if (spriteForActor != null) {
+                SetActorSprite(dialogue.actorName, dialogue.expression, spriteForActor, spriteForActor.rectTransform.anchoredPosition, spriteForActor.rectTransform.localScale, dialogue.useSilhouette);
+            }
+            if (skeletonGraphicsForActor != null) {
+                SetActorSpine(dialogue.actorName, dialogue.expression, skeletonGraphicsForActor, skeletonGraphicsForActor.rectTransform.anchoredPosition, skeletonGraphicsForActor.rectTransform.localScale, dialogue.useSilhouette, dialogue.animationLoop);
+            }
         }
     }
     private void SetActorSprite(string actorName, string animationName, Image actorSprite, Vector3 targetPos, Vector3 targetScale, bool usingSilhouette) {
