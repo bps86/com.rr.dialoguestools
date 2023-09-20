@@ -128,7 +128,7 @@ public class RR_DialogueTools_ExtraVisual : MonoBehaviour
         for (int i = 0; i < actorCount; i++) {
             images[i].rectTransform.localPosition = Vector3.Lerp(startPos[i], endPos[i], currentTransition);
             images[i].rectTransform.localScale = Vector3.Lerp(startScale[i], endScale[i], currentTransition);
-            skeletonGraphics[i].rectTransform.localPosition = Vector3.Lerp(startPos[i], endPos[i], currentTransition);
+            skeletonGraphics[i].rectTransform.anchoredPosition = Vector3.Lerp(startPos[i], endPos[i], currentTransition);
             skeletonGraphics[i].rectTransform.localScale = Vector3.Lerp(startScale[i], endScale[i], currentTransition);
             if (useColorTransition) {
                 skeletonGraphics[i].color = Color.Lerp(startColor[i], endColor[i], currentTransition);
