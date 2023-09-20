@@ -213,7 +213,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         SetDialogueText();
         ResetShakeObject();
         RunGeneralAudio();
-        if (rR_DialogueTools_ExtraVisual == null) {
+        if (rR_DialogueTools_ExtraVisual == null && useExtraVisual) {
             SetActor(rR_Narration.dialogue);
         } else {
             rR_DialogueTools_ExtraVisual.ChangeAnimPos(rR_Narration.dialogue);
