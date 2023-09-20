@@ -213,10 +213,10 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         SetDialogueText();
         ResetShakeObject();
         RunGeneralAudio();
-        if (rR_DialogueTools_ExtraVisual == null && useExtraVisual) {
-            SetActor(rR_Narration.dialogue);
-        } else {
+        if (rR_DialogueTools_ExtraVisual != null && useExtraVisual) {
             rR_DialogueTools_ExtraVisual.ChangeAnimPos(rR_Narration.dialogue);
+        } else {
+            SetActor(rR_Narration.dialogue);
         }
         if (MidDialogueEvent != null) {
             MidDialogueEvent(currentDialogue, tags, index);
