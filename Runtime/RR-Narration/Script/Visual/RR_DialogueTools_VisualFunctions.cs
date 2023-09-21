@@ -28,11 +28,18 @@ public class RR_DialogueTools_FunctionsVisual
     }
 
     public static Vector3 GetAdjustedActorPos(Vector3 targetPos, Vector3 targetScale, Vector3 actorPivot) {
+        Debug.Log("GetAdjusted Pos");
+        Debug.Log("target pos: " + targetPos);
+        Debug.Log("target scale: " + targetScale);
+        Debug.Log("actor pivot: " + actorPivot);
         return targetPos + (Vector3.Scale(actorPivot, targetScale));
     }
 
-    public static Vector3 GetAdjustedActorScale(Vector3 targetPos, Vector3 actorScale) {
-        return Vector3.Scale(targetPos, actorScale);
+    public static Vector3 GetAdjustedActorScale(Vector3 targetScale, Vector3 actorScale) {
+        Debug.Log("GetAdjusted Scale");
+        Debug.Log("target scale: " + targetScale);
+        Debug.Log("actor scale: " + actorScale);
+        return Vector3.Scale(targetScale, actorScale);
     }
 
     private static void ResetAnim(SkeletonGraphic skeletonGraphic, string defaultAnimation) {

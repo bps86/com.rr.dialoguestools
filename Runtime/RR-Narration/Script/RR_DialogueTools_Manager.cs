@@ -375,6 +375,15 @@ public class RR_DialogueTools_Manager : MonoBehaviour
         } else {
             skeletonGraphic.gameObject.SetActive(false);
         }
+        Debug.Log("Actor Spine Log");
+        Debug.Log("Position: " + skeletonGraphic.rectTransform.position);
+        Debug.Log("LocalPosition: " + skeletonGraphic.rectTransform.localPosition);
+        Debug.Log("AnchoredPosition: " + skeletonGraphic.rectTransform.anchoredPosition);
+        Debug.Log("LocalScale: " + skeletonGraphic.rectTransform.localScale);
+        Debug.Log("Width: " + skeletonGraphic.rectTransform.sizeDelta.x);
+        Debug.Log("Height: " + skeletonGraphic.rectTransform.sizeDelta.y);
+        Debug.Log("Game width: " + Screen.currentResolution.width);
+        Debug.Log("Game height: " + Screen.currentResolution.height);
     }
 
     private Vector3 GetActorPos(Vector3 targetPos, Vector3 targetScale, string actorName) {
