@@ -16,6 +16,7 @@ public class RR_DialogueTools_RectData
 
     public RR_DialogueTools_RectData(string[] rectData = null) {
         if (rectData != null) {
+            Debug.Log("RectData is available, loading: " + rectData);
             ActorPivot = new Vector3(
                 x: float.Parse(rectData[X_POSITION_INDEX]),
                 y: float.Parse(rectData[Y_POSITION_INDEX]),
@@ -27,6 +28,7 @@ public class RR_DialogueTools_RectData
                 z: float.Parse(rectData[Z_SCALE_INDEX])
             );
         } else {
+            Debug.Log("RectData is null, loading default rectData");
             ActorPivot = Vector3.zero;
             ActorScale = Vector3.one;
         }

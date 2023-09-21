@@ -376,6 +376,7 @@ public class RR_DialogueTools_Manager : MonoBehaviour
             skeletonGraphic.gameObject.SetActive(false);
         }
         Debug.Log("Actor Spine Log");
+        Debug.Log("tags: " + tags + ", index: " + index);
         Debug.Log("Position: " + skeletonGraphic.rectTransform.position);
         Debug.Log("LocalPosition: " + skeletonGraphic.rectTransform.localPosition);
         Debug.Log("AnchoredPosition: " + skeletonGraphic.rectTransform.anchoredPosition);
