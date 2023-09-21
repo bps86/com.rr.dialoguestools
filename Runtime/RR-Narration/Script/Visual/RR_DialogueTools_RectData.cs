@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 
 public class RR_DialogueTools_RectData
@@ -18,14 +19,14 @@ public class RR_DialogueTools_RectData
         if (rectData != null) {
             Debug.Log("RectData is available, loading: " + rectData);
             ActorPivot = new Vector3(
-                x: float.Parse(rectData[X_POSITION_INDEX]),
-                y: float.Parse(rectData[Y_POSITION_INDEX]),
-                z: float.Parse(rectData[Z_POSITION_INDEX])
+                x: float.Parse(rectData[X_POSITION_INDEX], CultureInfo.InvariantCulture),
+                y: float.Parse(rectData[Y_POSITION_INDEX], CultureInfo.InvariantCulture),
+                z: float.Parse(rectData[Z_POSITION_INDEX], CultureInfo.InvariantCulture)
             );
             ActorScale = new Vector3(
-                x: float.Parse(rectData[X_SCALE_INDEX]),
-                y: float.Parse(rectData[Y_SCALE_INDEX]),
-                z: float.Parse(rectData[Z_SCALE_INDEX])
+                x: float.Parse(rectData[X_SCALE_INDEX], CultureInfo.InvariantCulture),
+                y: float.Parse(rectData[Y_SCALE_INDEX], CultureInfo.InvariantCulture),
+                z: float.Parse(rectData[Z_SCALE_INDEX], CultureInfo.InvariantCulture)
             );
         } else {
             Debug.Log("RectData is null, loading default rectData");
